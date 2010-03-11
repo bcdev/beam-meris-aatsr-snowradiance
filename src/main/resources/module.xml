@@ -1,0 +1,62 @@
+<module>
+    <manifestVersion>1.0.0</manifestVersion>
+    <symbolicName>snowradiance</symbolicName>
+    <version>1.0-SNAPSHOT</version>
+    <name>snowradiance</name>
+    <description>BEAM GPF Module snowradiance</description>
+
+    <dependency>
+        <module>beam-gpf</module>
+    </dependency>
+    <dependency>
+        <module>beam-envisat-reader</module>
+    </dependency>
+    <dependency>
+        <module>beam-meris-brr</module>
+    </dependency>
+     <dependency>
+        <module>beam-meris-sdr</module>
+    </dependency>
+     <dependency>
+        <module>beam-meris-l2auxdata</module>
+    </dependency>
+     <dependency>
+        <module>lib-netcdf</module>
+    </dependency>
+    <dependency>
+        <module>beam-visat</module>
+        <optional>true</optional>
+    </dependency>
+
+    <categories>Processor,MERIS,AATSR</categories>
+
+    <extension point="beam-ui:actions">
+        <action>
+            <id>snowRadiance</id>
+            <class>org.esa.beam.visat.actions.ActionGroup</class>
+            <text>Snow Radiance (MERIS/(A)ATSR) </text>
+            <shortDescr>Snow Radiance Retrieval</shortDescr>
+            <longDescr>Performs a snow radiance retrieval on the selected Product</longDescr>
+            <mnemonic/>
+            <parent>tools</parent>
+        </action>
+       <action>
+            <id>snowRadianceFubProcessor</id>
+            <class>org.esa.beam.snowradiance.ui.SnowTemperatureEmissivityAction</class>
+            <text>Retrieve snow temperature...</text>
+            <shortDescr>snowTemp</shortDescr>
+            <mnemonic/>
+            <parent>snowRadiance</parent>
+            <helpID>snowRadianceFubProcessor</helpID>
+        </action>
+        <action>
+            <id>snowGrainsProcessor</id>
+            <class>org.esa.beam.snowradiance.ui.SnowGrainSizePollutionAction</class>
+            <text>Retrieve snow grain size and pollution...</text>
+            <shortDescr>snowGrains</shortDescr>
+            <mnemonic/>
+            <parent>snowRadiance</parent>
+            <helpID>snowGrainsProcessor</helpID>
+        </action>
+    </extension>
+</module>

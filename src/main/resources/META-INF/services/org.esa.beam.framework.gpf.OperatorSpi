@@ -1,0 +1,3 @@
+org.esa.beam.snowradiance.operator.SnowRadianceMasterOp$Spi
+org.esa.beam.snowradiance.operator.SnowTemperatureEmissivityOp$Spi
+org.esa.beam.snowradiance.operator.SnowGrainSizePollutionOp$Spi
