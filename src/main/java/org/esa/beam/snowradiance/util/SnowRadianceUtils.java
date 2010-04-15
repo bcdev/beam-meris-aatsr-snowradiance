@@ -32,7 +32,7 @@ public class SnowRadianceUtils {
                }
            }
         // special boundary case:
-        if (x == array[array.length-1] && nearestValueIndex == -1) {
+        if (x >= array[array.length-1] && nearestValueIndex == -1) {
             nearestValueIndex = array.length-1;
         }
 
@@ -52,7 +52,7 @@ public class SnowRadianceUtils {
             }
         }
         // special boundary case:
-        if (x == array[0] && nearestValueIndex == -1) {
+        if (x <= array[0] && nearestValueIndex == -1) {
             nearestValueIndex = 0;
         }
 

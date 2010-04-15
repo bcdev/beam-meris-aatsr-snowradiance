@@ -76,12 +76,6 @@ public class SnowRadianceMasterOp extends Operator {
                label = SnowRadianceConstants.LUT_PATH_PARAM_LABEL)
     private String lutPath;
 
-//    @Parameter(alias = SnowRadianceConstants.LUT_PATH_PARAM_NAME,
-//               defaultValue = SnowRadianceConstants.LUT_PATH_PARAM_DEFAULT,
-//               description = SnowRadianceConstants.LUT_PATH_PARAM_DESCRIPTION,
-//               label = SnowRadianceConstants.LUT_PATH_PARAM_LABEL)
-//    private String fubLutPath;
-
 
     public void initialize() throws OperatorException {
 

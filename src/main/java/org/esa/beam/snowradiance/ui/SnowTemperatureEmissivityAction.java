@@ -4,6 +4,7 @@ import org.esa.beam.framework.ui.command.CommandEvent;
 import org.esa.beam.framework.gpf.ui.DefaultSingleTargetProductDialog;
 import org.esa.beam.visat.actions.AbstractVisatAction;
 
+import javax.media.jai.JAI;
 import java.awt.Dimension;
 
 /**
@@ -15,6 +16,7 @@ import java.awt.Dimension;
 public class SnowTemperatureEmissivityAction extends AbstractVisatAction {
     @Override
     public void actionPerformed(CommandEvent event) {
+//        JAI.getDefaultInstance().getTileScheduler().setParallelism(1);
         final DefaultSingleTargetProductDialog productDialog = new DefaultSingleTargetProductDialog(
                 "SnowRadiance.temperature", getAppContext(), "Snow Temperature Retrieval", "");
 

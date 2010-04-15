@@ -16,6 +16,7 @@ package org.esa.beam.snowradiance.operator;
 
 import com.bc.ceres.core.ProgressMonitor;
 import com.bc.jnn.JnnException;
+import com.bc.jnn.JnnNet;
 import org.esa.beam.framework.datamodel.*;
 import org.esa.beam.framework.gpf.Operator;
 import org.esa.beam.framework.gpf.OperatorException;
@@ -115,23 +116,13 @@ public class SnowTemperatureEmissivityOp extends Operator {
     public static final int FLAG_SNOW = 2;
     public static final int FLAG_CLOUD = 4;
 
-    private LookupTable[][][] rtmLookupTables;
+    private LookupTable[][] rtmLookupTables;
 
     private static String productName = "SNOWRADIANCE PRODUCT";
     private static String productType = "SNOWRADIANCE PRODUCT";
 
-    private int nWvLut;
-    private int nEmiLut;
-    private int nTsfcLut;
-    private int nViewLut;
-
-    private float[][] rtmUpperSingle;    // NUMBER_ATMOSPHERIC_PROFILES,  NUMBER_AATSR_WVL (4, 2)
-    private float[][] rtmLowerSingle;
-    private float[][] rtm;
-
-    private double[] tsfcLut;
-
-    private SnowTemperatureEmissivityRetrieval snowTemperatureRetrieval;
+    private double[][][] tsfcLut;
+    private double[] tLowestLayer = new double[SnowRadianceConstants.NUMBER_ATMOSPHERIC_PROFILES];
 
     private static float NDSI_THRESH_CLOUD_LOWER = 0.2f;
     private static float NDSI_THRESH_SNOW_LOWER = 0.6f;
@@ -177,29 +168,16 @@ public class SnowTemperatureEmissivityOp extends Operator {
         ProductUtils.copyMetadata(sourceProduct, targetProduct);
         ProductUtils.copyFlagBands(sourceProduct, targetProduct);
 
-        snowTemperatureRetrieval = new SnowTemperatureEmissivityRetrieval();
-
         try {
-            snowTemperatureRetrieval.loadSnowRadianceAuxData();
-//            final URL url = getClass().getResource("");
-//            String lutPath = URLDecoder.decode(url.getPath(), "UTF-8");
-            rtmLookupTables = SnowRadianceAuxData.createRtmOceanLookupTables(lutPath);
+            rtmLookupTables = SnowRadianceAuxData.createRtmLookupTables(lutPath);
+            tsfcLut = SnowRadianceAuxData.getTsfcFromLookupTables(lutPath);
+            for (int i=0; i<SnowRadianceConstants.NUMBER_ATMOSPHERIC_PROFILES; i++) {
+                tLowestLayer[i] = tsfcLut[i][0][24];
+            }
         } catch (IOException e) {
             throw new OperatorException("Failed to read RTM lookup tables:\n" + e.getMessage(), e);
-        } catch (JnnException e) {
-            throw new OperatorException("Failed to read WV NN:\n" + e.getMessage(), e);
         }
 
-        nWvLut = rtmLookupTables[0][0][0].getDimensions()[3].getSequence().length;
-        nEmiLut = rtmLookupTables[0][0][0].getDimensions()[2].getSequence().length;
-        nTsfcLut = rtmLookupTables[0][0][0].getDimensions()[1].getSequence().length;
-        nViewLut = rtmLookupTables[0][0][0].getDimensions()[0].getSequence().length;
-
-        tsfcLut = rtmLookupTables[0][0][0].getDimensions()[1].getSequence(); // same array for all LUTs
-
-        rtmUpperSingle = new float[SnowRadianceConstants.NUMBER_ATMOSPHERIC_PROFILES][SnowRadianceConstants.NUMBER_AATSR_WVL];
-        rtmLowerSingle = new float[SnowRadianceConstants.NUMBER_ATMOSPHERIC_PROFILES][SnowRadianceConstants.NUMBER_AATSR_WVL];
-        rtm = new float[SnowRadianceConstants.NUMBER_ATMOSPHERIC_PROFILES][SnowRadianceConstants.NUMBER_AATSR_WVL];
     }
 
 
@@ -321,6 +299,15 @@ public class SnowTemperatureEmissivityOp extends Operator {
             return;
         }
 
+        JnnNet neuralNetWv;
+        try {
+            neuralNetWv = SnowRadianceAuxData.getInstance().loadNeuralNet(SnowRadianceAuxData.NEURAL_NET_WV_OCEAN_MERIS_FILE_NAME);
+        } catch (IOException e) {
+            throw new OperatorException("Failed to read WV neural net:\n" + e.getMessage(), e);
+        } catch (JnnException e) {
+            throw new OperatorException("Failed to load WV neural net:\n" + e.getMessage(), e);
+        }
+
         Rectangle rectangle = targetTile.getRectangle();
 
         Tile zonalWindTile = getSourceTile(sourceProduct.getTiePointGrid("zonal_wind"), rectangle, pm);
@@ -361,14 +348,14 @@ public class SnowTemperatureEmissivityOp extends Operator {
                 final float aatsrBt11 = aatsrBTNadir1100Tile.getSampleFloat(x, y);
                 final float aatsrBt12 = aatsrBTNadir1200Tile.getSampleFloat(x, y);
 
-                if (targetBand.getName().equals(CLOUDICESNOW_BAND_NAME) && x == 580 && y == 670) {
-                    System.out.println("halt");
-                }
+//                if (targetBand.getName().equals(CLOUDICESNOW_BAND_NAME) && x == 580 && y == 670) {
+//                    System.out.println("halt");
+//                }
 
                 if (aatsrBt11 > 0.0 && aatsrBt12 > 0.0 && !(aatsrBt11 == Float.NaN) && !(aatsrBt12 == Float.NaN)) {
 
-                     if (targetBand.getName().equals(NDSI_BAND_NAME)) {
-                        boolean isCloud = cloudFlags.getSampleBit(x, y, CloudProbabilityOp.FLAG_CLOUDY);
+                    boolean isCloud = cloudFlags.getSampleBit(x, y, CloudProbabilityOp.FLAG_CLOUDY);
+                    if (targetBand.getName().equals(NDSI_BAND_NAME)) {
                         if (!isCloud) {
                             float aatsr865 = aatsrReflecNadir870Tile.getSampleFloat(x, y);
                             float aatsr1610 = aatsrReflecNadir1600Tile.getSampleFloat(x, y);
@@ -378,7 +365,7 @@ public class SnowTemperatureEmissivityOp extends Operator {
                             targetTile.setSample(x, y, -1.0f);
                         }
                     } else if (targetBand.getName().equals(CLOUDICESNOW_BAND_NAME)) {
-//                         boolean isCloud = cloudFlags.getSampleBit(x, y, CloudProbabilityOp.FLAG_CLOUDY);
+                        // cloud, ice, snow retrieval using NDSI thresholds
 //                         if (!isCloud) {
                              targetTile.setSample(x, y, FLAG_UNCERTAIN);
                              float aatsr865 = aatsrReflecNadir870Tile.getSampleFloat(x, y);
@@ -409,33 +396,36 @@ public class SnowTemperatureEmissivityOp extends Operator {
 //                         }
                     } else {
                         // 3.2.3 Calculation of water vapour
-                        final float zonalWind = zonalWindTile.getSampleFloat(x, y);
-                        final float meridWind = meridWindTile.getSampleFloat(x, y);
                         float merisViewAzimuth = vaMerisTile.getSampleFloat(x, y);
                         float merisSunAzimuth = saMerisTile.getSampleFloat(x, y);
-                        float merisAzimuthDifference = snowTemperatureRetrieval.removeAzimuthDifferenceAmbiguity(merisViewAzimuth,
+                        final float zonalWind = zonalWindTile.getSampleFloat(x, y);
+                        final float meridWind = meridWindTile.getSampleFloat(x, y);
+                        float merisAzimuthDifference = SnowTemperatureEmissivityRetrieval.removeAzimuthDifferenceAmbiguity(merisViewAzimuth,
                                                                                                                  merisSunAzimuth);
                         final float merisViewZenith = vzMerisTile.getSampleFloat(x, y);
                         final float merisSunZenith = szMerisTile.getSampleFloat(x, y);
                         final float merisRad14 = merisRad14Tile.getSampleFloat(x, y);
                         final float merisRad15 = merisRad15Tile.getSampleFloat(x, y);
-                        float waterVapourColumn = snowTemperatureRetrieval.computeWaterVapour(zonalWind, meridWind, merisAzimuthDifference,
-                                                                                              merisViewZenith, merisSunZenith, merisRad14, merisRad15);
+//                        float waterVapourColumn = SnowTemperatureEmissivityRetrieval.computeWaterVapour(neuralNetWv, zonalWind, meridWind, merisAzimuthDifference,
+//                                                                                              merisViewZenith, merisSunZenith, merisRad14, merisRad15);
+                        float waterVapourColumn = 0.3f; // simplification, might be sufficient (RP, 2010/04/14)
 
                         // 3.2.4 temperature retrieval
-
 
                         final float aatsrViewElevationNadir = veAatsrNadirTile.getSampleFloat(x, y);
                         final float viewZenith = 90.0f - aatsrViewElevationNadir;
 
-                        float tempSurface = minimizeNewtonForTemperature(waterVapourColumn, viewZenith, aatsrBt11);
+                        float tempSurface = SnowTemperatureEmissivityRetrieval.
+                                minimizeNewtonForTemperature(waterVapourColumn, viewZenith, aatsrBt11, rtmLookupTables, tLowestLayer);
 
                         if (targetBand.getName().equals(SnowRadianceConstants.SNOW_TEMPERATURE_BAND_NAME)) {
                             targetTile.setSample(x, y, tempSurface);
                         }
                         if (computeEmissivityFub && targetBand.getName().equals(SnowRadianceConstants.EMISSIVITY_BAND_NAME)) {
 
-                            float emissivity = minimizeNewtonForEmissivity(waterVapourColumn, tempSurface, viewZenith, aatsrBt12);
+                            float emissivity =  SnowTemperatureEmissivityRetrieval.
+                                    minimizeNewtonForEmissivity(waterVapourColumn, viewZenith, tempSurface, aatsrBt12,
+                                                                             rtmLookupTables, tLowestLayer);
                             targetTile.setSample(x, y, emissivity);
                         }
                     }
@@ -455,124 +445,6 @@ public class SnowTemperatureEmissivityOp extends Operator {
 
             }
         }
-    }
-
-    private float minimizeNewtonForTemperature(float waterVapourColumn, float viewZenith, float aatsrBt11) {
-        float emissivity = SnowRadianceConstants.EMISSIVITY_11_DEFAULT;
-        float tSfcStart = aatsrBt11 + 0.5f;
-        if (tSfcStart < SnowRadianceConstants.TSFC_MIN) tSfcStart = SnowRadianceConstants.TSFC_MIN;
-        if (tSfcStart > SnowRadianceConstants.TSFC_MAX) tSfcStart = SnowRadianceConstants.TSFC_MAX;
-        float deltaTsfc = 0.1f;  // as in breadboard: inv_aatsr.pro, l.48
-        float thresh = 0.1f;  // as in breadboard: inv_aatsr.pro, l.2
-        float tsfc = tSfcStart;
-
-        int itermax = 5;
-        int iter = 0;
-        float rtm = 100.0f;
-        while (Math.abs(rtm - aatsrBt11) > thresh && rtm != SnowRadianceConstants.SNOW_TEMPERATURE_BAND_NODATAVALUE
-                && iter < itermax) {
-            double rtmUpper = getRtmUpper(waterVapourColumn, emissivity, tsfc, viewZenith, rtmLookupTables[0][0][0]);
-            double rtmLower = getRtmLower(waterVapourColumn, emissivity, tsfc, viewZenith, rtmLookupTables[0][0][0]);
-
-            rtm = getRtm(waterVapourColumn, emissivity, tsfc, viewZenith, rtmLookupTables[0][0][0]);
-            final float derivative = (float) ((rtmUpper - rtmLower) / (2.0f * deltaTsfc));
-            tsfc -= (rtm - aatsrBt11) / derivative;
-            if (tsfc < SnowRadianceConstants.TSFC_MIN) tsfc = SnowRadianceConstants.TSFC_MIN;
-            if (tsfc > SnowRadianceConstants.TSFC_MAX) tsfc = SnowRadianceConstants.TSFC_MAX;
-            iter++;
-        }
-
-        if (rtm == SnowRadianceConstants.SNOW_TEMPERATURE_BAND_NODATAVALUE) {
-            tsfc = (float) SnowRadianceConstants.SNOW_TEMPERATURE_BAND_NODATAVALUE;
-        }
-        return tsfc;
-    }
-
-
-    private float minimizeNewtonForEmissivity(float waterVapourColumn, float tsfc, float viewZenith, float aatsrBt12) {
-        final float emissivityStart = 0.96f; // as in breadboard: inv_aatsr.pro, l.114
-        float deltaEmi = 0.005f;  // as in breadboard: inv_aatsr.pro, l.11
-        float thresh = 0.1f;    // as in breadboard: inv_aatsr.pro, l.48
-        float emissivity = emissivityStart;
-
-        if (tsfc < SnowRadianceConstants.TSFC_MIN) tsfc = SnowRadianceConstants.TSFC_MIN;
-        if (tsfc > SnowRadianceConstants.TSFC_MAX) tsfc = SnowRadianceConstants.TSFC_MAX;
-
-        int itermax = 5;
-        int iter = 0;
-        float rtm = 100.0f;
-        while (Math.abs(rtm - aatsrBt12) > thresh && rtm != SnowRadianceConstants.EMISSIVITY_BAND_NODATAVALUE &&
-                iter < itermax) {
-            double emissivityUpper = Math.min(emissivity + deltaEmi, SnowRadianceConstants.EMISSIVITY_MAX);
-            double emissivityLower = Math.max(emissivity - deltaEmi, SnowRadianceConstants.EMISSIVITY_MIN);
-            double rtmUpper = getRtmUpper(waterVapourColumn, (float) emissivityUpper, tsfc, viewZenith, rtmLookupTables[0][0][1]);
-            double rtmLower = getRtmLower(waterVapourColumn, (float) emissivityLower, tsfc, viewZenith, rtmLookupTables[0][0][1]);
-
-            rtm = getRtm(waterVapourColumn, emissivity, tsfc, viewZenith, rtmLookupTables[0][0][1]);
-            final float derivative = (float) ((rtmUpper - rtmLower) / (2.0f * deltaEmi));
-            emissivity -= ((rtm - aatsrBt12) / derivative);
-            if (emissivity < SnowRadianceConstants.EMISSIVITY_MIN) emissivity = SnowRadianceConstants.EMISSIVITY_MIN;
-            if (emissivity > SnowRadianceConstants.EMISSIVITY_MAX) emissivity = SnowRadianceConstants.EMISSIVITY_MAX;
-            iter++;
-        }
-
-        if (rtm == SnowRadianceConstants.EMISSIVITY_BAND_NODATAVALUE) {
-            emissivity = (float) SnowRadianceConstants.EMISSIVITY_BAND_NODATAVALUE;
-        }
-        return emissivity;
-    }
-
-
-    private float getRtmUpper(float waterVapourColumn, float emissivity, float tSfc, float viewZenith,
-                              LookupTable lut) {
-
-        final int tsfcUpperIndex = SnowRadianceUtils.getNearestHigherValueIndexInDoubleArray(tSfc, tsfcLut);
-        if (tsfcUpperIndex == -1) {
-            return (float) SnowRadianceConstants.SNOW_TEMPERATURE_BAND_NODATAVALUE;
-        }
-        final float tsfcUpper = (float) tsfcLut[tsfcUpperIndex];
-
-        double[] rtmUpperInput = new double[]{-viewZenith, tsfcUpper, emissivity, waterVapourColumn};
-        float rtmUpper = (float) (lut.getValue(rtmUpperInput));
-
-        return rtmUpper;
-    }
-
-    private float getRtmLower(float waterVapourColumn, float emissivity, float tSfc, float viewZenith,
-                              LookupTable lut) {
-
-        final int tsfcLowerIndex = SnowRadianceUtils.getNearestLowerValueIndexInDoubleArray(tSfc, tsfcLut);
-        if (tsfcLowerIndex == -1) {
-            return (float) SnowRadianceConstants.SNOW_TEMPERATURE_BAND_NODATAVALUE;
-        }
-        final float tsfcLower = (float) tsfcLut[tsfcLowerIndex];
-
-        double[] rtmLowerInput = new double[]{-viewZenith, tsfcLower, emissivity, waterVapourColumn};
-        float rtmLower = (float) (lut.getValue(rtmLowerInput));
-
-        return rtmLower;
-    }
-
-    private float getRtm(float waterVapourColumn, float emissivity, float tSfc, float viewZenith,
-                         LookupTable lut) {
-
-        double rtmUpper = getRtmUpper(waterVapourColumn, emissivity, tSfc, viewZenith, lut);
-        double rtmLower = getRtmLower(waterVapourColumn, emissivity, tSfc, viewZenith, lut);
-
-        final int tsfcUpperIndex = SnowRadianceUtils.getNearestHigherValueIndexInDoubleArray(tSfc, tsfcLut);
-        final int tsfcLowerIndex = SnowRadianceUtils.getNearestLowerValueIndexInDoubleArray(tSfc, tsfcLut);
-        if (tsfcUpperIndex == -1 || tsfcLowerIndex == -1) {
-            return (float) SnowRadianceConstants.SNOW_TEMPERATURE_BAND_NODATAVALUE;
-        }
-        final float tsfcUpper = (float) tsfcLut[tsfcUpperIndex];
-        final float tsfcLower = (float) tsfcLut[tsfcLowerIndex];
-
-        double wUpper = (tsfcUpper - tSfc) / (tsfcUpper - tsfcLower);
-        double wLower = 1.0 - wUpper;
-
-        float rtm = (float) (wLower * rtmLower + wUpper * rtmUpper);
-
-        return rtm;
     }
 
     /**

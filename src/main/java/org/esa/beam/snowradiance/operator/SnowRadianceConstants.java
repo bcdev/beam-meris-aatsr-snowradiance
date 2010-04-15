@@ -24,6 +24,7 @@ public class SnowRadianceConstants {
     public static final int NUMBER_ATMOSPHERIC_PROFILES = 4;
     public static final int NUMBER_AATSR_WVL = 2;
     public static final int NUMBER_RTM = 2;
+    public static final int NUMBER_TSFC_LUT = 25;
 
     public static final long[] ATMOSPHERIC_PROFILE_INDICES = {3, 5, 6, 7};
 

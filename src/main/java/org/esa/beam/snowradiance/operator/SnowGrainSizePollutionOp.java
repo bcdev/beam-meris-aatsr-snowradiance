@@ -40,11 +40,6 @@ public class SnowGrainSizePollutionOp extends Operator {
                    description = "Select a MERIS product.")
     private Product sourceProduct;
 
-//    @SourceProduct(alias = "merisAatsr",
-//                   label = "Name (Collocated MERIS AATSR product)",
-//                   description = "Select a collocated MERIS AATSR product.")
-//    private Product merisAatsrProduct;
-
     @TargetProduct(description = "The target product.")
     private Product targetProduct;
 
@@ -69,31 +64,13 @@ public class SnowGrainSizePollutionOp extends Operator {
                label = SnowRadianceConstants.LUT_PATH_PARAM_LABEL)
     private String lutPath;
 
-//    @Parameter(defaultValue = "true",
-//               description = "Get reflectances from approximative formula (instead of LUT)",
-//               label = "Get reflectances from approximative formula (instead of LUT)")
-//    private boolean getReflFromApprox;
     private boolean getReflFromApprox = true;
-
-    private SnowRadianceAuxData.ReflectionLookupTable reflectionLookupTable;
 
     private static String productName = "SNOWRADIANCE PRODUCT";
     private static String productType = "SNOWRADIANCE PRODUCT";
 
-    private int nWvLut;
-    private int nEmiLut;
-    private int nTsfcLut;
-    private int nViewLut;
-
-    private float[][] rtmUpperSingle;    // NUMBER_ATMOSPHERIC_PROFILES,  NUMBER_AATSR_WVL (4, 2)
-    private float[][] rtmLowerSingle;
-    private float[][] rtm;
-
-    private double[] tsfcLut;
-
     private SnowGrainSizePollutionRetrieval snowGrainSizePollutionRetrieval;
     private Band[] merisReflectanceBands;
-    private Product rad2reflProduct;
 
     public static final String CLOUDICESNOW_FLAG_BAND = "cloud_ice_snow";
 
@@ -101,11 +78,6 @@ public class SnowGrainSizePollutionOp extends Operator {
     public static final int FLAG_CLOUD = 1;
     public static final int FLAG_ICE = 2;
     public static final int FLAG_SNOW = 4;
-
-     private Band cloudIceSnowFlagBand;
-
-    private static float NDSI_THRESH_SNOW_LOWER = 1.0f;
-    private static float NDSI_THRESH_SNOW_UPPER = 1.0f;
 
     /**
      * Default constructor. The graph processing framework
@@ -131,13 +103,12 @@ public class SnowGrainSizePollutionOp extends Operator {
     public void initialize() throws OperatorException {
 
         Map<String, Object> emptyParams = new HashMap<String, Object>();
-        rad2reflProduct = GPF.createProduct(OperatorSpi.getOperatorAlias(Rad2ReflOp.class), emptyParams, sourceProduct);
+        Product rad2reflProduct = GPF.createProduct(OperatorSpi.getOperatorAlias(Rad2ReflOp.class), emptyParams, sourceProduct);
 
         createTargetProduct();
 
         ProductUtils.copyGeoCoding(sourceProduct, targetProduct);
         ProductUtils.copyFlagBands(sourceProduct, targetProduct);
-//        ProductUtils.copyTiePointGrids(sourceProduct, targetProduct);
 
         merisReflectanceBands = new Band[EnvisatConstants.MERIS_L1B_NUM_SPECTRAL_BANDS];
         for (int i=0; i< EnvisatConstants.MERIS_L1B_NUM_SPECTRAL_BANDS; i++) {
@@ -146,16 +117,6 @@ public class SnowGrainSizePollutionOp extends Operator {
 
         snowGrainSizePollutionRetrieval = new SnowGrainSizePollutionRetrieval();
 
-
-
-        if (!getReflFromApprox) {
-            try {
-                reflectionLookupTable = SnowRadianceAuxData.getInstance().createReflectionLookupTable(SnowRadianceConstants.REFLECTION_LUT_BLOCKS_TO_USE, lutPath);
-            } catch (IOException e) {
-                throw new OperatorException("Failed to read RTM lookup tables:\n" + e.getMessage(), e);
-            }
-        }
-        System.out.println("Done reading RTM LUT.");
     }
 
 
@@ -238,14 +199,9 @@ public class SnowGrainSizePollutionOp extends Operator {
                 double sza = szMerisTile.getSampleDouble(x, y);
                 double vaa = vaMerisTile.getSampleDouble(x, y);
                 double vza = vzMerisTile.getSampleDouble(x, y);
-                double reflFunction = 0.0;
+                double reflFunction;
 
-                if (!getReflFromApprox) {
-                    reflFunction = snowGrainSizePollutionRetrieval.computeReflLut(reflectionLookupTable, sza, vza);
-                    System.out.println("reflFunction: " + reflFunction);
-                }  else {
-                    reflFunction = snowGrainSizePollutionRetrieval.computeReflLutApprox(saa, sza, vaa, vza);
-                }
+                reflFunction = snowGrainSizePollutionRetrieval.computeReflLutApprox(saa, sza, vaa, vza);
 
                 double merisRefl2 = merisRefl2Tile.getSampleDouble(x, y);
                 double merisRefl13 = merisRefl13Tile.getSampleDouble(x, y);
@@ -263,7 +219,7 @@ public class SnowGrainSizePollutionOp extends Operator {
                         snowGrainSizePollutionRetrieval.getUnpollutedSnowGrainSize(pal);
                     double sootConcentration =
                         snowGrainSizePollutionRetrieval.getSootConcentrationInPollutedSnow(merisRefl13, reflFunction, sza, vza,
-                                                                                           pal, unpollutedSnowGrainSize);
+                                                                                           unpollutedSnowGrainSize);
                     targetTile.setSample(x, y, sootConcentration);
                 }
 
