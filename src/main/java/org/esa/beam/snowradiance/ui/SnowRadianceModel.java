@@ -1,26 +1,19 @@
-package org.esa.beam.snowradiance.operator;
+package org.esa.beam.snowradiance.ui;
 
-import org.esa.beam.framework.gpf.annotations.SourceProduct;
-import org.esa.beam.framework.gpf.annotations.TargetProduct;
-import org.esa.beam.framework.gpf.annotations.Parameter;
-import org.esa.beam.framework.gpf.annotations.OperatorMetadata;
-import org.esa.beam.framework.gpf.OperatorException;
-import org.esa.beam.framework.gpf.GPF;
-import org.esa.beam.framework.gpf.OperatorSpi;
-import org.esa.beam.framework.gpf.Operator;
+import com.bc.ceres.binding.PropertyContainer;
 import org.esa.beam.framework.datamodel.Product;
+import org.esa.beam.framework.gpf.annotations.Parameter;
+import org.esa.beam.framework.gpf.annotations.ParameterDescriptorFactory;
+import org.esa.beam.framework.gpf.annotations.SourceProduct;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
- * Snow radiance 'master operator' (CURRENTLY NOT USED)
- *
  * @author Olaf Danne
- * @version $Revision: 8267 $ $Date: 2010-02-05 16:39:24 +0100 (Fr, 05 Feb 2010) $
+ * @version $Revision: $ $Date:  $
  */
-@OperatorMetadata(alias="SnowRadiance.Master")
-public class SnowRadianceMasterOp extends Operator {
+public class SnowRadianceModel {
 
     @SourceProduct(alias = "sourceMeris",
                    label = "Name (MERIS product)",
@@ -31,7 +24,6 @@ public class SnowRadianceMasterOp extends Operator {
                    label = "Name (MERIS product)",
                    description = "Select a MERIS product for snow grains retrieval.")
     private Product aatsrProduct;
-
 
     // Target bands
     @Parameter(defaultValue = "false",
@@ -154,99 +146,61 @@ public class SnowRadianceMasterOp extends Operator {
     private double aatsr1610LowerThreshold;
 
 
+    private Product merisSourceProduct;
+    private Product aatsrSourceProduct;
+    private PropertyContainer propertyContainer;
 
 
-
-
-//    @SourceProduct(alias = "source",
-//                   label = "Name (MERIS/AATSR colocated product)",
-//                   description = "Select a MERIS/AATSR colocated product for snow temperature retrieval.")
-//    private Product colocatedProduct;
-
-    @TargetProduct(description = "The target product.")
-    private Product targetProduct;
-
-//    @Parameter(defaultValue = "true",
-//               description = "Compute Snow Temperature (FUB)",
-//               label = "Compute Snow Temperature (FUB)")
-//    private boolean computeSnowTemperatureFub;
-//
-//    @Parameter(defaultValue = "true",
-//               description = "Compute Emissivity (FUB)",
-//               label = "Compute Emissivity (FUB)")
-//    private boolean computeEmissivityFub;
-//
-//    @Parameter(defaultValue = "true",
-//               description = "Compute Unpolluted Snow Grain Size",
-//               label = "Compute Unpolluted Snow Grain Size")
-//    private boolean computeUnpollutedSnowGrainSize;
-//
-//    @Parameter(defaultValue = "false",
-//               description = "Compute Polluted Snow Grain Size",
-//               label = "Compute Polluted Snow Grain Size")
-//    private boolean computePollutedSnowGrainSize;
-//
-//    @Parameter(defaultValue = "true",
-//               description = "Compute Snow Albedo",
-//               label = "Compute Snow Albedo")
-//    private boolean computeSnowAlbedo;
-//
-//    @Parameter(defaultValue = "M",
-//               description = "Master Product Bands Suffix",
-//               label = "Master Product Bands Suffix")
-//    private String masterProductBandsSuffix;
-//
-//    @Parameter(defaultValue = "S",
-//               description = "Slave Product Bands Suffix",
-//               label = "Slave Product Bands Suffix")
-//    private String slaveProductBandsSuffix;
-//
-//    @Parameter(alias = SnowRadianceConstants.LUT_PATH_PARAM_NAME,
-//               defaultValue = SnowRadianceConstants.LUT_PATH_PARAM_DEFAULT,
-//               description = SnowRadianceConstants.LUT_PATH_PARAM_DESCRIPTION,
-//               label = SnowRadianceConstants.LUT_PATH_PARAM_LABEL)
-//    private String lutPath;
-
-
-    public void initialize() throws OperatorException {
-
-        System.out.println("bla");
-        // compute the  FUB product...
-        Product fubSnowTempProduct = null;
-//        if (computeSnowTemperatureFub || computeEmissivityFub) {
-//            Map<String, Product> fubSnowTempInput = new HashMap<String, Product>(1);
-//            fubSnowTempInput.put("source", colocatedProduct);
-//            Map<String, Object> fubSnowTempParams = new HashMap<String, Object>(4);
-//            fubSnowTempParams.put("computeSnowTemperatureFub", computeSnowTemperatureFub);
-//            fubSnowTempParams.put("masterProductBandsSuffix", masterProductBandsSuffix);
-//            fubSnowTempParams.put("slaveProductBandsSuffix", slaveProductBandsSuffix);
-//            fubSnowTempProduct = GPF.createProduct(OperatorSpi.getOperatorAlias(SnowTemperatureEmissivityOp.class), fubSnowTempParams, fubSnowTempInput);
-//        }
-
-        // compute the  snow grains product...
-        Product snowGrainsProduct = null;
-//        if (computeUnpollutedSnowGrainSize || computePollutedSnowGrainSize || computeSnowAlbedo) {
-//            Map<String, Product> snowGrainsInput = new HashMap<String, Product>(1);
-//            snowGrainsInput.put("source", merisProduct);
-//            Map<String, Object> snowGrainsParams = new HashMap<String, Object>(4);
-//            snowGrainsParams.put("computeUnpollutedSnowGrainSize", computeUnpollutedSnowGrainSize);
-//            snowGrainsParams.put("computePollutedSnowGrainSize", computePollutedSnowGrainSize);
-//            snowGrainsParams.put("computeSnowAlbedo", computeSnowAlbedo);
-//            fubSnowTempProduct = GPF.createProduct(OperatorSpi.getOperatorAlias(SnowGrainSizePollutionOp.class), snowGrainsParams, snowGrainsInput);
-//        }
-
-//        targetProduct = fubSnowTempProduct;
-        targetProduct = snowGrainsProduct;
+    public SnowRadianceModel() {
+        propertyContainer = PropertyContainer.createObjectBacked(this, new ParameterDescriptorFactory());
     }
 
-
-    /**
-     * The Service Provider Interface (SPI) for the operator.
-     * It provides operator meta-data and is a factory for new operator instances.
-     */
-    public static class Spi extends OperatorSpi {
-        public Spi() {
-            super(SnowRadianceMasterOp.class);
-        }
+    public Product getMerisSourceProduct() {
+        return merisSourceProduct;
     }
+
+    public Product getAatsrSourceProduct() {
+        return aatsrSourceProduct;
+    }
+
+    public PropertyContainer getPropertyContainer() {
+        return propertyContainer;
+    }
+
+    public Map<String, Object> getSnowRadianceParameters() {
+        HashMap<String, Object> params = new HashMap<String, Object>();
+        configTargetBands(params);
+        configProcessingParameters(params);
+        return params;
+    }
+
+    private void configProcessingParameters(HashMap<String, Object> params) {
+        params.put("applyCloudMask", applyCloudMask);
+//        params.put("getCloudMaskFromMepix", getCloudMaskFromMepix);
+        params.put("getCloudMaskFromSynergy", getCloudMaskFromSynergy);
+        params.put("apply100PercentSnowMask", apply100PercentSnowMask);
+        params.put("use100PercentSnowMaskWithAatsrMaster", use100PercentSnowMaskWithAatsrMaster);
+//        params.put("use100PercentSnowMaskWithMerisMaster", use100PercentSnowMaskWithMerisMaster);
+        params.put("assumedEmissivityAt11Microns", assumedEmissivityAt11Microns);
+        params.put("cloudProbabilityThreshold", cloudProbabilityThreshold);
+        params.put("ndsiUpperThreshold", ndsiUpperThreshold);
+        params.put("ndsiLowerThreshold", ndsiLowerThreshold);
+        params.put("pureSnowAatsr1610UpperThreshold", aatsr1610UpperThreshold);
+        params.put("pureSnowAatsr1610LowerThreshold", aatsr1610LowerThreshold);
+    }
+
+    private void configTargetBands(HashMap<String, Object> params) {
+        params.put("copyInputBands", copyInputBands);
+        params.put("computeSnowGrainSize", computeSnowGrainSize);
+        params.put("computeSnowAlbedo", computeSnowAlbedo);
+        params.put("computeSnowSootContent", computeSnowSootContent);
+        params.put("computeSnowTemperatureFub", computeSnowTemperatureFub);
+        params.put("computeEmissivityFub", computeEmissivityFub);
+        params.put("computeMerisWaterVapour", computeMerisWaterVapour);
+        params.put("computeMerisNdvi", computeMerisNdvi);
+        params.put("computeMerisNdsi", computeMerisNdsi);
+        params.put("computeMerisMdsi", computeMerisMdsi);
+        params.put("copyAatsrL1Flags", copyAatsrL1Flags);
+    }
+
 }

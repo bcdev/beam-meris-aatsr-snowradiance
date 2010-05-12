@@ -58,4 +58,44 @@ public class SnowRadianceConstants {
     public static final int REFLECTION_LUT_BLOCKS_TO_USE = 1846;
     public static final int REFLECTION_LUT_TESTBLOCKS_TO_USE = 2;
 
+    public static final String copyInputBandsLabel = "Copy input bands";
+    public static final String computeSnowGrainSizeLabel = "Compute snow grain size";
+    public static final String computeSnowAlbedoLabel = "Compute snow albedo";
+    public static final String computeSnowSootContentLabel = "Compute snow soot content";
+    public static final String computeEmissivityLabel = "Compute emissivity";
+    public static final String computeSnowTemperatureLabel = "Compute temperature";
+
+    public static final String complementaryQuantitiesLabel = "Complementary quantities:";
+    public static final String waterVapourMerisLabel = "Water vapour (from MERIS)";
+    public static final String ndviMerisLabel = "NDVI (from MERIS)";
+    public static final String ndsiMerisLabel = "NDSI (from MERIS)";
+    public static final String mdsiMerisLabel = "MDSI (from MERIS)";
+    public static final String aatsrL1FlagsLabel = "AATSR L1 flags";
+
+    public static final String applyCloudMaskLabel = "Apply cloud mask";
+    public static final String applyCloudMaskMepixLabel = "Cloud probability (MEPIX)";
+    public static final String applyCloudMaskSynergyLabel = "Feature classification (MERIS/AATSR Synergy)";
+    public static final String applySnowMaskLabel = "Mask 100% snow";
+    public static final String applySnowMaskWithAatsrMasterLabel = "AATSR as master";
+    public static final String applySnowMaskWithMerisMasterLabel = "MERIS as master";
+
+    public static final String assumedEmissivity11MicronsLabel = "Assumed emissivity at 11um:";
+    public static final String parametersForMaskingLabel = "Parameters for masking:";
+
+    public static final String ndsiLowerLabel = "NDSI lower:";
+    public static final String ndsiUpperLabel = "NDSI upper:";
+    public static final String cloudProbThresholdLabel = "Cloud probability threshold:";
+    public static final String snowBoundariesLabel = "100% pure snow boundaries:";
+
+    public static final String aatsr1600Label = "AATSR 1600um";
+    public static final String lowerLabel = "lower:";
+    public static final String upperLabel = "upper:";
+    public static final String ndsiLowerDefaultValue = "0.90";
+
+    public static final String assumedEmissivity11MicronsDefaultValue = "0.99";
+    public static final String ndsiUpperDefaultValue = "0.96";
+    public static final String cloudProbThresholdDefaultValue = "0.8";       // tbd
+    public static final String aatsr1610LowerDefaultValue = "1.0";
+    public static final String aatsr1610UpperDefaultValue = "10.0";
+
 }
