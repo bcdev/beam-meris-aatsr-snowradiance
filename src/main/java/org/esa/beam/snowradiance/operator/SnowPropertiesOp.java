@@ -1,58 +1,55 @@
-/*
-* Copyright (C) 2002-2007 by ?
-*
-* This program is free software; you can redistribute it and/or modify it
-* under the terms of the GNU General Public License as published by the
-* Free Software Foundation. This program is distributed in the hope it will
-* be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
-* of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-* See the GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-*/
 package org.esa.beam.snowradiance.operator;
 
 import com.bc.ceres.core.ProgressMonitor;
 import com.bc.jnn.JnnException;
 import com.bc.jnn.JnnNet;
-import org.esa.beam.framework.datamodel.*;
+import org.esa.beam.framework.datamodel.Band;
+import org.esa.beam.framework.datamodel.BitmaskDef;
+import org.esa.beam.framework.datamodel.FlagCoding;
+import org.esa.beam.framework.datamodel.MetadataAttribute;
+import org.esa.beam.framework.datamodel.Product;
+import org.esa.beam.framework.datamodel.ProductData;
+import org.esa.beam.framework.gpf.GPF;
 import org.esa.beam.framework.gpf.Operator;
 import org.esa.beam.framework.gpf.OperatorException;
 import org.esa.beam.framework.gpf.OperatorSpi;
 import org.esa.beam.framework.gpf.Tile;
-import org.esa.beam.framework.gpf.GPF;
 import org.esa.beam.framework.gpf.annotations.OperatorMetadata;
+import org.esa.beam.framework.gpf.annotations.Parameter;
 import org.esa.beam.framework.gpf.annotations.SourceProduct;
 import org.esa.beam.framework.gpf.annotations.TargetProduct;
-import org.esa.beam.framework.gpf.annotations.Parameter;
+import org.esa.beam.meris.cloud.CloudProbabilityOp;
 import org.esa.beam.util.ProductUtils;
 import org.esa.beam.util.math.LookupTable;
-import org.esa.beam.snowradiance.util.SnowRadianceUtils;
-import org.esa.beam.meris.cloud.CloudProbabilityOp;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Rectangle;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Operator for snow temperature and emissivity retrieval
- *
  * @author Olaf Danne
- * @version $Revision: 8267 $ $Date: 2010-02-05 16:39:24 +0100 (Fr, 05 Feb 2010) $
+ * @version $Revision: $ $Date:  $
  */
-@OperatorMetadata(alias = "SnowRadiance.temperature")
-public class SnowTemperatureEmissivityOp extends Operator {
-
-    @SourceProduct(alias = "source",
+@OperatorMetadata(alias = "SnowRadiance.properties")
+public class SnowPropertiesOp extends Operator {
+    @SourceProduct(alias = "colocatedProduct",
                    label = "Name (Collocated MERIS AATSR product)",
                    description = "Select a collocated MERIS AATSR product.")
-    private Product sourceProduct;
+    private Product colocatedProduct;
+
+    @SourceProduct(alias = "merisProduct",
+                   label = "Name (MERIS product)",
+                   description = "Select a MERIS product.")
+    private Product merisProduct;
 
     @TargetProduct(description = "The target product.")
     private Product targetProduct;
+
+
+
+
 
     @Parameter(defaultValue = "true",
                description = "Compute Snow Temperature (FUB)",
@@ -132,7 +129,7 @@ public class SnowTemperatureEmissivityOp extends Operator {
      * Default constructor. The graph processing framework
      * requires that an operator has a default constructor.
      */
-    public SnowTemperatureEmissivityOp() {
+    public SnowPropertiesOp() {
     }
 
     /**
@@ -152,8 +149,8 @@ public class SnowTemperatureEmissivityOp extends Operator {
     public void initialize() throws OperatorException {
 
         Map<String, Product> cloudProbabilityInput = new HashMap<String, Product>(1);
-        sourceProduct.setProductType("MER_RR__1P");
-        cloudProbabilityInput.put("input", sourceProduct);
+        colocatedProduct.setProductType("MER_RR__1P");
+        cloudProbabilityInput.put("input", colocatedProduct);
         Map<String, Object> cloudProbabilityParameters = new HashMap<String, Object>(3);
         cloudProbabilityParameters.put("configFile", "cloud_config.txt");
         cloudProbabilityParameters.put("validLandExpression", "not l1_flags_" + masterProductBandsSuffix + ".INVALID and dem_alt > -50");
@@ -163,10 +160,10 @@ public class SnowTemperatureEmissivityOp extends Operator {
 
         createTargetProduct();
 
-        ProductUtils.copyTiePointGrids(sourceProduct, targetProduct);
-        ProductUtils.copyGeoCoding(sourceProduct, targetProduct);
-        ProductUtils.copyMetadata(sourceProduct, targetProduct);
-        ProductUtils.copyFlagBands(sourceProduct, targetProduct);
+        ProductUtils.copyTiePointGrids(colocatedProduct, targetProduct);
+        ProductUtils.copyGeoCoding(colocatedProduct, targetProduct);
+        ProductUtils.copyMetadata(colocatedProduct, targetProduct);
+        ProductUtils.copyFlagBands(colocatedProduct, targetProduct);
 
         try {
             rtmLookupTables = SnowRadianceAuxData.createRtmLookupTables();
@@ -184,8 +181,8 @@ public class SnowTemperatureEmissivityOp extends Operator {
     private void createTargetProduct() {
         targetProduct = new Product(productName,
                                     productType,
-                                    sourceProduct.getSceneRasterWidth(),
-                                    sourceProduct.getSceneRasterHeight());
+                                    colocatedProduct.getSceneRasterWidth(),
+                                    colocatedProduct.getSceneRasterHeight());
 
         createTargetProductBands();
     }
@@ -310,25 +307,25 @@ public class SnowTemperatureEmissivityOp extends Operator {
 
         Rectangle rectangle = targetTile.getRectangle();
 
-        Tile zonalWindTile = getSourceTile(sourceProduct.getTiePointGrid("zonal_wind"), rectangle, pm);
-        Tile meridWindTile = getSourceTile(sourceProduct.getTiePointGrid("merid_wind"), rectangle, pm);
-        Tile saMerisTile = getSourceTile(sourceProduct.getTiePointGrid("sun_azimuth"), rectangle, pm);
-        Tile szMerisTile = getSourceTile(sourceProduct.getTiePointGrid("sun_zenith"), rectangle, pm);
-        Tile vaMerisTile = getSourceTile(sourceProduct.getTiePointGrid("view_azimuth"), rectangle, pm);
-        Tile vzMerisTile = getSourceTile(sourceProduct.getTiePointGrid("view_zenith"), rectangle, pm);
+        Tile zonalWindTile = getSourceTile(colocatedProduct.getTiePointGrid("zonal_wind"), rectangle, pm);
+        Tile meridWindTile = getSourceTile(colocatedProduct.getTiePointGrid("merid_wind"), rectangle, pm);
+        Tile saMerisTile = getSourceTile(colocatedProduct.getTiePointGrid("sun_azimuth"), rectangle, pm);
+        Tile szMerisTile = getSourceTile(colocatedProduct.getTiePointGrid("sun_zenith"), rectangle, pm);
+        Tile vaMerisTile = getSourceTile(colocatedProduct.getTiePointGrid("view_azimuth"), rectangle, pm);
+        Tile vzMerisTile = getSourceTile(colocatedProduct.getTiePointGrid("view_zenith"), rectangle, pm);
 
-        Tile merisRad14Tile = getSourceTile(sourceProduct.getBand("radiance_14" + "_" + masterProductBandsSuffix + ""), rectangle, pm);
-        Tile merisRad15Tile = getSourceTile(sourceProduct.getBand("radiance_15" + "_" + masterProductBandsSuffix + ""), rectangle, pm);
+        Tile merisRad14Tile = getSourceTile(colocatedProduct.getBand("radiance_14" + "_" + masterProductBandsSuffix + ""), rectangle, pm);
+        Tile merisRad15Tile = getSourceTile(colocatedProduct.getBand("radiance_15" + "_" + masterProductBandsSuffix + ""), rectangle, pm);
 
-        Tile aatsrBTNadir1100Tile = getSourceTile(sourceProduct.getBand("btemp_nadir_1100" + "_" + slaveProductBandsSuffix + ""), rectangle, pm);
-        Tile aatsrBTNadir1200Tile = getSourceTile(sourceProduct.getBand("btemp_nadir_1200" + "_" + slaveProductBandsSuffix + ""), rectangle, pm);
+        Tile aatsrBTNadir1100Tile = getSourceTile(colocatedProduct.getBand("btemp_nadir_1100" + "_" + slaveProductBandsSuffix + ""), rectangle, pm);
+        Tile aatsrBTNadir1200Tile = getSourceTile(colocatedProduct.getBand("btemp_nadir_1200" + "_" + slaveProductBandsSuffix + ""), rectangle, pm);
 
-        Tile veAatsrNadirTile = getSourceTile(sourceProduct.getBand("view_elev_nadir" + "_" + slaveProductBandsSuffix + ""), rectangle, pm);
+        Tile veAatsrNadirTile = getSourceTile(colocatedProduct.getBand("view_elev_nadir" + "_" + slaveProductBandsSuffix + ""), rectangle, pm);
 
-        Tile aatsrReflecNadir550Tile = getSourceTile(sourceProduct.getBand("reflec_nadir_0550" + "_" + slaveProductBandsSuffix + ""), rectangle, pm);
-        Tile aatsrReflecNadir670Tile = getSourceTile(sourceProduct.getBand("reflec_nadir_0670" + "_" + slaveProductBandsSuffix + ""), rectangle, pm);
-        Tile aatsrReflecNadir870Tile = getSourceTile(sourceProduct.getBand("reflec_nadir_0870" + "_" + slaveProductBandsSuffix + ""), rectangle, pm);
-        Tile aatsrReflecNadir1600Tile = getSourceTile(sourceProduct.getBand("reflec_nadir_1600" + "_" + slaveProductBandsSuffix + ""), rectangle, pm);
+        Tile aatsrReflecNadir550Tile = getSourceTile(colocatedProduct.getBand("reflec_nadir_0550" + "_" + slaveProductBandsSuffix + ""), rectangle, pm);
+        Tile aatsrReflecNadir670Tile = getSourceTile(colocatedProduct.getBand("reflec_nadir_0670" + "_" + slaveProductBandsSuffix + ""), rectangle, pm);
+        Tile aatsrReflecNadir870Tile = getSourceTile(colocatedProduct.getBand("reflec_nadir_0870" + "_" + slaveProductBandsSuffix + ""), rectangle, pm);
+        Tile aatsrReflecNadir1600Tile = getSourceTile(colocatedProduct.getBand("reflec_nadir_1600" + "_" + slaveProductBandsSuffix + ""), rectangle, pm);
 
 
         Tile cloudFlags = getSourceTile(cloudProbabilityProduct.getBand(CloudProbabilityOp.CLOUD_FLAG_BAND), rectangle, pm);
@@ -453,12 +450,12 @@ public class SnowTemperatureEmissivityOp extends Operator {
      * {@code META-INF/services/org.esa.beam.framework.gpf.OperatorSpi}.
      * This class may also serve as a factory for new operator instances.
      *
-     * @see OperatorSpi#createOperator()
-     * @see OperatorSpi#createOperator(java.util.Map, java.util.Map)
+     * @see org.esa.beam.framework.gpf.OperatorSpi#createOperator()
+     * @see org.esa.beam.framework.gpf.OperatorSpi#createOperator(java.util.Map, java.util.Map)
      */
     public static class Spi extends OperatorSpi {
         public Spi() {
-            super(SnowTemperatureEmissivityOp.class);
+            super(SnowPropertiesOp.class);
         }
     }
 }

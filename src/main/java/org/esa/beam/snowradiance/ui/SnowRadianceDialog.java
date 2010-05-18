@@ -1,22 +1,14 @@
 package org.esa.beam.snowradiance.ui;
 
-import com.bc.ceres.binding.PropertyDescriptor;
-import com.bc.ceres.swing.TableLayout;
 import org.esa.beam.framework.datamodel.Product;
-import org.esa.beam.framework.datamodel.ProductFilter;
 import org.esa.beam.framework.gpf.GPF;
 import org.esa.beam.framework.gpf.OperatorSpi;
-import org.esa.beam.framework.gpf.annotations.SourceProduct;
 import org.esa.beam.framework.gpf.ui.SingleTargetProductDialog;
-import org.esa.beam.framework.gpf.ui.SourceProductSelector;
 import org.esa.beam.framework.ui.AppContext;
 import org.esa.beam.snowradiance.operator.SnowRadianceMasterOp;
+import org.esa.beam.snowradiance.util.SnowRadianceUtils;
 
-import javax.swing.JPanel;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -89,16 +81,22 @@ public class SnowRadianceDialog extends SingleTargetProductDialog {
 
     @Override
     protected boolean verifyUserInput() {
-        // todo: verify
+        SnowRadianceUtils.validateMerisProduct(model.getMerisSourceProduct());
+        SnowRadianceUtils.validateAatsrProduct(model.getAatsrSourceProduct());
+
+        final Map<String, Object> parameterMap = model.getSnowRadianceParameters();
+        SnowRadianceUtils.validateParameters(parameterMap);
+
+        // if all validations passed:
         return true;
     }
 
     protected Product createTargetProduct() throws Exception {
         final HashMap<String, Product> sourceProducts = new HashMap<String, Product>(8);
-        Product merisProduct = model.getMerisSourceProduct();
-        Product aatsrProduct = model.getAatsrSourceProduct();
-        sourceProducts.put("sourceMeris", merisProduct);
-        sourceProducts.put("sourceAatsr", aatsrProduct);
+        Product merisSourceProduct = model.getMerisSourceProduct();
+        Product aatsrSourceProduct = model.getAatsrSourceProduct();
+        sourceProducts.put("merisSourceProduct", merisSourceProduct);
+        sourceProducts.put("aatsrSourceProduct", aatsrSourceProduct);
         Product targetProduct = GPF.createProduct(OperatorSpi.getOperatorAlias(SnowRadianceMasterOp.class)
               , model.getSnowRadianceParameters(), sourceProducts);
         return targetProduct;

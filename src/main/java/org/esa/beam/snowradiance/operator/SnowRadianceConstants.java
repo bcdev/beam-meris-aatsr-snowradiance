@@ -79,15 +79,14 @@ public class SnowRadianceConstants {
     public static final String applySnowMaskWithAatsrMasterLabel = "AATSR as master";
     public static final String applySnowMaskWithMerisMasterLabel = "MERIS as master";
 
-    public static final String assumedEmissivity11MicronsLabel = "Assumed emissivity at 11um:";
+    public static final String assumedEmissivity11MicronsLabel = "Assumed emissivity at 11 microns:";
     public static final String parametersForMaskingLabel = "Parameters for masking:";
 
-    public static final String ndsiLowerLabel = "NDSI lower:";
-    public static final String ndsiUpperLabel = "NDSI upper:";
+    public static final String ndsiLabel = "NDSI";
     public static final String cloudProbThresholdLabel = "Cloud probability threshold:";
     public static final String snowBoundariesLabel = "100% pure snow boundaries:";
 
-    public static final String aatsr1600Label = "AATSR 1600um";
+    public static final String aatsr1610Label = "AATSR 1610nm";
     public static final String lowerLabel = "lower:";
     public static final String upperLabel = "upper:";
     public static final String ndsiLowerDefaultValue = "0.90";

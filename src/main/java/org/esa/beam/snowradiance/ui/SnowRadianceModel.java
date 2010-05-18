@@ -5,6 +5,7 @@ import org.esa.beam.framework.datamodel.Product;
 import org.esa.beam.framework.gpf.annotations.Parameter;
 import org.esa.beam.framework.gpf.annotations.ParameterDescriptorFactory;
 import org.esa.beam.framework.gpf.annotations.SourceProduct;
+import org.esa.beam.snowradiance.operator.SnowRadianceConstants;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,12 +19,12 @@ public class SnowRadianceModel {
     @SourceProduct(alias = "sourceMeris",
                    label = "Name (MERIS product)",
                    description = "Select a MERIS product for snow grains retrieval.")
-    private Product merisProduct;
+    private Product merisSourceProduct;
 
     @SourceProduct(alias = "sourceAatsr",
                    label = "Name (MERIS product)",
                    description = "Select a MERIS product for snow grains retrieval.")
-    private Product aatsrProduct;
+    private Product aatsrSourceProduct;
 
     // Target bands
     @Parameter(defaultValue = "false",
@@ -34,27 +35,27 @@ public class SnowRadianceModel {
     @Parameter(defaultValue = "true",
                description = "Compute Snow Grain Size",
                label = "Compute snow grain size")
-    private boolean computeSnowGrainSize;
+    private boolean computeSnowGrainSize = true;
 
     @Parameter(defaultValue = "true",
                description = "Compute snow albedo",
                label = "Compute snow albedo")
-    private boolean computeSnowAlbedo;
+    private boolean computeSnowAlbedo = true;
 
     @Parameter(defaultValue = "true",
                description = "Compute snow soot content",
                label = "Compute snow soot content")
-    private boolean computeSnowSootContent;
+    private boolean computeSnowSootContent = true;
 
     @Parameter(defaultValue = "true",
                description = "Compute Snow Temperature (FUB)",
                label = "Compute Snow Temperature (FUB)")
-    private boolean computeSnowTemperatureFub;
+    private boolean computeSnowTemperatureFub = true;
 
     @Parameter(defaultValue = "true",
                description = "Compute Emissivity (FUB)",
                label = "Compute Emissivity (FUB)")
-    private boolean computeEmissivityFub;
+    private boolean computeEmissivityFub = true;
 
 
     // complementary quantities:
@@ -88,7 +89,7 @@ public class SnowRadianceModel {
     @Parameter(defaultValue = "true",
                description = "Apply cloud mask",
                label = "Apply cloud mask")
-    private boolean applyCloudMask;
+    private boolean applyCloudMask = true;
 
 //    @Parameter(defaultValue = "false",
 //               description = "Get cloud mask from cloud probability (MEPIX)",
@@ -110,44 +111,37 @@ public class SnowRadianceModel {
                label = "AATSR as master")
     private boolean use100PercentSnowMaskWithAatsrMaster;
 
-//    @Parameter(defaultValue = "false",
-//               description = "Apply 100% snow mask with MERIS as master",
-//               label = "MERIS as master")
-//    private boolean use100PercentSnowMaskWithMerisMaster;
-
     @Parameter(defaultValue = "0.99", interval = "[0.0, 1.0]",
                description = "Assumed emissivity at 11 microns",
                label = "Assumed emissivity at 11 microns")
-    private double assumedEmissivityAt11Microns;
+    private double assumedEmissivityAt11Microns = Double.parseDouble(SnowRadianceConstants.assumedEmissivity11MicronsDefaultValue);
 
     @Parameter(defaultValue = "0.8", interval = "[0.0, 1.0]",
                description = "Cloud probability threshold",
                label = "Cloud probability threshold")
-    private double cloudProbabilityThreshold;
+    private double cloudProbabilityThreshold = Double.parseDouble(SnowRadianceConstants.cloudProbThresholdDefaultValue);
 
-    @Parameter(defaultValue = "0.8", interval = "[0.0, 1.0]",
+    @Parameter(defaultValue = "0.96", interval = "[0.0, 1.0]",
                description = "NDSI upper threshold",
                label = "NDSI upper threshold")
-    private double ndsiUpperThreshold;
+    private double ndsiUpperThreshold = Double.parseDouble(SnowRadianceConstants.ndsiUpperDefaultValue);
 
-    @Parameter(defaultValue = "0.8", interval = "[0.0, 1.0]",
+    @Parameter(defaultValue = "0.90", interval = "[0.0, 1.0]",
                description = "NDSI lower threshold",
                label = "NDSI lower threshold")
-    private double ndsiLowerThreshold;
+    private double ndsiLowerThreshold = Double.parseDouble(SnowRadianceConstants.ndsiLowerDefaultValue);
 
-    @Parameter(defaultValue = "0.8", interval = "[0.0, 1.0]",
-               description = "AATSR 1610um upper threshold",
-               label = "AATSR 1610um upper threshold")
-    private double aatsr1610UpperThreshold;
+    @Parameter(defaultValue = "10.0", interval = "[1.0, 100.0]",
+               description = "AATSR 1610nm upper threshold",
+               label = "AATSR 1610nm upper threshold")
+    private double aatsr1610UpperThreshold = Double.parseDouble(SnowRadianceConstants.aatsr1610UpperDefaultValue);
 
-    @Parameter(defaultValue = "0.8", interval = "[0.0, 1.0]",
-               description = "AATSR 1610um lower threshold",
-               label = "AATSR 1610um lower threshold")
-    private double aatsr1610LowerThreshold;
+    @Parameter(defaultValue = "1.0", interval = "[1.0, 100.0]",
+               description = "AATSR 1610nm lower threshold",
+               label = "AATSR 1610nm lower threshold")
+    private double aatsr1610LowerThreshold = Double.parseDouble(SnowRadianceConstants.aatsr1610LowerDefaultValue);
 
 
-    private Product merisSourceProduct;
-    private Product aatsrSourceProduct;
     private PropertyContainer propertyContainer;
 
 
@@ -185,8 +179,8 @@ public class SnowRadianceModel {
         params.put("cloudProbabilityThreshold", cloudProbabilityThreshold);
         params.put("ndsiUpperThreshold", ndsiUpperThreshold);
         params.put("ndsiLowerThreshold", ndsiLowerThreshold);
-        params.put("pureSnowAatsr1610UpperThreshold", aatsr1610UpperThreshold);
-        params.put("pureSnowAatsr1610LowerThreshold", aatsr1610LowerThreshold);
+        params.put("aatsr1610UpperThreshold", aatsr1610UpperThreshold);
+        params.put("aatsr1610LowerThreshold", aatsr1610LowerThreshold);
     }
 
     private void configTargetBands(HashMap<String, Object> params) {

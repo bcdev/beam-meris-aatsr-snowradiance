@@ -35,7 +35,7 @@ public class SnowTemperatureFubOpTest extends TestCase {
 
         LookupTable[][] rtmLookupTables;
         try {
-            rtmLookupTables = SnowRadianceAuxData.createRtmLookupTables(lutPath);
+            rtmLookupTables = SnowRadianceAuxData.createRtmLookupTables();
             assertNotNull(rtmLookupTables);
             assertEquals(4, rtmLookupTables.length);
             assertNotNull(rtmLookupTables[0][0]);
@@ -100,7 +100,7 @@ public class SnowTemperatureFubOpTest extends TestCase {
         double[][][] tsfcLut;
 
         try {
-            tsfcLut = SnowRadianceAuxData.getTsfcFromLookupTables(lutPath);
+            tsfcLut = SnowRadianceAuxData.getTsfcFromLookupTables();
             assertEquals(272.2, tsfcLut[0][0][24], 1.E-3);
             assertEquals(257.1, tsfcLut[1][0][24], 1.E-3);
             assertEquals(272.39, tsfcLut[2][0][24], 1.E-3);
@@ -115,7 +115,7 @@ public class SnowTemperatureFubOpTest extends TestCase {
         double[] tLowestLayer = new double[4];
 
         try {
-            tsfcLut = SnowRadianceAuxData.getTsfcFromLookupTables(lutPath);
+            tsfcLut = SnowRadianceAuxData.getTsfcFromLookupTables();
             for (int i=0; i<SnowRadianceConstants.NUMBER_ATMOSPHERIC_PROFILES; i++) {
                 tLowestLayer[i] = tsfcLut[i][0][24];
             }
@@ -140,7 +140,7 @@ public class SnowTemperatureFubOpTest extends TestCase {
         float[][] btToa = new float[SnowRadianceConstants.NUMBER_ATMOSPHERIC_PROFILES][SnowRadianceConstants.NUMBER_AATSR_WVL];
 
         try {
-            rtmLookupTables = SnowRadianceAuxData.createRtmLookupTables(lutPath);
+            rtmLookupTables = SnowRadianceAuxData.createRtmLookupTables();
             for (int i = 0; i < SnowRadianceConstants.NUMBER_ATMOSPHERIC_PROFILES; i++) {
                 for (int j = 0; j < SnowRadianceConstants.NUMBER_AATSR_WVL; j++) {
                     btToa[i][j] = SnowTemperatureEmissivityRetrieval.getRtmSingle(waterVapour, esissivity, tSfc, viewAngle, rtmLookupTables[i][j]);
@@ -169,8 +169,8 @@ public class SnowTemperatureFubOpTest extends TestCase {
         final float waterVapour = 14.0f;
 
         try {
-            rtmLookupTables = SnowRadianceAuxData.createRtmLookupTables(lutPath);
-            tsfcLut = SnowRadianceAuxData.getTsfcFromLookupTables(lutPath);
+            rtmLookupTables = SnowRadianceAuxData.createRtmLookupTables();
+            tsfcLut = SnowRadianceAuxData.getTsfcFromLookupTables();
             for (int i = 0; i < SnowRadianceConstants.NUMBER_ATMOSPHERIC_PROFILES; i++) {
                 tLowestLayer[i] = tsfcLut[i][0][24];
             }
@@ -191,8 +191,8 @@ public class SnowTemperatureFubOpTest extends TestCase {
         final float bt11 = 250.42f;
 
         try {
-            rtmLookupTables = SnowRadianceAuxData.createRtmLookupTables(lutPath);
-            tsfcLut = SnowRadianceAuxData.getTsfcFromLookupTables(lutPath);
+            rtmLookupTables = SnowRadianceAuxData.createRtmLookupTables();
+            tsfcLut = SnowRadianceAuxData.getTsfcFromLookupTables();
             for (int i = 0; i < SnowRadianceConstants.NUMBER_ATMOSPHERIC_PROFILES; i++) {
                 tLowestLayer[i] = tsfcLut[i][0][24];
             }
@@ -214,8 +214,8 @@ public class SnowTemperatureFubOpTest extends TestCase {
         final float bt12 = 250.010f;
 
         try {
-            rtmLookupTables = SnowRadianceAuxData.createRtmLookupTables(lutPath);
-            tsfcLut = SnowRadianceAuxData.getTsfcFromLookupTables(lutPath);
+            rtmLookupTables = SnowRadianceAuxData.createRtmLookupTables();
+            tsfcLut = SnowRadianceAuxData.getTsfcFromLookupTables();
             for (int i = 0; i < SnowRadianceConstants.NUMBER_ATMOSPHERIC_PROFILES; i++) {
                 tLowestLayer[i] = tsfcLut[i][0][24];
             }

@@ -1,17 +1,19 @@
 package org.esa.beam.snowradiance.operator;
 
+import org.esa.beam.collocation.CollocateOp;
+import org.esa.beam.framework.datamodel.TiePointGrid;
+import org.esa.beam.framework.gpf.GPF;
 import org.esa.beam.framework.gpf.annotations.SourceProduct;
 import org.esa.beam.framework.gpf.annotations.TargetProduct;
 import org.esa.beam.framework.gpf.annotations.Parameter;
 import org.esa.beam.framework.gpf.annotations.OperatorMetadata;
 import org.esa.beam.framework.gpf.OperatorException;
-import org.esa.beam.framework.gpf.GPF;
 import org.esa.beam.framework.gpf.OperatorSpi;
 import org.esa.beam.framework.gpf.Operator;
 import org.esa.beam.framework.datamodel.Product;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Snow radiance 'master operator' (CURRENTLY NOT USED)
@@ -25,12 +27,12 @@ public class SnowRadianceMasterOp extends Operator {
     @SourceProduct(alias = "sourceMeris",
                    label = "Name (MERIS product)",
                    description = "Select a MERIS product for snow grains retrieval.")
-    private Product merisProduct;
+    private Product merisSourceProduct;
 
     @SourceProduct(alias = "sourceAatsr",
                    label = "Name (MERIS product)",
                    description = "Select a MERIS product for snow grains retrieval.")
-    private Product aatsrProduct;
+    private Product aatsrSourceProduct;
 
 
     // Target bands
@@ -98,11 +100,6 @@ public class SnowRadianceMasterOp extends Operator {
                label = "Apply cloud mask")
     private boolean applyCloudMask;
 
-//    @Parameter(defaultValue = "false",
-//               description = "Get cloud mask from cloud probability (MEPIX)",
-//               label = "Cloud probability (MEPIX)")
-//    private boolean getCloudMaskFromMepix;
-
     @Parameter(defaultValue = "true",
                description = "Get cloud mask from feature classification (MERIS/AATSR Synergy)",
                label = "Cloud probability (MERIS/AATSR Synergy)")
@@ -118,11 +115,6 @@ public class SnowRadianceMasterOp extends Operator {
                label = "AATSR as master")
     private boolean use100PercentSnowMaskWithAatsrMaster;
 
-//    @Parameter(defaultValue = "false",
-//               description = "Apply 100% snow mask with MERIS as master",
-//               label = "MERIS as master")
-//    private boolean use100PercentSnowMaskWithMerisMaster;
-
     @Parameter(defaultValue = "0.99", interval = "[0.0, 1.0]",
                description = "Assumed emissivity at 11 microns",
                label = "Assumed emissivity at 11 microns")
@@ -133,79 +125,30 @@ public class SnowRadianceMasterOp extends Operator {
                label = "Cloud probability threshold")
     private double cloudProbabilityThreshold;
 
-    @Parameter(defaultValue = "0.8", interval = "[0.0, 1.0]",
+    @Parameter(defaultValue = "0.96", interval = "[0.0, 1.0]",
                description = "NDSI upper threshold",
                label = "NDSI upper threshold")
     private double ndsiUpperThreshold;
 
-    @Parameter(defaultValue = "0.8", interval = "[0.0, 1.0]",
+    @Parameter(defaultValue = "0.90", interval = "[0.0, 1.0]",
                description = "NDSI lower threshold",
                label = "NDSI lower threshold")
     private double ndsiLowerThreshold;
 
-    @Parameter(defaultValue = "0.8", interval = "[0.0, 1.0]",
-               description = "AATSR 1610um upper threshold",
-               label = "AATSR 1610um upper threshold")
+    @Parameter(defaultValue = "10.0", interval = "[1.0, 100.0]",
+               description = "AATSR 1610nm upper threshold",
+               label = "AATSR 1610nm upper threshold")
     private double aatsr1610UpperThreshold;
 
-    @Parameter(defaultValue = "0.8", interval = "[0.0, 1.0]",
-               description = "AATSR 1610um lower threshold",
-               label = "AATSR 1610um lower threshold")
+    @Parameter(defaultValue = "1.0", interval = "[1.0, 100.0]",
+               description = "AATSR 1610nm lower threshold",
+               label = "AATSR 1610nm lower threshold")
     private double aatsr1610LowerThreshold;
 
-
-
-
-
-
-//    @SourceProduct(alias = "source",
-//                   label = "Name (MERIS/AATSR colocated product)",
-//                   description = "Select a MERIS/AATSR colocated product for snow temperature retrieval.")
-//    private Product colocatedProduct;
 
     @TargetProduct(description = "The target product.")
     private Product targetProduct;
 
-//    @Parameter(defaultValue = "true",
-//               description = "Compute Snow Temperature (FUB)",
-//               label = "Compute Snow Temperature (FUB)")
-//    private boolean computeSnowTemperatureFub;
-//
-//    @Parameter(defaultValue = "true",
-//               description = "Compute Emissivity (FUB)",
-//               label = "Compute Emissivity (FUB)")
-//    private boolean computeEmissivityFub;
-//
-//    @Parameter(defaultValue = "true",
-//               description = "Compute Unpolluted Snow Grain Size",
-//               label = "Compute Unpolluted Snow Grain Size")
-//    private boolean computeUnpollutedSnowGrainSize;
-//
-//    @Parameter(defaultValue = "false",
-//               description = "Compute Polluted Snow Grain Size",
-//               label = "Compute Polluted Snow Grain Size")
-//    private boolean computePollutedSnowGrainSize;
-//
-//    @Parameter(defaultValue = "true",
-//               description = "Compute Snow Albedo",
-//               label = "Compute Snow Albedo")
-//    private boolean computeSnowAlbedo;
-//
-//    @Parameter(defaultValue = "M",
-//               description = "Master Product Bands Suffix",
-//               label = "Master Product Bands Suffix")
-//    private String masterProductBandsSuffix;
-//
-//    @Parameter(defaultValue = "S",
-//               description = "Slave Product Bands Suffix",
-//               label = "Slave Product Bands Suffix")
-//    private String slaveProductBandsSuffix;
-//
-//    @Parameter(alias = SnowRadianceConstants.LUT_PATH_PARAM_NAME,
-//               defaultValue = SnowRadianceConstants.LUT_PATH_PARAM_DEFAULT,
-//               description = SnowRadianceConstants.LUT_PATH_PARAM_DESCRIPTION,
-//               label = SnowRadianceConstants.LUT_PATH_PARAM_LABEL)
-//    private String lutPath;
 
 
     public void initialize() throws OperatorException {
@@ -227,7 +170,7 @@ public class SnowRadianceMasterOp extends Operator {
         Product snowGrainsProduct = null;
 //        if (computeUnpollutedSnowGrainSize || computePollutedSnowGrainSize || computeSnowAlbedo) {
 //            Map<String, Product> snowGrainsInput = new HashMap<String, Product>(1);
-//            snowGrainsInput.put("source", merisProduct);
+//            snowGrainsInput.put("source", merisSourceProduct);
 //            Map<String, Object> snowGrainsParams = new HashMap<String, Object>(4);
 //            snowGrainsParams.put("computeUnpollutedSnowGrainSize", computeUnpollutedSnowGrainSize);
 //            snowGrainsParams.put("computePollutedSnowGrainSize", computePollutedSnowGrainSize);
@@ -235,10 +178,28 @@ public class SnowRadianceMasterOp extends Operator {
 //            fubSnowTempProduct = GPF.createProduct(OperatorSpi.getOperatorAlias(SnowGrainSizePollutionOp.class), snowGrainsParams, snowGrainsInput);
 //        }
 
+         // Collocation
+        Map<String, Product> collocateInput = new HashMap<String, Product>(2);
+        collocateInput.put("masterProduct", merisSourceProduct);
+        collocateInput.put("slaveProduct", aatsrSourceProduct);
+        Map<String, Object> collocateParams = new HashMap<String, Object>(2);
+        collocateParams.put("masterComponentPattern", "${ORIGINAL_NAME}_MERIS");
+        collocateParams.put("slaveComponentPattern", "${ORIGINAL_NAME}_AATSR");
+        Product collocateProduct =
+            GPF.createProduct(OperatorSpi.getOperatorAlias(CollocateOp.class), collocateParams, collocateInput);
+
+        // Fix collocation output (tie point grids lost their units and descriptions)
+        for (TiePointGrid tpg : collocateProduct.getTiePointGrids()) {
+            tpg.setUnit(merisSourceProduct.getTiePointGrid(tpg.getName()).getUnit());
+            tpg.setDescription(merisSourceProduct.getTiePointGrid(tpg.getName()).getDescription());
+        }
+
+
 //        targetProduct = fubSnowTempProduct;
         targetProduct = snowGrainsProduct;
     }
 
+    
 
     /**
      * The Service Provider Interface (SPI) for the operator.

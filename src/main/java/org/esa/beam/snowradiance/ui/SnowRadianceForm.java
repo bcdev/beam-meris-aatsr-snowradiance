@@ -2,8 +2,6 @@ package org.esa.beam.snowradiance.ui;
 
 import com.bc.ceres.swing.TableLayout;
 import com.bc.ceres.swing.binding.BindingContext;
-import org.esa.beam.dataio.envisat.EnvisatProductReader;
-import org.esa.beam.framework.dataio.ProductReader;
 import org.esa.beam.framework.datamodel.Product;
 import org.esa.beam.framework.gpf.ui.SourceProductSelector;
 import org.esa.beam.framework.gpf.ui.TargetProductSelector;
@@ -12,26 +10,21 @@ import org.esa.beam.framework.ui.AppContext;
 import org.esa.beam.snowradiance.operator.SnowRadianceConstants;
 
 import javax.swing.AbstractButton;
-import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTabbedPane;
-import javax.swing.border.TitledBorder;
-import java.awt.Color;
+import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -98,8 +91,8 @@ public class SnowRadianceForm extends JTabbedPane {
 
     private void bindComponents() {
         final BindingContext bc = new BindingContext(snowRadianceModel.getPropertyContainer());
-        bc.bind("merisProduct", merisSourceProductSelector.getProductNameComboBox());
-        bc.bind("aatsrProduct", aatsrSourceProductSelector.getProductNameComboBox());
+        bc.bind("merisSourceProduct", merisSourceProductSelector.getProductNameComboBox());
+        bc.bind("aatsrSourceProduct", aatsrSourceProductSelector.getProductNameComboBox());
 
         bc.bind("copyInputBands", copyInputBandsCheckBox);
         bc.bind("computeSnowGrainSize", computeSnowGrainSizeCheckBox);
@@ -160,12 +153,13 @@ public class SnowRadianceForm extends JTabbedPane {
         cloudMaskGroup.add(getCloudMaskFromSynergyRadioButton);
 
         apply100PercentSnowMaskCheckBox = new JCheckBox(SnowRadianceConstants.applySnowMaskLabel);
-        ActionListener snowMaskActionListener = new ActionListener() {
+        ActionListener applyMasksActionListener = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 updateUIState();
             }
 		};
-        apply100PercentSnowMaskCheckBox.addActionListener(snowMaskActionListener);
+        applyCloudMaskCheckBox.addActionListener(applyMasksActionListener);
+        apply100PercentSnowMaskCheckBox.addActionListener(applyMasksActionListener);
         snowMaskGroup = new ButtonGroup();
         use100PercentSnowMaskWithAatsrMasterRadioButton = new JRadioButton(SnowRadianceConstants.applySnowMaskWithAatsrMasterLabel);
         use100PercentSnowMaskWithAatsrMasterRadioButton.setSelected(true);
@@ -190,23 +184,16 @@ public class SnowRadianceForm extends JTabbedPane {
         layoutIO.setCellWeightY(2, 0, 1);
         layoutIO.setTablePadding(2, 2);
 
-        TableLayout targetBandsParam = new TableLayout(1);
-        targetBandsParam.setTableAnchor(TableLayout.Anchor.NORTHWEST);
-        targetBandsParam.setTableFill(TableLayout.Fill.HORIZONTAL);
-        targetBandsParam.setTableWeightX(1);
-        targetBandsParam.setCellWeightY(0, 0, 1);
-        targetBandsParam.setTablePadding(2, 2);
-
-        TableLayout processingParam = new TableLayout(1);
-        processingParam.setTableAnchor(TableLayout.Anchor.NORTHWEST);
-        processingParam.setTableFill(TableLayout.Fill.HORIZONTAL);
-        processingParam.setTableWeightX(1);
-        processingParam.setCellWeightY(3, 0, 1);
-        processingParam.setTablePadding(2, 2);
+        TableLayout layoutTargetBands = new TableLayout(1);
+        layoutTargetBands.setTableAnchor(TableLayout.Anchor.NORTHWEST);
+        layoutTargetBands.setTableFill(TableLayout.Fill.HORIZONTAL);
+        layoutTargetBands.setTableWeightX(1);
+        layoutTargetBands.setCellWeightY(0, 0, 1);
+        layoutTargetBands.setTablePadding(2, 2);
 
         JPanel ioTab = new JPanel(layoutIO);
-        JPanel targetBandsParamTab = new JPanel(targetBandsParam);
-        JPanel processingParamTab = new JPanel(processingParam);
+        JPanel targetBandsParamTab = new JPanel(layoutTargetBands);
+        JPanel processingParamTab = new JPanel(new BorderLayout(10,10));
         addTab("I/O Parameters", ioTab);
         addTab("Target Bands", targetBandsParamTab);
         addTab("Processing Parameters", processingParamTab);
@@ -222,7 +209,7 @@ public class SnowRadianceForm extends JTabbedPane {
         targetBandsParamTab.add(targetBandsPanel);
 
         JPanel processingParamsPanel = createProcessingParamsPanel();
-        processingParamTab.add(processingParamsPanel);
+        processingParamTab.add(processingParamsPanel, BorderLayout.NORTH);
     }
 
     private JPanel createTargetBandSelectionPanel() {
@@ -258,50 +245,15 @@ public class SnowRadianceForm extends JTabbedPane {
 		return panel;
 	}
 
-    public JPanel createProcessingParamsPanel() {
+    private JPanel createCloudMaskParametersPanel() {
 
-        TableLayout layout = new TableLayout(5);
+        TableLayout layout = new TableLayout(2);
         layout.setTableAnchor(TableLayout.Anchor.WEST);
         layout.setTableFill(TableLayout.Fill.HORIZONTAL);
         layout.setTablePadding(10, 5);     // space between columns/rows
         final JPanel panel = new JPanel(layout);
 
         int rowIndex = 0;
-
-        layout.setCellColspan(rowIndex, 0, 4);
-        layout.setCellWeightX(rowIndex, 0, 1.0);
-        panel.add(new JLabel(SnowRadianceConstants.parametersForMaskingLabel), new TableLayout.Cell(rowIndex, 0));
-        rowIndex++;
-
-        layout.setCellPadding(rowIndex, 0, new Insets(0, 12, 0, 0));
-        layout.setCellPadding(rowIndex, 1, new Insets(0, 60, 0, 0));
-        layout.setCellPadding(rowIndex, 2, new Insets(0, 120, 0, 0));
-        layout.setCellPadding(rowIndex, 3, new Insets(0, 180, 0, 0));
-//        layout.setCellWeightX(rowIndex, 0, 1.0);
-//        layout.setCellWeightX(rowIndex, 1, 0.2);
-//        layout.setCellWeightX(rowIndex, 2, 0.2);
-//        layout.setCellWeightX(rowIndex, 3, 0.2);
-//        layout.setCellWeightX(rowIndex, 4, 0.2);
-        panel.add(new JLabel(SnowRadianceConstants.ndsiLowerLabel), new TableLayout.Cell(rowIndex, 0));
-        panel.add(ndsiLowerThresholdTextField, new TableLayout.Cell(rowIndex, 1));
-        panel.add(new JLabel(SnowRadianceConstants.ndsiUpperLabel), new TableLayout.Cell(rowIndex, 2));
-        panel.add(ndsiUpperThresholdTextField, new TableLayout.Cell(rowIndex, 3));
-        panel.add(new JLabel("bla"), new TableLayout.Cell(rowIndex, 4));
-        rowIndex++;
-
-        rowIndex = addCloudMaskParameters(layout, panel, rowIndex);
-        rowIndex = addEmptyLine(panel, rowIndex);
-        rowIndex = addSnowMaskParameters(layout, panel, rowIndex);
-
-        layout.setCellColspan(rowIndex, 0, 2);
-        layout.setCellWeightX(rowIndex, 0, 1.0);
-        layout.setCellWeightY(rowIndex, 0, 1.0);
-        panel.add(new JPanel());
-
-        return panel;
-    }
-
-    private int addCloudMaskParameters(TableLayout layout, JPanel panel, int rowIndex) {
 
         layout.setCellColspan(rowIndex, 0, 2);
         layout.setCellWeightX(rowIndex, 0, 1.0);
@@ -320,37 +272,105 @@ public class SnowRadianceForm extends JTabbedPane {
         layout.setCellPadding(rowIndex, 1, new Insets(0, 24, 0, 0));
         layout.setCellWeightX(rowIndex, 0, 1.0);
         panel.add(getCloudMaskFromSynergyRadioButton, new TableLayout.Cell(rowIndex, 0));
-        rowIndex++;
 
-        return rowIndex;
+        return panel;
     }
 
+    private JPanel createSnowMaskParametersPanel() {
 
+        TableLayout layout = new TableLayout(2);
+        layout.setTableAnchor(TableLayout.Anchor.WEST);
+        layout.setTableFill(TableLayout.Fill.HORIZONTAL);
+        layout.setTablePadding(10, 5);     // space between columns/rows
+        final JPanel panel = new JPanel(layout);
 
-    private int addSnowMaskParameters(TableLayout layout, JPanel panel, int rowIndex) {
+        int rowIndex = 0;
 
-        rowIndex++;
         layout.setCellColspan(rowIndex, 0, 2);
         layout.setCellWeightX(rowIndex, 0, 1.0);
         panel.add(apply100PercentSnowMaskCheckBox, new TableLayout.Cell(rowIndex, 0));
-        rowIndex++;
+//        rowIndex++;
+//
+//        layout.setCellColspan(rowIndex, 0, 2);
+//        layout.setCellPadding(rowIndex, 0, new Insets(0, 24, 0, 0));
+//        layout.setCellPadding(rowIndex, 1, new Insets(0, 24, 0, 0));
+//        layout.setCellWeightX(rowIndex, 0, 1.0);
+//        panel.add(use100PercentSnowMaskWithAatsrMasterRadioButton, new TableLayout.Cell(rowIndex, 0));
+//
+//        rowIndex++;
+//
+//        layout.setCellPadding(rowIndex, 0, new Insets(0, 24, 0, 0));
+//        layout.setCellPadding(rowIndex, 1, new Insets(0, 24, 0, 0));
+//        layout.setCellWeightX(rowIndex, 0, 1.0);
+//        panel.add(use100PercentSnowMaskWithMerisMasterRadioButton, new TableLayout.Cell(rowIndex, 0));
 
-        layout.setCellColspan(rowIndex, 0, 2);
-        layout.setCellPadding(rowIndex, 0, new Insets(0, 24, 0, 0));
-        layout.setCellPadding(rowIndex, 1, new Insets(0, 24, 0, 0));
-        layout.setCellWeightX(rowIndex, 0, 1.0);
-        panel.add(use100PercentSnowMaskWithAatsrMasterRadioButton, new TableLayout.Cell(rowIndex, 0));
+        return panel;
+    }
 
-        rowIndex++;
+    private JPanel createProcessingParamsPanel() {
+        final JPanel panel = new JPanel(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.HORIZONTAL;
 
-        layout.setCellPadding(rowIndex, 0, new Insets(0, 24, 0, 0));
-        layout.setCellPadding(rowIndex, 1, new Insets(0, 24, 0, 0));
-        layout.setCellWeightX(rowIndex, 0, 1.0);
-        panel.add(use100PercentSnowMaskWithMerisMasterRadioButton, new TableLayout.Cell(rowIndex, 0));
+        JPanel cloudMaskParametersPanel = createCloudMaskParametersPanel();
+        JPanel snowMaskParametersPanel = createSnowMaskParametersPanel();
 
-        rowIndex++;
+        c.weightx = 0.5;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.gridx = 0;
+        c.gridy = 0;
+        panel.add(cloudMaskParametersPanel, c);
+        c.gridy = 1;
+        panel.add(snowMaskParametersPanel, c);
 
-        return rowIndex;
+        // Text field for assumed emissivity at 11 um
+        c.gridx = 0;
+        c.gridy = 2;
+        panel.add(new JLabel(SnowRadianceConstants.assumedEmissivity11MicronsLabel), c);
+        c.gridx = 2;
+        panel.add(assumedEmissivityAt11MicronsTextField, c);
+
+        // Label: Parameters for masking
+        c.gridx = 0;
+        c.gridy = 3;
+        panel.add(new JLabel(SnowRadianceConstants.parametersForMaskingLabel), c);
+
+        // NDSI upper/lower:
+        c.gridx = 0;
+        c.gridy = 4;
+        panel.add(new JLabel(SnowRadianceConstants.ndsiLabel), c);
+        c.gridx = 1;
+        panel.add(new JLabel(SnowRadianceConstants.lowerLabel), c);
+        c.gridx = 2;
+        panel.add(ndsiLowerThresholdTextField, c);
+        c.gridx = 3;
+        panel.add(new JLabel(SnowRadianceConstants.upperLabel), c);
+        c.gridx = 4;
+        panel.add(ndsiUpperThresholdTextField, c);
+
+        // Cloud prob. threshold:
+        c.gridx = 0;
+        c.gridy = 5;
+        panel.add(new JLabel(SnowRadianceConstants.cloudProbThresholdLabel), c);
+        c.gridx = 2;
+        panel.add(cloudProbabilityThresholdTextField, c);
+
+        // 100% snow boundaries:
+        c.gridx = 0;
+        c.gridy = 6;
+        panel.add(new JLabel(SnowRadianceConstants.snowBoundariesLabel), c);
+        c.gridy = 7;
+        panel.add(new JLabel(SnowRadianceConstants.aatsr1610Label), c);
+        c.gridx = 1;
+        panel.add(new JLabel(SnowRadianceConstants.lowerLabel), c);
+        c.gridx = 2;
+        panel.add(aatsr1610LowerThresholdTextField, c);
+        c.gridx = 3;
+        panel.add(new JLabel(SnowRadianceConstants.upperLabel), c);
+        c.gridx = 4;
+        panel.add(aatsr1610UpperThresholdTextField, c);
+
+        return panel;
     }
 
     private int addEmptyLine(JPanel panel, int rowIndex) {
@@ -361,6 +381,7 @@ public class SnowRadianceForm extends JTabbedPane {
 
     private void updateUIState() {
         updateSnowMaskUIstate();
+        updateCloudMaskUIstate();
     }
 
     private void updateSnowMaskUIstate() {
@@ -368,6 +389,13 @@ public class SnowRadianceForm extends JTabbedPane {
         use100PercentSnowMaskWithAatsrMasterRadioButton.setEnabled(maskSnowSelected);
         use100PercentSnowMaskWithMerisMasterRadioButton.setEnabled(maskSnowSelected);
     }
+
+    private void updateCloudMaskUIstate() {
+        boolean maskCloudSelected = applyCloudMaskCheckBox.isSelected();
+        getCloudMaskFromMepixRadioButton.setEnabled(maskCloudSelected);
+        getCloudMaskFromSynergyRadioButton.setEnabled(maskCloudSelected);
+    }
+
 
     public void prepareShow() {
 	    merisSourceProductSelector.initProducts();

@@ -8,6 +8,8 @@ import ucar.nc2.NetcdfFile;
 import ucar.nc2.Variable;
 
 import java.io.*;
+import java.net.URL;
+import java.net.URLDecoder;
 import java.text.DecimalFormat;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -66,11 +68,10 @@ public class SnowRadianceAuxData {
      * This method reads all LUT files for snow temperature retrieval and creates
      * corresponding {@link org.esa.beam.util.math.LookupTable} objects.
      *
-     * @param inputPath - file input path
      * @return LookupTable[][]
      * @throws java.io.IOException
      */
-    public static LookupTable[][] createRtmLookupTables(String inputPath) throws IOException {
+    public static LookupTable[][] createRtmLookupTables() throws IOException {
 
         final DecimalFormat df1 = new DecimalFormat("0");
 
@@ -85,7 +86,13 @@ public class SnowRadianceAuxData {
                 final String inputFileString = "pr" + sb2 + "_" + SnowRadianceConstants.AATSR_WVL[j] + ".nc";
 
                 try {
-                    final NetcdfFile netcdfFile = NetcdfFile.open(inputPath + File.separator + inputFileString);
+                    final URL url = SnowPropertiesOp.class.getResource(inputFileString);
+                    final String path = URLDecoder.decode(url.getPath(), "UTF-8");
+                    final File file = new File(path);
+                    final String inputPath = file.getAbsolutePath();
+
+//                    final NetcdfFile netcdfFile = NetcdfFile.open(inputPath + File.separator + inputFileString);
+                    final NetcdfFile netcdfFile = NetcdfFile.open(inputPath);
 
                     List variables = netcdfFile.getVariables();
 
@@ -137,7 +144,7 @@ public class SnowRadianceAuxData {
         return rtmLookupTables;
     }
 
-    public static double[][][] getTsfcFromLookupTables(String inputPath) throws IOException {
+    public static double[][][] getTsfcFromLookupTables() throws IOException {
 
         final DecimalFormat df1 = new DecimalFormat("0");
 
@@ -153,7 +160,13 @@ public class SnowRadianceAuxData {
                 final String inputFileString = "pr" + sb2 + "_" + SnowRadianceConstants.AATSR_WVL[j] + ".nc";
 
                 try {
-                    final NetcdfFile netcdfFile = NetcdfFile.open(inputPath + File.separator + inputFileString);
+                    final URL url = SnowPropertiesOp.class.getResource(inputFileString);
+                    final String path = URLDecoder.decode(url.getPath(), "UTF-8");
+                    final File file = new File(path);
+                    final String inputPath = file.getAbsolutePath();
+
+//                    final NetcdfFile netcdfFile = NetcdfFile.open(inputPath + File.separator + inputFileString);
+                    final NetcdfFile netcdfFile = NetcdfFile.open(inputPath);
 
                     final Variable tsfc = netcdfFile.findVariable("TMP");
 
