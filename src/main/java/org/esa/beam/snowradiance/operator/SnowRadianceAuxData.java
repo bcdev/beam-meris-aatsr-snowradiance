@@ -1,6 +1,7 @@
 package org.esa.beam.snowradiance.operator;
 
 import org.esa.beam.framework.gpf.OperatorException;
+import org.esa.beam.snowradiance.util.SnowRadianceUtils;
 import org.esa.beam.util.math.IntervalPartition;
 import org.esa.beam.util.math.LookupTable;
 import ucar.ma2.Array;
@@ -12,7 +13,6 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.text.DecimalFormat;
 import java.util.List;
-import java.util.StringTokenizer;
 
 import com.bc.jnn.JnnNet;
 import com.bc.jnn.JnnException;
@@ -91,8 +91,16 @@ public class SnowRadianceAuxData {
                     final File file = new File(path);
                     final String inputPath = file.getAbsolutePath();
 
+//                    final String netcdfPath = "C:" + File.separator + "temp" + File.separator + inputFileString;
+//                    final String netcdfPath = "C:" + File.separator + "temp" + File.separator + inputFileString;
+                    final String netcdfPath = System.getProperty("java.io.tmpdir") + 
+                            File.separator + inputFileString;
+                    InputStream inputStream = SnowPropertiesOp.class.getResourceAsStream(inputFileString);
+                    SnowRadianceUtils.copyStreamToFile(inputStream, netcdfPath);
+
 //                    final NetcdfFile netcdfFile = NetcdfFile.open(inputPath + File.separator + inputFileString);
-                    final NetcdfFile netcdfFile = NetcdfFile.open(inputPath);
+//                    final NetcdfFile netcdfFile = NetcdfFile.open(inputPath);
+                    final NetcdfFile netcdfFile = NetcdfFile.open(netcdfPath);
 
                     List variables = netcdfFile.getVariables();
 
@@ -166,7 +174,13 @@ public class SnowRadianceAuxData {
                     final String inputPath = file.getAbsolutePath();
 
 //                    final NetcdfFile netcdfFile = NetcdfFile.open(inputPath + File.separator + inputFileString);
-                    final NetcdfFile netcdfFile = NetcdfFile.open(inputPath);
+//                    final String netcdfPath = "C:" + File.separator + "temp" + File.separator + inputFileString;
+                    final String netcdfPath = System.getProperty("java.io.tmpdir") +
+                            File.separator + inputFileString;
+                    InputStream inputStream = SnowPropertiesOp.class.getResourceAsStream(inputFileString);
+                    SnowRadianceUtils.copyStreamToFile(inputStream, netcdfPath);
+//                    final NetcdfFile netcdfFile = NetcdfFile.open(inputPath);
+                    final NetcdfFile netcdfFile = NetcdfFile.open(netcdfPath);
 
                     final Variable tsfc = netcdfFile.findVariable("TMP");
 

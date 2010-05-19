@@ -79,9 +79,9 @@ public class SnowRadianceMasterOp extends Operator {
     private boolean computeMerisNdvi;
 
     @Parameter(defaultValue = "false",
-               description = "Compute MERIS NDSI",
-               label = "Compute MERIS NDSI")
-    private boolean computeMerisNdsi;
+               description = "Compute AATSR NDSI",
+               label = "Compute AATSR NDSI")
+    private boolean computeAatsrNdsi;
 
     @Parameter(defaultValue = "false",
                description = "Compute MERIS MDSI",
@@ -100,7 +100,7 @@ public class SnowRadianceMasterOp extends Operator {
                label = "Apply cloud mask")
     private boolean applyCloudMask;
 
-    @Parameter(defaultValue = "true",
+    @Parameter(defaultValue = "false",
                description = "Get cloud mask from feature classification (MERIS/AATSR Synergy)",
                label = "Cloud probability (MERIS/AATSR Synergy)")
     private boolean getCloudMaskFromSynergy;
@@ -109,11 +109,6 @@ public class SnowRadianceMasterOp extends Operator {
                description = "Apply 100% snow mask",
                label = "Apply 100% snow mask")
     private boolean apply100PercentSnowMask;
-
-    @Parameter(defaultValue = "false",
-               description = "Apply 100% snow mask with AATSR as master",
-               label = "AATSR as master")
-    private boolean use100PercentSnowMaskWithAatsrMaster;
 
     @Parameter(defaultValue = "0.99", interval = "[0.0, 1.0]",
                description = "Assumed emissivity at 11 microns",
@@ -183,20 +178,43 @@ public class SnowRadianceMasterOp extends Operator {
         collocateInput.put("masterProduct", merisSourceProduct);
         collocateInput.put("slaveProduct", aatsrSourceProduct);
         Map<String, Object> collocateParams = new HashMap<String, Object>(2);
-        collocateParams.put("masterComponentPattern", "${ORIGINAL_NAME}_MERIS");
-        collocateParams.put("slaveComponentPattern", "${ORIGINAL_NAME}_AATSR");
-        Product collocateProduct =
+        collocateParams.put("masterComponentPattern", "${ORIGINAL_NAME}_M");
+        collocateParams.put("slaveComponentPattern", "${ORIGINAL_NAME}_S");
+        Product colocatedProduct =
             GPF.createProduct(OperatorSpi.getOperatorAlias(CollocateOp.class), collocateParams, collocateInput);
 
         // Fix collocation output (tie point grids lost their units and descriptions)
-        for (TiePointGrid tpg : collocateProduct.getTiePointGrids()) {
+        for (TiePointGrid tpg : colocatedProduct.getTiePointGrids()) {
             tpg.setUnit(merisSourceProduct.getTiePointGrid(tpg.getName()).getUnit());
             tpg.setDescription(merisSourceProduct.getTiePointGrid(tpg.getName()).getDescription());
         }
 
+        Product snowPropertiesProduct = null;
+        if (computeSnowTemperatureFub || computeEmissivityFub ||
+                computeSnowGrainSize || computeSnowSootContent || computeSnowAlbedo) {
+            Map<String, Product> snowPropertiesInput = new HashMap<String, Product>(2);
+            snowPropertiesInput.put("colocatedProduct", colocatedProduct);
+            snowPropertiesInput.put("merisProduct", merisSourceProduct);
+            Map<String, Object> snowPropertiesParams = new HashMap<String, Object>(4);
+            snowPropertiesParams.put("applyCloudMask", applyCloudMask);
+            snowPropertiesParams.put("getCloudMaskFromSynergy", getCloudMaskFromSynergy);
+            snowPropertiesParams.put("apply100PercentSnowMask", apply100PercentSnowMask);
+            snowPropertiesParams.put("copyInputBands", copyInputBands);
+            snowPropertiesParams.put("computeSnowGrainSize", computeSnowGrainSize);
+            snowPropertiesParams.put("computeSnowAlbedo", computeSnowAlbedo);
+            snowPropertiesParams.put("computeSnowSootContent", computeSnowSootContent);
+            snowPropertiesParams.put("computeEmissivityFub", computeEmissivityFub);
+            snowPropertiesParams.put("computeSnowTemperatureFub", computeSnowTemperatureFub);
+            snowPropertiesParams.put("computeMerisWaterVapour", computeMerisWaterVapour);
+            snowPropertiesParams.put("computeMerisNdvi", computeMerisNdvi);
+            snowPropertiesParams.put("computeAatsrNdsi", computeAatsrNdsi);
+            snowPropertiesParams.put("computeMerisMdsi", computeMerisMdsi);
+            snowPropertiesParams.put("copyAatsrL1Flags", copyAatsrL1Flags);
+            snowPropertiesProduct = GPF.createProduct(OperatorSpi.getOperatorAlias(SnowPropertiesOp.class), snowPropertiesParams, snowPropertiesInput);
+        }
 
-//        targetProduct = fubSnowTempProduct;
-        targetProduct = snowGrainsProduct;
+//        targetProduct = colocatedProduct;
+        targetProduct = snowPropertiesProduct;
     }
 
     

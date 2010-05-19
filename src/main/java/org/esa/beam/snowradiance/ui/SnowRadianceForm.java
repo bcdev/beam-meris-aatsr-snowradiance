@@ -47,7 +47,7 @@ public class SnowRadianceForm extends JTabbedPane {
 
     private JCheckBox computeMerisWaterVapourCheckBox;
     private JCheckBox computeMerisNdviCheckBox;
-    private JCheckBox computeMerisNdsiCheckBox;
+    private JCheckBox computeAatsrNdsiCheckBox;
     private JCheckBox computeMerisMdsiCheckBox;
     private JCheckBox copyAatsrL1FlagsCheckBox;
 
@@ -56,10 +56,7 @@ public class SnowRadianceForm extends JTabbedPane {
     private ButtonGroup cloudMaskGroup;
     private JRadioButton getCloudMaskFromMepixRadioButton;
     private JRadioButton getCloudMaskFromSynergyRadioButton;
-    private ButtonGroup snowMaskGroup;
     private JCheckBox apply100PercentSnowMaskCheckBox;
-    private JRadioButton use100PercentSnowMaskWithAatsrMasterRadioButton;
-    private JRadioButton use100PercentSnowMaskWithMerisMasterRadioButton;
     private JFormattedTextField assumedEmissivityAt11MicronsTextField;
     private JFormattedTextField cloudProbabilityThresholdTextField;
     private JFormattedTextField ndsiUpperThresholdTextField;
@@ -102,7 +99,7 @@ public class SnowRadianceForm extends JTabbedPane {
         bc.bind("computeEmissivityFub", computeEmissivityFubCheckBox);
         bc.bind("computeMerisWaterVapour", computeMerisWaterVapourCheckBox);
         bc.bind("computeMerisNdvi", computeMerisNdviCheckBox);
-        bc.bind("computeMerisNdsi", computeMerisNdsiCheckBox);
+        bc.bind("computeAatsrNdsi", computeAatsrNdsiCheckBox);
         bc.bind("computeMerisMdsi", computeMerisMdsiCheckBox);
         bc.bind("copyAatsrL1Flags", copyAatsrL1FlagsCheckBox);
         
@@ -120,11 +117,6 @@ public class SnowRadianceForm extends JTabbedPane {
         cloudMaskGroupValueSet.put(getCloudMaskFromSynergyRadioButton, true);
         bc.bind("getCloudMaskFromSynergy", cloudMaskGroup, cloudMaskGroupValueSet);
 
-        Map<AbstractButton, Object> snowMaskGroupValueSet = new HashMap<AbstractButton, Object>(4);
-        snowMaskGroupValueSet.put(use100PercentSnowMaskWithAatsrMasterRadioButton, true);
-        snowMaskGroupValueSet.put(use100PercentSnowMaskWithMerisMasterRadioButton, false);
-        bc.bind("use100PercentSnowMaskWithAatsrMaster", snowMaskGroup, snowMaskGroupValueSet);
-
     }
 
     private void initComponents() {
@@ -139,16 +131,16 @@ public class SnowRadianceForm extends JTabbedPane {
 
         computeMerisWaterVapourCheckBox = new JCheckBox(SnowRadianceConstants.waterVapourMerisLabel);
         computeMerisNdviCheckBox = new JCheckBox(SnowRadianceConstants.ndviMerisLabel);
-        computeMerisNdsiCheckBox = new JCheckBox(SnowRadianceConstants.ndsiMerisLabel);
+        computeAatsrNdsiCheckBox = new JCheckBox(SnowRadianceConstants.ndsiMerisLabel);
         computeMerisMdsiCheckBox = new JCheckBox(SnowRadianceConstants.mdsiMerisLabel);
         copyAatsrL1FlagsCheckBox = new JCheckBox(SnowRadianceConstants.aatsrL1FlagsLabel);
 
         applyCloudMaskCheckBox = new JCheckBox(SnowRadianceConstants.applyCloudMaskLabel, true);
         cloudMaskGroup = new ButtonGroup();
         getCloudMaskFromMepixRadioButton = new JRadioButton(SnowRadianceConstants.applyCloudMaskMepixLabel);
-        getCloudMaskFromMepixRadioButton.setSelected(false);
+        getCloudMaskFromMepixRadioButton.setSelected(true);
         getCloudMaskFromSynergyRadioButton = new JRadioButton(SnowRadianceConstants.applyCloudMaskSynergyLabel);
-        getCloudMaskFromSynergyRadioButton.setSelected(true);
+        getCloudMaskFromSynergyRadioButton.setSelected(false);
         cloudMaskGroup.add(getCloudMaskFromMepixRadioButton);
         cloudMaskGroup.add(getCloudMaskFromSynergyRadioButton);
 
@@ -159,14 +151,6 @@ public class SnowRadianceForm extends JTabbedPane {
             }
 		};
         applyCloudMaskCheckBox.addActionListener(applyMasksActionListener);
-        apply100PercentSnowMaskCheckBox.addActionListener(applyMasksActionListener);
-        snowMaskGroup = new ButtonGroup();
-        use100PercentSnowMaskWithAatsrMasterRadioButton = new JRadioButton(SnowRadianceConstants.applySnowMaskWithAatsrMasterLabel);
-        use100PercentSnowMaskWithAatsrMasterRadioButton.setSelected(true);
-        use100PercentSnowMaskWithMerisMasterRadioButton = new JRadioButton(SnowRadianceConstants.applySnowMaskWithMerisMasterLabel);
-        use100PercentSnowMaskWithMerisMasterRadioButton.setSelected(false);
-        snowMaskGroup.add(use100PercentSnowMaskWithAatsrMasterRadioButton);
-        snowMaskGroup.add(use100PercentSnowMaskWithMerisMasterRadioButton);
 
         assumedEmissivityAt11MicronsTextField = new JFormattedTextField(SnowRadianceConstants.assumedEmissivity11MicronsDefaultValue);
         cloudProbabilityThresholdTextField = new JFormattedTextField(SnowRadianceConstants.cloudProbThresholdLabel);
@@ -238,7 +222,7 @@ public class SnowRadianceForm extends JTabbedPane {
         panel.add(new JLabel(" "));
         panel.add(computeMerisWaterVapourCheckBox);
         panel.add(computeMerisNdviCheckBox);
-        panel.add(computeMerisNdsiCheckBox);
+        panel.add(computeAatsrNdsiCheckBox);
         panel.add(computeMerisMdsiCheckBox);
         panel.add(copyAatsrL1FlagsCheckBox);
 
@@ -289,20 +273,6 @@ public class SnowRadianceForm extends JTabbedPane {
         layout.setCellColspan(rowIndex, 0, 2);
         layout.setCellWeightX(rowIndex, 0, 1.0);
         panel.add(apply100PercentSnowMaskCheckBox, new TableLayout.Cell(rowIndex, 0));
-//        rowIndex++;
-//
-//        layout.setCellColspan(rowIndex, 0, 2);
-//        layout.setCellPadding(rowIndex, 0, new Insets(0, 24, 0, 0));
-//        layout.setCellPadding(rowIndex, 1, new Insets(0, 24, 0, 0));
-//        layout.setCellWeightX(rowIndex, 0, 1.0);
-//        panel.add(use100PercentSnowMaskWithAatsrMasterRadioButton, new TableLayout.Cell(rowIndex, 0));
-//
-//        rowIndex++;
-//
-//        layout.setCellPadding(rowIndex, 0, new Insets(0, 24, 0, 0));
-//        layout.setCellPadding(rowIndex, 1, new Insets(0, 24, 0, 0));
-//        layout.setCellWeightX(rowIndex, 0, 1.0);
-//        panel.add(use100PercentSnowMaskWithMerisMasterRadioButton, new TableLayout.Cell(rowIndex, 0));
 
         return panel;
     }
@@ -380,20 +350,15 @@ public class SnowRadianceForm extends JTabbedPane {
     }
 
     private void updateUIState() {
-        updateSnowMaskUIstate();
         updateCloudMaskUIstate();
-    }
-
-    private void updateSnowMaskUIstate() {
-        boolean maskSnowSelected = apply100PercentSnowMaskCheckBox.isSelected();
-        use100PercentSnowMaskWithAatsrMasterRadioButton.setEnabled(maskSnowSelected);
-        use100PercentSnowMaskWithMerisMasterRadioButton.setEnabled(maskSnowSelected);
     }
 
     private void updateCloudMaskUIstate() {
         boolean maskCloudSelected = applyCloudMaskCheckBox.isSelected();
-        getCloudMaskFromMepixRadioButton.setEnabled(maskCloudSelected);
-        getCloudMaskFromSynergyRadioButton.setEnabled(maskCloudSelected);
+//        getCloudMaskFromMepixRadioButton.setEnabled(maskCloudSelected);
+//        getCloudMaskFromSynergyRadioButton.setEnabled(maskCloudSelected);
+        getCloudMaskFromMepixRadioButton.setEnabled(false);
+        getCloudMaskFromSynergyRadioButton.setEnabled(false);
     }
 
 

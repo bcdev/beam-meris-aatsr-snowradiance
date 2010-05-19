@@ -196,7 +196,7 @@ public class SnowTemperatureFubOpTest extends TestCase {
             for (int i = 0; i < SnowRadianceConstants.NUMBER_ATMOSPHERIC_PROFILES; i++) {
                 tLowestLayer[i] = tsfcLut[i][0][24];
             }
-            float temp = SnowTemperatureEmissivityRetrieval.minimizeNewtonForTemperature(waterVapour, viewAngle, bt11,
+            float temp = SnowTemperatureEmissivityRetrieval.minimizeNewtonForTemperature(0.99, waterVapour, viewAngle, bt11,
                                                                              rtmLookupTables, tLowestLayer);
             assertEquals(250.945f, temp, 1.E-3);
         } catch (IOException e) {

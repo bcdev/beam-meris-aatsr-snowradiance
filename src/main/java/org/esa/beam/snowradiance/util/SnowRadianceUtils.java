@@ -1,9 +1,20 @@
 package org.esa.beam.snowradiance.util;
 
 import org.esa.beam.dataio.envisat.EnvisatConstants;
+import org.esa.beam.framework.datamodel.Band;
+import org.esa.beam.framework.datamodel.FlagCoding;
 import org.esa.beam.framework.datamodel.Product;
 import org.esa.beam.framework.gpf.OperatorException;
+import org.esa.beam.util.Guardian;
+import org.esa.beam.util.ProductUtils;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
@@ -175,4 +186,63 @@ public class SnowRadianceUtils {
             throw new OperatorException(message);
         }
     }
+
+    public static void copyFlagBand(String flagBandName, Product sourceProduct, Product targetProduct) {
+        Guardian.assertNotNull("source", sourceProduct);
+        Guardian.assertNotNull("target", targetProduct);
+        if (sourceProduct.getFlagCodingGroup().getNodeCount() > 0) {
+            Band sourceBand;
+            Band targetBand;
+            FlagCoding coding;
+
+            for (int i = 0; i < sourceProduct.getNumBands(); i++) {
+                sourceBand = sourceProduct.getBandAt(i);
+                String bandName = sourceBand.getName();
+                coding = sourceBand.getFlagCoding();
+                if (coding != null && bandName.equals(flagBandName)) {
+                    targetBand = ProductUtils.copyBand(bandName, sourceProduct, targetProduct);
+                    targetBand.setSampleCoding(targetProduct.getFlagCodingGroup().get(coding.getName()));
+                }
+            }
+        }
+    }
+
+    public static void copyFlagCoding(String flagCodingName, Product sourceProduct, Product targetProduct) {
+
+        Guardian.assertNotNull("source", sourceProduct);
+        Guardian.assertNotNull("target", targetProduct);
+
+        int numCodings = sourceProduct.getFlagCodingGroup().getNodeCount();
+        for (int n = 0; n < numCodings; n++) {
+            FlagCoding sourceFlagCoding = sourceProduct.getFlagCodingGroup().get(n);
+            if (sourceFlagCoding.getName().equals(flagCodingName)) {
+                ProductUtils.copyFlagCoding(sourceFlagCoding, targetProduct);
+            }
+        }
+    }
+
+    public static void copyStreamToFile(InputStream inFile, String to) throws IOException {
+        InputStream in = null;
+        OutputStream out = null;
+        try {
+            in = new BufferedInputStream(inFile);
+            OutputStream outFile = new FileOutputStream(to);
+            out = new BufferedOutputStream(outFile);
+            while (true) {
+                int data = in.read();
+                if (data == -1) {
+                    break;
+                }
+                out.write(data);
+            }
+        } finally {
+            if (in != null) {
+                in.close();
+            }
+            if (out != null) {
+                out.close();
+            }
+        }
+    }
+
 }

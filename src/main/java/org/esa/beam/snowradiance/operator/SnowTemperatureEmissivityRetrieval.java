@@ -58,9 +58,9 @@ public class SnowTemperatureEmissivityRetrieval {
         return rtm;
     }
 
-    public static float minimizeNewtonForTemperature(float waterVapourColumn, float viewZenith, float aatsrBt11,
+    public static float minimizeNewtonForTemperature(double assumedEmissivityAt11Microns, float waterVapourColumn, float viewZenith, float aatsrBt11,
                                                      LookupTable[][] rtmLookupTables, double[] tLowestLayer) {
-        final float emissivity = SnowRadianceConstants.EMISSIVITY_11_DEFAULT;
+        final float emissivity = (float) assumedEmissivityAt11Microns;
         float tSfcStart = aatsrBt11 + 0.5f;
         if (tSfcStart < SnowRadianceConstants.TSFC_MIN) tSfcStart = SnowRadianceConstants.TSFC_MIN;
         if (tSfcStart > SnowRadianceConstants.TSFC_MAX) tSfcStart = SnowRadianceConstants.TSFC_MAX;

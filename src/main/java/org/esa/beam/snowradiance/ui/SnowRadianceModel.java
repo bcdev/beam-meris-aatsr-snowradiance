@@ -70,9 +70,9 @@ public class SnowRadianceModel {
     private boolean computeMerisNdvi;
 
     @Parameter(defaultValue = "false",
-               description = "Compute MERIS NDSI",
-               label = "Compute MERIS NDSI")
-    private boolean computeMerisNdsi;
+               description = "Compute AATSR NDSI",
+               label = "Compute AATSR NDSI")
+    private boolean computeAatsrNdsi;
 
     @Parameter(defaultValue = "false",
                description = "Compute MERIS MDSI",
@@ -91,12 +91,7 @@ public class SnowRadianceModel {
                label = "Apply cloud mask")
     private boolean applyCloudMask = true;
 
-//    @Parameter(defaultValue = "false",
-//               description = "Get cloud mask from cloud probability (MEPIX)",
-//               label = "Cloud probability (MEPIX)")
-//    private boolean getCloudMaskFromMepix;
-
-    @Parameter(defaultValue = "true",
+    @Parameter(defaultValue = "false",
                description = "Get cloud mask from feature classification (MERIS/AATSR Synergy)",
                label = "Cloud probability (MERIS/AATSR Synergy)")
     private boolean getCloudMaskFromSynergy;
@@ -104,12 +99,7 @@ public class SnowRadianceModel {
     @Parameter(defaultValue = "true",
                description = "Apply 100% snow mask",
                label = "Apply 100% snow mask")
-    private boolean apply100PercentSnowMask;
-
-    @Parameter(defaultValue = "false",
-               description = "Apply 100% snow mask with AATSR as master",
-               label = "AATSR as master")
-    private boolean use100PercentSnowMaskWithAatsrMaster;
+    private boolean apply100PercentSnowMask = true;
 
     @Parameter(defaultValue = "0.99", interval = "[0.0, 1.0]",
                description = "Assumed emissivity at 11 microns",
@@ -170,11 +160,8 @@ public class SnowRadianceModel {
 
     private void configProcessingParameters(HashMap<String, Object> params) {
         params.put("applyCloudMask", applyCloudMask);
-//        params.put("getCloudMaskFromMepix", getCloudMaskFromMepix);
         params.put("getCloudMaskFromSynergy", getCloudMaskFromSynergy);
         params.put("apply100PercentSnowMask", apply100PercentSnowMask);
-        params.put("use100PercentSnowMaskWithAatsrMaster", use100PercentSnowMaskWithAatsrMaster);
-//        params.put("use100PercentSnowMaskWithMerisMaster", use100PercentSnowMaskWithMerisMaster);
         params.put("assumedEmissivityAt11Microns", assumedEmissivityAt11Microns);
         params.put("cloudProbabilityThreshold", cloudProbabilityThreshold);
         params.put("ndsiUpperThreshold", ndsiUpperThreshold);
@@ -192,7 +179,7 @@ public class SnowRadianceModel {
         params.put("computeEmissivityFub", computeEmissivityFub);
         params.put("computeMerisWaterVapour", computeMerisWaterVapour);
         params.put("computeMerisNdvi", computeMerisNdvi);
-        params.put("computeMerisNdsi", computeMerisNdsi);
+        params.put("computeAatsrNdsi", computeAatsrNdsi);
         params.put("computeMerisMdsi", computeMerisMdsi);
         params.put("copyAatsrL1Flags", copyAatsrL1Flags);
     }

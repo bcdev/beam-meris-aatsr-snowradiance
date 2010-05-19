@@ -68,7 +68,7 @@ public class SnowRadianceConstants {
     public static final String complementaryQuantitiesLabel = "Complementary quantities:";
     public static final String waterVapourMerisLabel = "Water vapour (from MERIS)";
     public static final String ndviMerisLabel = "NDVI (from MERIS)";
-    public static final String ndsiMerisLabel = "NDSI (from MERIS)";
+    public static final String ndsiMerisLabel = "NDSI (from AATSR)";
     public static final String mdsiMerisLabel = "MDSI (from MERIS)";
     public static final String aatsrL1FlagsLabel = "AATSR L1 flags";
 

@@ -17,9 +17,18 @@
      <dependency>
         <module>beam-meris-sdr</module>
     </dependency>
+    <dependency>
+        <module>beam-collocation</module>
+    </dependency>
      <dependency>
         <module>beam-meris-l2auxdata</module>
     </dependency>
+    <!--<dependency>-->
+        <!--<module>beam-meris-aatsr-synergy-cloud-screening</module>-->
+    <!--</dependency>-->
+    <!--<dependency>-->
+        <!--<module>beam-meris-aatsr-synergy-core</module>-->
+    <!--</dependency>-->
      <dependency>
         <module>lib-netcdf</module>
     </dependency>

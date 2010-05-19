@@ -416,7 +416,7 @@ public class SnowTemperatureEmissivityOp extends Operator {
                         final float viewZenith = 90.0f - aatsrViewElevationNadir;
 
                         float tempSurface = SnowTemperatureEmissivityRetrieval.
-                                minimizeNewtonForTemperature(waterVapourColumn, viewZenith, aatsrBt11, rtmLookupTables, tLowestLayer);
+                                minimizeNewtonForTemperature(0.99,waterVapourColumn, viewZenith, aatsrBt11, rtmLookupTables, tLowestLayer);
 
                         if (targetBand.getName().equals(SnowRadianceConstants.SNOW_TEMPERATURE_BAND_NAME)) {
                             targetTile.setSample(x, y, tempSurface);
