@@ -41,7 +41,7 @@ public class SnowRadianceConstants {
     public static final float TSFC_MIN = 243.15f;
     public static final float TSFC_MAX = 274.15f;
 
-    public static final String UNPOLLUTED_SNOW_GRAIN_SIZE_BAND_NAME= "unpolluted_snow_grain_size";
+    public static final String UNPOLLUTED_SNOW_GRAIN_SIZE_BAND_NAME= "snow_grain_size";
     public static final double UNPOLLUTED_SNOW_GRAIN_SIZE_BAND_NODATAVALUE = -1.0;
     public static final boolean UNPOLLUTED_SNOW_GRAIN_SIZE_BAND_NODATAVALUE_USED = true;
 
@@ -73,20 +73,19 @@ public class SnowRadianceConstants {
     public static final String aatsrL1FlagsLabel = "AATSR L1 flags";
 
     public static final String applyCloudMaskLabel = "Apply cloud mask";
-    public static final String applyCloudMaskMepixLabel = "Cloud probability (MEPIX)";
-    public static final String applyCloudMaskSynergyLabel = "Feature classification (MERIS/AATSR Synergy)";
+    public static final String applyCloudMaskMepixLabel = "Cloud probability (MERIS O2 Project)";
+    public static final String applyCloudMaskSynergyLabel = "Feature classification (MERIS/AATSR Synergy Project)";
     public static final String applySnowMaskLabel = "Mask 100% snow";
-    public static final String applySnowMaskWithAatsrMasterLabel = "AATSR as master";
-    public static final String applySnowMaskWithMerisMasterLabel = "MERIS as master";
 
     public static final String assumedEmissivity11MicronsLabel = "Assumed emissivity at 11 microns:";
-    public static final String parametersForMaskingLabel = "Parameters for masking:";
+    public static final String parametersForMaskingLabel = "Thresholds for snow/ice flags:";
 
     public static final String ndsiLabel = "NDSI";
     public static final String cloudProbThresholdLabel = "Cloud probability threshold:";
-    public static final String snowBoundariesLabel = "100% pure snow boundaries:";
+    public static final String snowBoundariesLabel = "100% snow thresholds:";
 
     public static final String aatsr1610Label = "AATSR 1610nm";
+    public static final String aatsr0670Label = "AATSR  670nm";
     public static final String lowerLabel = "lower:";
     public static final String upperLabel = "upper:";
     public static final String ndsiLowerDefaultValue = "0.90";
@@ -96,5 +95,7 @@ public class SnowRadianceConstants {
     public static final String cloudProbThresholdDefaultValue = "0.8";       // tbd
     public static final String aatsr1610LowerDefaultValue = "1.0";
     public static final String aatsr1610UpperDefaultValue = "10.0";
+    public static final String aatsr0670LowerDefaultValue = "60.0";
+    public static final String aatsr0670UpperDefaultValue = "100.0";
 
 }

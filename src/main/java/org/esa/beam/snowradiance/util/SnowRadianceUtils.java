@@ -174,15 +174,20 @@ public class SnowRadianceUtils {
         double ndsiLowerThreshold = ((Double) parameterMap.get("ndsiLowerThreshold")).doubleValue();
         double aatsr1610UpperThreshold = ((Double) parameterMap.get("aatsr1610UpperThreshold")).doubleValue();
         double aatsr1610LowerThreshold = ((Double) parameterMap.get("aatsr1610LowerThreshold")).doubleValue();
+         double aatsr0670UpperThreshold = ((Double) parameterMap.get("aatsr0670UpperThreshold")).doubleValue();
+        double aatsr0670LowerThreshold = ((Double) parameterMap.get("aatsr0670LowerThreshold")).doubleValue();
 
         if (ndsiUpperThreshold < ndsiLowerThreshold) {
-            String message = MessageFormat.format("NDSI: lower threshold {0} must be less than upper threshold {1}",
-                                                  ndsiLowerThreshold, ndsiUpperThreshold);
+            String message = "NDSI: lower threshold must be less than upper threshold";
             throw new OperatorException(message);
         }
         if (aatsr1610UpperThreshold < aatsr1610LowerThreshold) {
-            String message = MessageFormat.format("AATSR 1610nm: lower threshold {0} must be less than upper threshold {1}",
-                                                  aatsr1610LowerThreshold, aatsr1610UpperThreshold);
+            String message = "AATSR 1610nm: lower threshold must be less than upper threshold";
+            throw new OperatorException(message);
+        }
+
+        if (aatsr0670UpperThreshold < aatsr0670LowerThreshold) {
+            String message = "AATSR 670nm: lower threshold must be less than upper threshold";
             throw new OperatorException(message);
         }
     }

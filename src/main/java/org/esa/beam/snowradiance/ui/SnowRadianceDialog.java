@@ -53,17 +53,17 @@ public class SnowRadianceDialog extends SingleTargetProductDialog {
         super.hide();
     }
 
-    @Override
-    protected boolean verifyUserInput() {
-        SnowRadianceUtils.validateMerisProduct(model.getMerisSourceProduct());
-        SnowRadianceUtils.validateAatsrProduct(model.getAatsrSourceProduct());
-
-        final Map<String, Object> parameterMap = model.getSnowRadianceParameters();
-        SnowRadianceUtils.validateParameters(parameterMap);
-
-        // if all validations passed:
-        return true;
-    }
+//    @Override
+//    protected boolean verifyUserInput() {
+//        SnowRadianceUtils.validateMerisProduct(model.getMerisSourceProduct());
+//        SnowRadianceUtils.validateAatsrProduct(model.getAatsrSourceProduct());
+//
+//        final Map<String, Object> parameterMap = model.getSnowRadianceParameters();
+//        SnowRadianceUtils.validateParameters(parameterMap);
+//
+//        // if all validations passed:
+//        return true;
+//    }
 
     protected Product createTargetProduct() throws Exception {
         final HashMap<String, Product> sourceProducts = new HashMap<String, Product>(8);

@@ -131,6 +131,17 @@ public class SnowRadianceModel {
                label = "AATSR 1610nm lower threshold")
     private double aatsr1610LowerThreshold = Double.parseDouble(SnowRadianceConstants.aatsr1610LowerDefaultValue);
 
+    @Parameter(defaultValue = "10.0", interval = "[1.0, 100.0]",
+               description = "AATSR 670nm upper threshold",
+               label = "AATSR 670nm upper threshold")
+    private double aatsr0670UpperThreshold = Double.parseDouble(SnowRadianceConstants.aatsr0670UpperDefaultValue);
+
+    @Parameter(defaultValue = "1.0", interval = "[1.0, 100.0]",
+               description = "AATSR 670nm lower threshold",
+               label = "AATSR 670nm lower threshold")
+    private double aatsr0670LowerThreshold = Double.parseDouble(SnowRadianceConstants.aatsr0670LowerDefaultValue);
+
+
 
     private PropertyContainer propertyContainer;
 
@@ -168,6 +179,8 @@ public class SnowRadianceModel {
         params.put("ndsiLowerThreshold", ndsiLowerThreshold);
         params.put("aatsr1610UpperThreshold", aatsr1610UpperThreshold);
         params.put("aatsr1610LowerThreshold", aatsr1610LowerThreshold);
+        params.put("aatsr0670UpperThreshold", aatsr0670UpperThreshold);
+        params.put("aatsr0670LowerThreshold", aatsr0670LowerThreshold);
     }
 
     private void configTargetBands(HashMap<String, Object> params) {

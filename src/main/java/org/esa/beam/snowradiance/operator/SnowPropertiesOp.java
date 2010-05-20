@@ -21,6 +21,8 @@ import org.esa.beam.framework.gpf.annotations.SourceProduct;
 import org.esa.beam.framework.gpf.annotations.TargetProduct;
 import org.esa.beam.meris.brr.Rad2ReflOp;
 import org.esa.beam.meris.cloud.CloudProbabilityOp;
+import org.esa.beam.synergy.operators.SynergyCloudScreeningOp;
+import org.esa.beam.synergy.util.SynergyConstants;
 import org.esa.beam.util.ProductUtils;
 import org.esa.beam.util.math.LookupTable;
 
@@ -34,7 +36,7 @@ import java.util.Map;
  * @author Olaf Danne
  * @version $Revision: $ $Date:  $
  */
-@OperatorMetadata(alias = "SnowRadiance.properties")
+@OperatorMetadata(alias = "snowradiance.SnowProperties")
 public class SnowPropertiesOp extends Operator {
     @SourceProduct(alias = "colocatedProduct",
                    label = "Name (Collocated MERIS AATSR product)",
@@ -151,6 +153,16 @@ public class SnowPropertiesOp extends Operator {
                label = "AATSR 1610nm lower threshold")
     private double aatsr1610LowerThreshold;
 
+    @Parameter(defaultValue = "10.0", interval = "[1.0, 100.0]",
+               description = "AATSR 670nm upper threshold",
+               label = "AATSR 670nm upper threshold")
+    private double aatsr0670UpperThreshold = Double.parseDouble(SnowRadianceConstants.aatsr0670UpperDefaultValue);
+
+    @Parameter(defaultValue = "1.0", interval = "[1.0, 100.0]",
+               description = "AATSR 670nm lower threshold",
+               label = "AATSR 670nm lower threshold")
+    private double aatsr0670LowerThreshold = Double.parseDouble(SnowRadianceConstants.aatsr0670LowerDefaultValue);
+
 
     @TargetProduct(description = "The target product.")
     private Product targetProduct;
@@ -222,14 +234,14 @@ public class SnowPropertiesOp extends Operator {
 
         if (applyCloudMask) {
             if (getCloudMaskFromSynergy) {
-//                Map<String, Product> cloudScreeningInput = new HashMap<String, Product>(1);
-//                cloudScreeningInput.put("source", colocatedProduct);
-//                Map<String, Object> cloudScreeningParams = new HashMap<String, Object>(4);
-//                cloudScreeningParams.put("useForwardView", true);
-//                cloudScreeningParams.put("computeCOT", true);
-//                cloudScreeningParams.put("computeSF", true);
-//                cloudScreeningParams.put("computeSH", true);
-//                cloudScreeningProduct = GPF.createProduct(OperatorSpi.getOperatorAlias(SynergyCloudScreeningOp.class), cloudScreeningParams, cloudScreeningInput);
+                Map<String, Product> cloudScreeningInput = new HashMap<String, Product>(1);
+                cloudScreeningInput.put("source", colocatedProduct);
+                Map<String, Object> cloudScreeningParams = new HashMap<String, Object>(4);
+                cloudScreeningParams.put("useForwardView", true);
+                cloudScreeningParams.put("computeCOT", true);
+                cloudScreeningParams.put("computeSF", true);
+                cloudScreeningParams.put("computeSH", true);
+                cloudScreeningProduct = GPF.createProduct("synergy.SynergyCloudScreening", cloudScreeningParams, cloudScreeningInput);
             } else {
                 Map<String, Product> cloudProbabilityInput = new HashMap<String, Product>(1);
                 colocatedProduct.setProductType("MER_RR__1P");
@@ -371,7 +383,17 @@ public class SnowPropertiesOp extends Operator {
 
         if (copyAatsrL1Flags) {
             ProductUtils.copyFlagBands(colocatedProduct, targetProduct);
-            System.out.println("");
+        } else {
+            ProductUtils.copyFlagBands(merisProduct, targetProduct);
+        }
+
+        if (getCloudMaskFromSynergy) {
+            ProductUtils.copyFlagBands(cloudScreeningProduct, targetProduct);
+        } else {
+            Band cloudProbBand = targetProduct.addBand("cloud_probability", ProductData.TYPE_FLOAT32);
+            cloudProbBand.setDescription("cloud_probability");
+            cloudProbBand.setNoDataValue(-1.0f);
+            cloudProbBand.setNoDataValueUsed(true);
         }
     }
 
@@ -466,18 +488,18 @@ public class SnowPropertiesOp extends Operator {
         Tile vaMerisTile = getSourceTile(colocatedProduct.getTiePointGrid("view_azimuth"), rectangle, pm);
         Tile vzMerisTile = getSourceTile(colocatedProduct.getTiePointGrid("view_zenith"), rectangle, pm);
 
-        Tile merisRad14Tile = getSourceTile(colocatedProduct.getBand("radiance_14" + "_M" + ""), rectangle, pm);
-        Tile merisRad15Tile = getSourceTile(colocatedProduct.getBand("radiance_15" + "_M" + ""), rectangle, pm);
+        Tile merisRad14Tile = getSourceTile(colocatedProduct.getBand("radiance_14" + "_MERIS" + ""), rectangle, pm);
+        Tile merisRad15Tile = getSourceTile(colocatedProduct.getBand("radiance_15" + "_MERIS" + ""), rectangle, pm);
 
-        Tile aatsrBTNadir1100Tile = getSourceTile(colocatedProduct.getBand("btemp_nadir_1100" + "_S" + ""), rectangle, pm);
-        Tile aatsrBTNadir1200Tile = getSourceTile(colocatedProduct.getBand("btemp_nadir_1200" + "_S" + ""), rectangle, pm);
+        Tile aatsrBTNadir1100Tile = getSourceTile(colocatedProduct.getBand("btemp_nadir_1100" + "_AATSR" + ""), rectangle, pm);
+        Tile aatsrBTNadir1200Tile = getSourceTile(colocatedProduct.getBand("btemp_nadir_1200" + "_AATSR" + ""), rectangle, pm);
 
-        Tile veAatsrNadirTile = getSourceTile(colocatedProduct.getBand("view_elev_nadir" + "_S" + ""), rectangle, pm);
+        Tile veAatsrNadirTile = getSourceTile(colocatedProduct.getBand("view_elev_nadir" + "_AATSR" + ""), rectangle, pm);
 
-        Tile aatsrReflecNadir550Tile = getSourceTile(colocatedProduct.getBand("reflec_nadir_0550" + "_S" + ""), rectangle, pm);
-        Tile aatsrReflecNadir670Tile = getSourceTile(colocatedProduct.getBand("reflec_nadir_0670" + "_S" + ""), rectangle, pm);
-        Tile aatsrReflecNadir870Tile = getSourceTile(colocatedProduct.getBand("reflec_nadir_0870" + "_S" + ""), rectangle, pm);
-        Tile aatsrReflecNadir1600Tile = getSourceTile(colocatedProduct.getBand("reflec_nadir_1600" + "_S" + ""), rectangle, pm);
+        Tile aatsrReflecNadir550Tile = getSourceTile(colocatedProduct.getBand("reflec_nadir_0550" + "_AATSR" + ""), rectangle, pm);
+        Tile aatsrReflecNadir670Tile = getSourceTile(colocatedProduct.getBand("reflec_nadir_0670" + "_AATSR" + ""), rectangle, pm);
+        Tile aatsrReflecNadir870Tile = getSourceTile(colocatedProduct.getBand("reflec_nadir_0870" + "_AATSR" + ""), rectangle, pm);
+        Tile aatsrReflecNadir1600Tile = getSourceTile(colocatedProduct.getBand("reflec_nadir_1600" + "_AATSR" + ""), rectangle, pm);
 
         Tile[] merisSpectralBandTiles = new Tile[EnvisatConstants.MERIS_L1B_NUM_SPECTRAL_BANDS];
         for (int i = 0; i < EnvisatConstants.MERIS_L1B_NUM_SPECTRAL_BANDS; i++) {
@@ -491,9 +513,9 @@ public class SnowPropertiesOp extends Operator {
 
         Tile cloudFlagsTile = null;
         Tile cloudProbTile = null;
-        if (applyCloudMask && !getCloudMaskFromSynergy) {
+        if (applyCloudMask) {
             if (getCloudMaskFromSynergy) {
-//                cloudFlagsTile = getSourceTile(cloudScreeningProduct.getBand(SynergyConstants.B_CLOUDFLAGS), rectangle, pm);
+                cloudFlagsTile = getSourceTile(cloudScreeningProduct.getBand(SynergyConstants.B_CLOUDFLAGS), rectangle, pm);
             } else {
                 cloudFlagsTile = getSourceTile(cloudProbabilityProduct.getBand(CloudProbabilityOp.CLOUD_FLAG_BAND), rectangle, pm);
                 cloudProbTile = getSourceTile(cloudProbabilityProduct.getBand(CloudProbabilityOp.CLOUD_PROP_BAND), rectangle, pm);
@@ -512,7 +534,13 @@ public class SnowPropertiesOp extends Operator {
                     break;
                 }
 
-                if (targetBand.isFlagBand() && !targetBand.getName().equals(CLOUDICESNOW_BAND_NAME)) {
+                if (targetBand.isFlagBand() && targetBand.getName().equals("l1_flags")) {
+                    Tile flagTile = getSourceTile(merisProduct.getBand(targetBand.getName()), rectangle, pm);
+                    targetTile.setSample(x, y, flagTile.getSampleInt(x, y));
+                } else if (targetBand.isFlagBand() && targetBand.getName().equals("cloud_flags_synergy")) {
+                    Tile flagTile = getSourceTile(cloudScreeningProduct.getBand(targetBand.getName()), rectangle, pm);
+                    targetTile.setSample(x, y, flagTile.getSampleInt(x, y));
+                } else if (targetBand.isFlagBand() && !targetBand.getName().equals(CLOUDICESNOW_BAND_NAME)) {
                     Tile flagTile = getSourceTile(colocatedProduct.getBand(targetBand.getName()), rectangle, pm);
                     targetTile.setSample(x, y, flagTile.getSampleInt(x, y));
                 } else {
@@ -533,6 +561,7 @@ public class SnowPropertiesOp extends Operator {
                                     targetTile.setSample(x, y, FLAG_UNCERTAIN);
                                     float aatsr865 = aatsrReflecNadir870Tile.getSampleFloat(x, y);
                                     float aatsr1610 = aatsrReflecNadir1600Tile.getSampleFloat(x, y);
+                                    float aatsr0670 = aatsrReflecNadir670Tile.getSampleFloat(x, y);
                                     float ndsi = (aatsr865 - aatsr1610) / (aatsr865 + aatsr1610);
                                     if (ndsi > ndsiLowerThreshold && ndsi < ndsiUpperThreshold) {
                                         targetTile.setSample(x, y, FLAG_SNOW);
@@ -541,7 +570,8 @@ public class SnowPropertiesOp extends Operator {
                                     }
                                     if (apply100PercentSnowMask && !(ndsi > ndsiUpperThreshold)) {
                                         boolean is1600InInterval = aatsr1610 >= aatsr1610LowerThreshold && aatsr1610 <= aatsr1610UpperThreshold;
-                                        boolean isSnow = is1600InInterval;
+                                        boolean is0670InInterval = aatsr0670 >= aatsr0670LowerThreshold && aatsr0670 <= aatsr0670UpperThreshold;
+                                        boolean isSnow = is1600InInterval && is0670InInterval;
                                         if (isSnow) {
                                             targetTile.setSample(x, y, FLAG_SNOW);
                                         } else {
@@ -586,53 +616,55 @@ public class SnowPropertiesOp extends Operator {
                                 }
                             }
                         }
+
+                        // snow grain size / pollution retrieval...
+                        if (doSnowGrainSizePollutionRetrieval()) {
+                            double saa = saMerisTile.getSampleDouble(x, y);
+                            double sza = szMerisTile.getSampleDouble(x, y);
+                            double vaa = vaMerisTile.getSampleDouble(x, y);
+                            double vza = vzMerisTile.getSampleDouble(x, y);
+                            double reflFunction;
+
+                            reflFunction = snowGrainSizePollutionRetrieval.computeReflLutApprox(saa, sza, vaa, vza);
+
+                            double merisRefl2 = merisRefl2Tile.getSampleDouble(x, y);
+                            double merisRefl13 = merisRefl13Tile.getSampleDouble(x, y);
+
+                            if (computeSnowGrainSize && targetBand.getName().equals(SnowRadianceConstants.UNPOLLUTED_SNOW_GRAIN_SIZE_BAND_NAME)) {
+                                double unpollutedSnowGrainSize =
+                                        snowGrainSizePollutionRetrieval.getParticleAbsorptionLength(merisRefl2, merisRefl13, reflFunction, sza, vza);
+                                targetTile.setSample(x, y, unpollutedSnowGrainSize);
+                            }
+
+                            if (computeSnowSootContent && targetBand.getName().equals(SnowRadianceConstants.SOOT_CONCENTRATION_BAND_NAME)) {
+                                double pal =
+                                        snowGrainSizePollutionRetrieval.getParticleAbsorptionLength(merisRefl2, merisRefl13, reflFunction, sza, vza);
+                                double unpollutedSnowGrainSize =
+                                        snowGrainSizePollutionRetrieval.getUnpollutedSnowGrainSize(pal);
+                                double sootConcentration =
+                                        snowGrainSizePollutionRetrieval.getSootConcentrationInPollutedSnow(merisRefl13, reflFunction, sza, vza,
+                                                                                                           unpollutedSnowGrainSize);
+                                targetTile.setSample(x, y, sootConcentration);
+                            }
+
+                            if (computeSnowAlbedo && targetBand.getName().startsWith(SnowRadianceConstants.SNOW_ALBEDO_BAND_NAME)) {
+                                int snowAlbedoBandPrefixLength = SnowRadianceConstants.SNOW_ALBEDO_BAND_NAME.length();
+                                String snowAlbedoBandIndexString = targetBand.getName().
+                                        substring(snowAlbedoBandPrefixLength + 1, targetBand.getName().length());
+                                int snowAlbedoBandIndex = Integer.parseInt(snowAlbedoBandIndexString);
+                                double merisRefl = merisSpectralBandTiles[snowAlbedoBandIndex].getSampleDouble(x, y);
+                                double snowAlbedo =
+                                        snowGrainSizePollutionRetrieval.getSnowAlbedo(merisRefl, reflFunction, sza, vza);
+                                targetTile.setSample(x, y, snowAlbedo);
+                            }
+                        }
+
                     } else {
                         if (targetBand.getName().equals(CLOUDICESNOW_BAND_NAME)) {
                             targetTile.setSample(x, y, FLAG_CLOUD);
                         }
                     }
 
-                    // snow grain size / pollution retrieval...
-                    if (doSnowGrainSizePollutionRetrieval()) {
-                        double saa = saMerisTile.getSampleDouble(x, y);
-                        double sza = szMerisTile.getSampleDouble(x, y);
-                        double vaa = vaMerisTile.getSampleDouble(x, y);
-                        double vza = vzMerisTile.getSampleDouble(x, y);
-                        double reflFunction;
-
-                        reflFunction = snowGrainSizePollutionRetrieval.computeReflLutApprox(saa, sza, vaa, vza);
-
-                        double merisRefl2 = merisRefl2Tile.getSampleDouble(x, y);
-                        double merisRefl13 = merisRefl13Tile.getSampleDouble(x, y);
-
-                        if (computeSnowGrainSize && targetBand.getName().equals(SnowRadianceConstants.UNPOLLUTED_SNOW_GRAIN_SIZE_BAND_NAME)) {
-                            double unpollutedSnowGrainSize =
-                                    snowGrainSizePollutionRetrieval.getParticleAbsorptionLength(merisRefl2, merisRefl13, reflFunction, sza, vza);
-                            targetTile.setSample(x, y, unpollutedSnowGrainSize);
-                        }
-
-                        if (computeSnowSootContent && targetBand.getName().equals(SnowRadianceConstants.SOOT_CONCENTRATION_BAND_NAME)) {
-                            double pal =
-                                    snowGrainSizePollutionRetrieval.getParticleAbsorptionLength(merisRefl2, merisRefl13, reflFunction, sza, vza);
-                            double unpollutedSnowGrainSize =
-                                    snowGrainSizePollutionRetrieval.getUnpollutedSnowGrainSize(pal);
-                            double sootConcentration =
-                                    snowGrainSizePollutionRetrieval.getSootConcentrationInPollutedSnow(merisRefl13, reflFunction, sza, vza,
-                                                                                                       unpollutedSnowGrainSize);
-                            targetTile.setSample(x, y, sootConcentration);
-                        }
-
-                        if (computeSnowAlbedo && targetBand.getName().startsWith(SnowRadianceConstants.SNOW_ALBEDO_BAND_NAME)) {
-                            int snowAlbedoBandPrefixLength = SnowRadianceConstants.SNOW_ALBEDO_BAND_NAME.length();
-                            String snowAlbedoBandIndexString = targetBand.getName().
-                                    substring(snowAlbedoBandPrefixLength + 1, targetBand.getName().length());
-                            int snowAlbedoBandIndex = Integer.parseInt(snowAlbedoBandIndexString);
-                            double merisRefl = merisSpectralBandTiles[snowAlbedoBandIndex].getSampleDouble(x, y);
-                            double snowAlbedo =
-                                    snowGrainSizePollutionRetrieval.getSnowAlbedo(merisRefl, reflFunction, sza, vza);
-                            targetTile.setSample(x, y, snowAlbedo);
-                        }
-                    }
 
                     // complementary quantities...
                     float merisViewAzimuth = vaMerisTile.getSampleFloat(x, y);
@@ -673,18 +705,21 @@ public class SnowPropertiesOp extends Operator {
                         targetTile.setSample(x, y, mdsi);
                     }
                 }
+                if (!getCloudMaskFromSynergy && targetBand.getName().equals("cloud_probability")) {
+                    targetTile.setSample(x, y, cloudProbTile.getSampleFloat(x, y));
+                }
             }
         }
     }
 
     private boolean isCloud(Tile cloudFlagsTile, Tile cloudProbTile, int x, int y) {
-        boolean isCloud = false;
+        boolean isCloud;
         if (!applyCloudMask) {
             return false;
         }
 
         if (getCloudMaskFromSynergy) {
-//            isCloud = cloudFlagsTile.getSampleBit(x, y, SynergyConstants.FLAGMASK_CLOUD);
+            isCloud = cloudFlagsTile.getSampleBit(x, y, SynergyConstants.FLAGMASK_CLOUD);
         } else {
             float cloudProb = cloudProbTile.getSampleFloat(x, y);
             isCloud = (cloudProb > cloudProbabilityThreshold);
