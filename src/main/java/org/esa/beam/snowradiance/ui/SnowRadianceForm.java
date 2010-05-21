@@ -36,8 +36,10 @@ public class SnowRadianceForm extends JTabbedPane {
 
     private TargetProductSelector targetProductSelector;
     private SourceProductSelector merisSourceProductSelector;
-    private SourceProductSelector aatsrSourceProductSelector;
 
+    private JCheckBox computeSnowGrainSizePollutionOnlyCheckBox;
+
+    private SourceProductSelector aatsrSourceProductSelector;
     private JCheckBox copyInputBandsCheckBox;
     private JCheckBox computeSnowGrainSizeCheckBox;
     private JCheckBox computeSnowAlbedoCheckBox;
@@ -68,6 +70,7 @@ public class SnowRadianceForm extends JTabbedPane {
 
 
     private SnowRadianceModel snowRadianceModel;
+    private JPanel aatsrInputPanel;
 
     public SnowRadianceForm(AppContext appContext, SnowRadianceModel snowRadianceModel, TargetProductSelector targetProductSelector) {
        this.snowRadianceModel = snowRadianceModel;
@@ -92,6 +95,8 @@ public class SnowRadianceForm extends JTabbedPane {
         final BindingContext bc = new BindingContext(snowRadianceModel.getPropertyContainer());
         bc.bind("merisSourceProduct", merisSourceProductSelector.getProductNameComboBox());
         bc.bind("aatsrSourceProduct", aatsrSourceProductSelector.getProductNameComboBox());
+
+        bc.bind("computeSnowGrainSizePollutionOnly", computeSnowGrainSizePollutionOnlyCheckBox);
 
         bc.bind("copyInputBands", copyInputBandsCheckBox);
         bc.bind("computeSnowGrainSize", computeSnowGrainSizeCheckBox);
@@ -127,6 +132,7 @@ public class SnowRadianceForm extends JTabbedPane {
         setPreferredSize(new Dimension(600, 600));
 
         copyInputBandsCheckBox = new JCheckBox(SnowRadianceConstants.copyInputBandsLabel);
+        computeSnowGrainSizePollutionOnlyCheckBox= new JCheckBox(SnowRadianceConstants.computeSnowGrainSizePollutionOnlyLabel);
         computeSnowGrainSizeCheckBox = new JCheckBox(SnowRadianceConstants.computeSnowGrainSizeLabel, true);
         computeSnowAlbedoCheckBox = new JCheckBox(SnowRadianceConstants.computeSnowAlbedoLabel, true);
         computeSnowSootContentCheckBox = new JCheckBox(SnowRadianceConstants.computeSnowSootContentLabel, true);
@@ -149,15 +155,16 @@ public class SnowRadianceForm extends JTabbedPane {
         cloudMaskGroup.add(getCloudMaskFromSynergyRadioButton);
 
         apply100PercentSnowMaskCheckBox = new JCheckBox(SnowRadianceConstants.applySnowMaskLabel);
-        ActionListener applyMasksActionListener = new ActionListener() {
+        ActionListener updateUIActionListener = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 updateUIState();
             }
 		};
-        applyCloudMaskCheckBox.addActionListener(applyMasksActionListener);
-        apply100PercentSnowMaskCheckBox.addActionListener(applyMasksActionListener);
-        getCloudMaskFromMepixRadioButton.addActionListener(applyMasksActionListener);
-        getCloudMaskFromSynergyRadioButton.addActionListener(applyMasksActionListener);
+        applyCloudMaskCheckBox.addActionListener(updateUIActionListener);
+        apply100PercentSnowMaskCheckBox.addActionListener(updateUIActionListener);
+        computeSnowGrainSizePollutionOnlyCheckBox.addActionListener(updateUIActionListener);
+        getCloudMaskFromMepixRadioButton.addActionListener(updateUIActionListener);
+        getCloudMaskFromSynergyRadioButton.addActionListener(updateUIActionListener);
 
         assumedEmissivityAt11MicronsTextField = new JFormattedTextField(SnowRadianceConstants.assumedEmissivity11MicronsDefaultValue);
         cloudProbabilityThresholdTextField = new JFormattedTextField(SnowRadianceConstants.cloudProbThresholdLabel);
@@ -193,7 +200,8 @@ public class SnowRadianceForm extends JTabbedPane {
 
         JPanel merisInputPanel = merisSourceProductSelector.createDefaultPanel();
         ioTab.add(merisInputPanel);
-        JPanel aatsrInputPanel = aatsrSourceProductSelector.createDefaultPanel();
+        ioTab.add(computeSnowGrainSizePollutionOnlyCheckBox);
+        aatsrInputPanel = aatsrSourceProductSelector.createDefaultPanel();
         ioTab.add(aatsrInputPanel);
 		ioTab.add(targetProductSelector.createDefaultPanel());
 		ioTab.add(new JLabel(""));
@@ -219,6 +227,9 @@ public class SnowRadianceForm extends JTabbedPane {
 //				new Color(0, 70, 213)));
 
 //        panel.add(copyInputBandsCheckBox);
+        panel.add(new JLabel(" "));
+        panel.add(new JLabel(SnowRadianceConstants.snowPropertiesLabel));
+        panel.add(new JLabel(" "));
         panel.add(computeSnowGrainSizeCheckBox);
         panel.add(computeSnowAlbedoCheckBox);
         panel.add(computeSnowSootContentCheckBox);
@@ -310,6 +321,29 @@ public class SnowRadianceForm extends JTabbedPane {
         c.gridx = 2;
         panel.add(cloudProbabilityThresholdTextField, c);
 
+        // Label: Thresholds for snow/ice flags
+        c.insets = new Insets(10, 10, 0, 0);
+        c.gridx = 0;
+        c.gridy++;
+        panel.add(new JLabel(SnowRadianceConstants.snowIceThresholdsLabel), c);
+
+        // NDSI upper/lower:
+        c.insets = new Insets(0, 50, 0, 0);
+        c.gridx = 0;
+        c.gridy++;
+        panel.add(new JLabel(SnowRadianceConstants.ndsiLabel), c);
+        c.insets = new Insets(0, 0, 0, 0);
+        c.gridx = 1;
+        panel.add(new JLabel(SnowRadianceConstants.lowerLabel), c);
+        c.gridx = 2;
+        panel.add(ndsiLowerThresholdTextField, c);
+        c.insets = new Insets(0, 10, 0, 0);
+        c.gridx = 3;
+        panel.add(new JLabel(SnowRadianceConstants.upperLabel), c);
+        c.insets = new Insets(0, 0, 0, 0);
+        c.gridx = 4;
+        panel.add(ndsiUpperThresholdTextField, c);
+
         c.insets = new Insets(10, 0, 0, 0);
         c.gridx = 0;
         c.gridy++;
@@ -351,29 +385,6 @@ public class SnowRadianceForm extends JTabbedPane {
         c.gridx = 4;
         panel.add(aatsr0670UpperThresholdTextField, c);
 
-        // Label: Parameters for masking
-        c.insets = new Insets(10, 10, 0, 0);
-        c.gridx = 0;
-        c.gridy++;
-        panel.add(new JLabel(SnowRadianceConstants.parametersForMaskingLabel), c);
-
-        // NDSI upper/lower:
-        c.insets = new Insets(0, 50, 0, 0);
-        c.gridx = 0;
-        c.gridy++;
-        panel.add(new JLabel(SnowRadianceConstants.ndsiLabel), c);
-        c.insets = new Insets(0, 0, 0, 0);
-        c.gridx = 1;
-        panel.add(new JLabel(SnowRadianceConstants.lowerLabel), c);
-        c.gridx = 2;
-        panel.add(ndsiLowerThresholdTextField, c);
-        c.insets = new Insets(0, 10, 0, 0);
-        c.gridx = 3;
-        panel.add(new JLabel(SnowRadianceConstants.upperLabel), c);
-        c.insets = new Insets(0, 0, 0, 0);
-        c.gridx = 4;
-        panel.add(ndsiUpperThresholdTextField, c);
-
         // Text field for assumed emissivity at 11 um
         c.insets = new Insets(10, 10, 0, 0);
         c.gridx = 0;
@@ -394,21 +405,48 @@ public class SnowRadianceForm extends JTabbedPane {
     }
 
     private void updateUIState() {
-        updateCloudMaskUIstate();
-    }
-
-    private void updateCloudMaskUIstate() {
-        boolean maskCloudSelected = applyCloudMaskCheckBox.isSelected();
-        getCloudMaskFromMepixRadioButton.setEnabled(maskCloudSelected);
-        getCloudMaskFromSynergyRadioButton.setEnabled(maskCloudSelected);
-        cloudProbabilityThresholdTextField.setEnabled(getCloudMaskFromMepixRadioButton.isSelected());
+        cloudProbabilityThresholdTextField.setEnabled(applyCloudMaskCheckBox.isSelected() && getCloudMaskFromMepixRadioButton.isSelected());
         aatsr1610UpperThresholdTextField.setEnabled(apply100PercentSnowMaskCheckBox.isSelected());
         aatsr1610LowerThresholdTextField.setEnabled(apply100PercentSnowMaskCheckBox.isSelected());
         aatsr0670UpperThresholdTextField.setEnabled(apply100PercentSnowMaskCheckBox.isSelected());
         aatsr0670LowerThresholdTextField.setEnabled(apply100PercentSnowMaskCheckBox.isSelected());
 
-//        getCloudMaskFromMepixRadioButton.setEnabled(false);
-//        getCloudMaskFromSynergyRadioButton.setEnabled(false);
+        aatsrInputPanel.setVisible(!computeSnowGrainSizePollutionOnlyCheckBox.isSelected());
+        computeEmissivityFubCheckBox.setEnabled(!computeSnowGrainSizePollutionOnlyCheckBox.isSelected());
+        computeSnowTemperatureFubCheckBox.setEnabled(!computeSnowGrainSizePollutionOnlyCheckBox.isSelected());
+        computeAatsrNdsiCheckBox.setEnabled(!computeSnowGrainSizePollutionOnlyCheckBox.isSelected());
+        copyAatsrL1FlagsCheckBox.setEnabled(!computeSnowGrainSizePollutionOnlyCheckBox.isSelected());
+
+        boolean maskCloudSelected = applyCloudMaskCheckBox.isSelected();
+        getCloudMaskFromMepixRadioButton.setEnabled(maskCloudSelected && !computeSnowGrainSizePollutionOnlyCheckBox.isSelected());
+        getCloudMaskFromSynergyRadioButton.setEnabled(maskCloudSelected && !computeSnowGrainSizePollutionOnlyCheckBox.isSelected());
+        apply100PercentSnowMaskCheckBox.setEnabled(!computeSnowGrainSizePollutionOnlyCheckBox.isSelected());
+        aatsr1610UpperThresholdTextField.setEnabled(apply100PercentSnowMaskCheckBox.isSelected() && !computeSnowGrainSizePollutionOnlyCheckBox.isSelected());
+        aatsr1610LowerThresholdTextField.setEnabled(apply100PercentSnowMaskCheckBox.isSelected() && !computeSnowGrainSizePollutionOnlyCheckBox.isSelected());
+        aatsr0670UpperThresholdTextField.setEnabled(apply100PercentSnowMaskCheckBox.isSelected() && !computeSnowGrainSizePollutionOnlyCheckBox.isSelected());
+        aatsr0670LowerThresholdTextField.setEnabled(apply100PercentSnowMaskCheckBox.isSelected() && !computeSnowGrainSizePollutionOnlyCheckBox.isSelected());
+        ndsiUpperThresholdTextField.setEnabled(!computeSnowGrainSizePollutionOnlyCheckBox.isSelected());
+        ndsiLowerThresholdTextField.setEnabled(!computeSnowGrainSizePollutionOnlyCheckBox.isSelected());
+        assumedEmissivityAt11MicronsTextField.setEnabled(!computeSnowGrainSizePollutionOnlyCheckBox.isSelected());
+        snowRadianceModel.setComputeSnowGrainSizePollutionOnly(computeSnowGrainSizePollutionOnlyCheckBox.isSelected());
+        if (computeSnowGrainSizePollutionOnlyCheckBox.isSelected()) {
+            computeEmissivityFubCheckBox.setSelected(false);
+            computeSnowTemperatureFubCheckBox.setSelected(false);
+            computeAatsrNdsiCheckBox.setSelected(false);
+            copyAatsrL1FlagsCheckBox.setSelected(false);
+
+            getCloudMaskFromMepixRadioButton.setSelected(true);
+            getCloudMaskFromSynergyRadioButton.setSelected(false);
+            cloudProbabilityThresholdTextField.setEnabled(applyCloudMaskCheckBox.isSelected());
+            apply100PercentSnowMaskCheckBox.setSelected(false);
+
+            snowRadianceModel.setComputeEmissivityFub(false);
+            snowRadianceModel.setComputeSnowTemperatureFub(false);
+            snowRadianceModel.setApply100PercentSnowMask(false);
+            snowRadianceModel.setComputeAatsrNdsi(false);
+            snowRadianceModel.setCopyAatsrL1Flags(false);
+            snowRadianceModel.setGetCloudMaskFromSynergy(false);
+        }
     }
 
 
@@ -426,9 +464,8 @@ public class SnowRadianceForm extends JTabbedPane {
         final Product sourceProduct = merisSourceProductSelector.getSelectedProduct();
         final TargetProductSelectorModel selectorModel = targetProductSelector.getModel();
         if (sourceProduct != null) {
-            String sourceProductName = sourceProduct.getName();
-            String targetProductName = sourceProductName.substring(0,4) + "ATS_2SNOWRAD" +
-                       sourceProductName.substring(14,sourceProductName.length()-3);
+            String sourceProductType = sourceProduct.getProductType();
+            String targetProductName = sourceProductType.substring(0,8) + "2SNOWRAD_";
             selectorModel.setProductName(targetProductName);
         }
     }

@@ -24,13 +24,16 @@ public class SnowRadianceDialog extends SingleTargetProductDialog {
 
     private Map<String, Object> parameterMap;
 
-    public SnowRadianceDialog(AppContext appContext)  {
-        super(appContext, TITLE, "snowPropertiesProcessor");
+    public static SingleTargetProductDialog createDefaultDialog(String operatorName, AppContext appContext) {
+        return new SnowRadianceDialog(operatorName, appContext, operatorName, null);
+    }
+
+    public SnowRadianceDialog(String operatorName, AppContext appContext, String title, String helpID)  {
+        super(appContext, TITLE, helpID);
         targetProductNameSuffix = "";
 
         parameterMap = new HashMap<String, Object>(17);
 
-        final String operatorName = OperatorSpi.getOperatorAlias(SnowRadianceMasterOp.class);
         final OperatorSpi operatorSpi = GPF.getDefaultInstance().getOperatorSpiRegistry().getOperatorSpi(operatorName);
         if (operatorSpi == null) {
             throw new IllegalArgumentException("operatorName");
@@ -52,18 +55,6 @@ public class SnowRadianceDialog extends SingleTargetProductDialog {
         form.prepareHide();
         super.hide();
     }
-
-//    @Override
-//    protected boolean verifyUserInput() {
-//        SnowRadianceUtils.validateMerisProduct(model.getMerisSourceProduct());
-//        SnowRadianceUtils.validateAatsrProduct(model.getAatsrSourceProduct());
-//
-//        final Map<String, Object> parameterMap = model.getSnowRadianceParameters();
-//        SnowRadianceUtils.validateParameters(parameterMap);
-//
-//        // if all validations passed:
-//        return true;
-//    }
 
     protected Product createTargetProduct() throws Exception {
         final HashMap<String, Product> sourceProducts = new HashMap<String, Product>(8);

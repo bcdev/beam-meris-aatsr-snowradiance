@@ -29,7 +29,6 @@ import org.esa.beam.framework.gpf.annotations.TargetProduct;
 import org.esa.beam.framework.gpf.annotations.Parameter;
 import org.esa.beam.util.ProductUtils;
 import org.esa.beam.util.math.LookupTable;
-import org.esa.beam.snowradiance.util.SnowRadianceUtils;
 import org.esa.beam.meris.cloud.CloudProbabilityOp;
 
 import java.awt.*;
@@ -348,7 +347,7 @@ public class SnowTemperatureEmissivityOp extends Operator {
                 final float aatsrBt11 = aatsrBTNadir1100Tile.getSampleFloat(x, y);
                 final float aatsrBt12 = aatsrBTNadir1200Tile.getSampleFloat(x, y);
 
-//                if (targetBand.getName().equals(CLOUDICESNOW_BAND_NAME) && x == 580 && y == 670) {
+//                if (targetBand.getName().equals(SNOWRADIANCE_FLAG_BAND_NAME) && x == 580 && y == 670) {
 //                    System.out.println("halt");
 //                }
 

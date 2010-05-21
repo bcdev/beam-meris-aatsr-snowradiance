@@ -2,12 +2,20 @@ package org.esa.beam.snowradiance.util;
 
 import org.esa.beam.dataio.envisat.EnvisatConstants;
 import org.esa.beam.framework.datamodel.Band;
+import org.esa.beam.framework.datamodel.BitmaskDef;
 import org.esa.beam.framework.datamodel.FlagCoding;
+import org.esa.beam.framework.datamodel.Mask;
+import org.esa.beam.framework.datamodel.MetadataAttribute;
 import org.esa.beam.framework.datamodel.Product;
+import org.esa.beam.framework.datamodel.ProductData;
 import org.esa.beam.framework.gpf.OperatorException;
+import org.esa.beam.snowradiance.operator.SnowRadianceConstants;
+import org.esa.beam.synergy.util.SynergyConstants;
+import org.esa.beam.util.BitSetter;
 import org.esa.beam.util.Guardian;
 import org.esa.beam.util.ProductUtils;
 
+import java.awt.Color;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
@@ -41,6 +49,9 @@ public class SnowRadianceUtils {
     private static final String[] REQUIRED_AATSR_TPG_NAMES =
             EnvisatConstants.AATSR_TIE_POINT_GRID_NAMES;
 
+
+
+
     /**
      * This method computed the index of the nearest higher value in a float array
      * compared to a given input float value
@@ -65,7 +76,6 @@ public class SnowRadianceUtils {
         if (x >= array[array.length - 1] && nearestValueIndex == -1) {
             nearestValueIndex = array.length - 1;
         }
-
         return nearestValueIndex;
     }
 
@@ -90,16 +100,21 @@ public class SnowRadianceUtils {
     }
 
     public static void validateMerisProduct(final Product merisProduct) {
-        final String missedBand = validateMerisProductBands(merisProduct);
-        if (!missedBand.isEmpty()) {
-            String message = MessageFormat.format("Missing required band in MERIS input product: {0} . Not a L1b product?",
-                                                  missedBand);
-            throw new OperatorException(message);
-        }
-        final String missedTPG = validateMerisProductTpgs(merisProduct);
-        if (!missedTPG.isEmpty()) {
-            String message = MessageFormat.format("Missing required tie-point grid in MERIS input product: {0} . Not a L1b product?",
-                                                  missedTPG);
+        if (merisProduct != null) {
+            final String missedBand = validateMerisProductBands(merisProduct);
+            if (!missedBand.isEmpty()) {
+                String message = MessageFormat.format("Missing required band in MERIS input product: {0} . Not a L1b product?",
+                                                      missedBand);
+                throw new OperatorException(message);
+            }
+            final String missedTPG = validateMerisProductTpgs(merisProduct);
+            if (!missedTPG.isEmpty()) {
+                String message = MessageFormat.format("Missing required tie-point grid in MERIS input product: {0} . Not a L1b product?",
+                                                      missedTPG);
+                throw new OperatorException(message);
+            }
+        } else {
+            String message = "Missing MERIS L1b input product";
             throw new OperatorException(message);
         }
     }
@@ -108,16 +123,19 @@ public class SnowRadianceUtils {
         if (aatsrProduct != null) {
             final String missedBand = validateAatsrProductBands(aatsrProduct);
             if (!missedBand.isEmpty()) {
-                String message = MessageFormat.format("Missing required band in AATSR input product: {0} . Not a L1b product?",
+                String message = MessageFormat.format("Missing required band in AATSR input product: {0} . Is this really a MERIS L1b product?",
                                                       missedBand);
                 throw new OperatorException(message);
             }
             final String missedTPG = validateAatsrProductTpgs(aatsrProduct);
             if (!missedTPG.isEmpty()) {
-                String message = MessageFormat.format("Missing required tie-point grid in AATSR input product: {0} . Not a L1b product?",
+                String message = MessageFormat.format("Missing required tie-point grid in AATSR input product: {0} . Is this really an AATSR L1b product?",
                                                       missedTPG);
                 throw new OperatorException(message);
             }
+        } else {
+            String message = "Missing AATSR L1b input product";
+            throw new OperatorException(message);
         }
     }
 
@@ -192,40 +210,6 @@ public class SnowRadianceUtils {
         }
     }
 
-    public static void copyFlagBand(String flagBandName, Product sourceProduct, Product targetProduct) {
-        Guardian.assertNotNull("source", sourceProduct);
-        Guardian.assertNotNull("target", targetProduct);
-        if (sourceProduct.getFlagCodingGroup().getNodeCount() > 0) {
-            Band sourceBand;
-            Band targetBand;
-            FlagCoding coding;
-
-            for (int i = 0; i < sourceProduct.getNumBands(); i++) {
-                sourceBand = sourceProduct.getBandAt(i);
-                String bandName = sourceBand.getName();
-                coding = sourceBand.getFlagCoding();
-                if (coding != null && bandName.equals(flagBandName)) {
-                    targetBand = ProductUtils.copyBand(bandName, sourceProduct, targetProduct);
-                    targetBand.setSampleCoding(targetProduct.getFlagCodingGroup().get(coding.getName()));
-                }
-            }
-        }
-    }
-
-    public static void copyFlagCoding(String flagCodingName, Product sourceProduct, Product targetProduct) {
-
-        Guardian.assertNotNull("source", sourceProduct);
-        Guardian.assertNotNull("target", targetProduct);
-
-        int numCodings = sourceProduct.getFlagCodingGroup().getNodeCount();
-        for (int n = 0; n < numCodings; n++) {
-            FlagCoding sourceFlagCoding = sourceProduct.getFlagCodingGroup().get(n);
-            if (sourceFlagCoding.getName().equals(flagCodingName)) {
-                ProductUtils.copyFlagCoding(sourceFlagCoding, targetProduct);
-            }
-        }
-    }
-
     public static void copyStreamToFile(InputStream inFile, String to) throws IOException {
         InputStream in = null;
         OutputStream out = null;
@@ -250,4 +234,27 @@ public class SnowRadianceUtils {
         }
     }
 
+    public static FlagCoding createSnowRadianceFlagCoding() {
+        final FlagCoding flagCoding = new FlagCoding(SnowRadianceConstants.SNOWRADIANCE_FLAG_BAND_NAME);
+        flagCoding.setDescription("Snow Radiance Flag Coding");
+
+//        flagCoding.addFlag("F_UNCERTAIN", BitSetter.setFlag(0, SnowRadianceConstants.F_UNCERTAIN), "coverage is uncertain");
+        flagCoding.addFlag("F_NO_AATSR", BitSetter.setFlag(0, SnowRadianceConstants.F_NO_AATSR), "pixel is outside AATSR coverage (in case of colocated product)");
+        flagCoding.addFlag("F_CLOUD", BitSetter.setFlag(0, SnowRadianceConstants.F_CLOUD), "is with more than 80% cloudy");
+        flagCoding.addFlag("F_ICE", BitSetter.setFlag(0, SnowRadianceConstants.F_ICE), "is covered with ice (AATSR NDSI criterion)");
+        flagCoding.addFlag("F_SNOW", BitSetter.setFlag(0, SnowRadianceConstants.F_SNOW), "is covered with snow (AATSR band criterion)");
+        return flagCoding;
+    }
+
+    public static boolean snowGrainSizePollutionAlgoFailed(double result) {
+        return (result < 0.0 || result == Double.NaN || Math.abs(result) == Double.POSITIVE_INFINITY);
+    }
+
+    public static boolean temperatureAlgoFailed(double result) {
+        return (result < 200.0 || result > 350 || result == Double.NaN || Math.abs(result) == Double.POSITIVE_INFINITY);
+    }
+
+    public static boolean emissivityAlgoFailed(double result) {
+        return (result < 0.0 || result > 1.0 || result == Double.NaN || Math.abs(result) == Double.POSITIVE_INFINITY);
+    }
 }

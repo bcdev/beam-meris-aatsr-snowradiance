@@ -24,7 +24,7 @@ public class SnowGrainSizePollutionRetrieval {
      * @param viewZenith - view zenith
      * @return  pal
      */
-    public double getParticleAbsorptionLength(double reflMeas2, double reflMeas13, double reflLut, double sunZenith, double viewZenith) {
+    public static double getParticleAbsorptionLength(double reflMeas2, double reflMeas13, double reflLut, double sunZenith, double viewZenith) {
         final double mus = Math.cos(sunZenith* MathUtils.DTOR);
         final double muv = Math.cos(viewZenith* MathUtils.DTOR);
         final double uMus = 3.0*(1.0 + 2.0*mus)/7.0;
@@ -63,7 +63,7 @@ public class SnowGrainSizePollutionRetrieval {
      * @param pal - particle absorption length  442nm
      * @return  size
      */
-    public double getUnpollutedSnowGrainSize(double pal) {
+    public static double getUnpollutedSnowGrainSize(double pal) {
          return 0.38*pal;
     }
 
@@ -77,7 +77,7 @@ public class SnowGrainSizePollutionRetrieval {
      * @param grainSize - snow grain size
      * @return  conc
      */
-     public double getSootConcentrationInPollutedSnow(double reflMeas2, double reflLut,
+     public static double getSootConcentrationInPollutedSnow(double reflMeas2, double reflLut,
                                                       double sunZenith, double viewZenith,
                                                       double grainSize) {
 
@@ -113,7 +113,7 @@ public class SnowGrainSizePollutionRetrieval {
      * @param viewZenith - view zenith
      * @return  size
      */
-    public double getSnowAlbedo(double reflMeas, double reflLut, double sunZenith, double viewZenith) {
+    public static double getSnowAlbedo(double reflMeas, double reflLut, double sunZenith, double viewZenith) {
         final double mus = Math.cos(sunZenith* MathUtils.DTOR);
         final double muv = Math.cos(viewZenith* MathUtils.DTOR);
         final double uMus = 3.0*(1.0 + 2.0*mus)/7.0;
@@ -135,7 +135,7 @@ public class SnowGrainSizePollutionRetrieval {
      * @param vza
      * @return
      */
-    public double computeReflLutApprox(double saa, double sza, double vaa, double vza) {
+    public static double computeReflLutApprox(double saa, double sza, double vaa, double vza) {
         final double a = 1.247;
         final double b = 1.186;
         final double c = 5.157;

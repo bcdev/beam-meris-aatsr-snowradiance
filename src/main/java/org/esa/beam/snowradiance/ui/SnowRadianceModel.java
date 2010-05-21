@@ -37,6 +37,11 @@ public class SnowRadianceModel {
                label = "Compute snow grain size")
     private boolean computeSnowGrainSize = true;
 
+    @Parameter(defaultValue = "false",
+               description = "Only Compute Snow Grain Size and Pollution (requires MERIS only)",
+               label = "Only Compute Snow Grain Size and Pollution (requires MERIS only)")
+    private boolean computeSnowGrainSizePollutionOnly;
+
     @Parameter(defaultValue = "true",
                description = "Compute snow albedo",
                label = "Compute snow albedo")
@@ -162,6 +167,34 @@ public class SnowRadianceModel {
         return propertyContainer;
     }
 
+    public void setComputeSnowTemperatureFub(boolean computeSnowTemperatureFub) {
+        this.computeSnowTemperatureFub = computeSnowTemperatureFub;
+    }
+
+    public void setComputeEmissivityFub(boolean computeEmissivityFub) {
+        this.computeEmissivityFub = computeEmissivityFub;
+    }
+
+    public void setComputeAatsrNdsi(boolean computeAatsrNdsi) {
+        this.computeAatsrNdsi = computeAatsrNdsi;
+    }
+
+    public void setCopyAatsrL1Flags(boolean copyAatsrL1Flags) {
+        this.copyAatsrL1Flags = copyAatsrL1Flags;
+    }
+
+    public void setGetCloudMaskFromSynergy(boolean getCloudMaskFromSynergy) {
+        this.getCloudMaskFromSynergy = getCloudMaskFromSynergy;
+    }
+
+    public void setApply100PercentSnowMask(boolean apply100PercentSnowMask) {
+        this.apply100PercentSnowMask = apply100PercentSnowMask;
+    }
+
+    public void setComputeSnowGrainSizePollutionOnly(boolean computeSnowGrainSizePollutionOnly) {
+        this.computeSnowGrainSizePollutionOnly = computeSnowGrainSizePollutionOnly;
+    }
+
     public Map<String, Object> getSnowRadianceParameters() {
         HashMap<String, Object> params = new HashMap<String, Object>();
         configTargetBands(params);
@@ -186,6 +219,7 @@ public class SnowRadianceModel {
     private void configTargetBands(HashMap<String, Object> params) {
         params.put("copyInputBands", copyInputBands);
         params.put("computeSnowGrainSize", computeSnowGrainSize);
+        params.put("computeSnowGrainSizePollutionOnly", computeSnowGrainSizePollutionOnly);
         params.put("computeSnowAlbedo", computeSnowAlbedo);
         params.put("computeSnowSootContent", computeSnowSootContent);
         params.put("computeSnowTemperatureFub", computeSnowTemperatureFub);

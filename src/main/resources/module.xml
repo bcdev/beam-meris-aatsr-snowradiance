@@ -48,9 +48,16 @@
             <longDescr>Performs a snow properties retrieval on the selected Product</longDescr>
             <mnemonic/>
             <parent>tools</parent>
-            <helpID>snowPropertiesProcessor</helpID>
+            <helpID>snowRadianceHelp</helpID>
         </action>
-        
+
+        <extension point="beam-ui:helpSets">
+            <helpSet>
+                <parent>beam-help</parent>
+                <path>doc/help/snowradiance.hs</path>
+            </helpSet>
+        </extension>
+
        <!--<action>-->
             <!--<id>snowRadianceFubProcessor</id>-->
             <!--<class>org.esa.beam.snowradiance.ui.SnowTemperatureEmissivityAction</class>-->

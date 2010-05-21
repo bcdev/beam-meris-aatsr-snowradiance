@@ -1,16 +1,16 @@
 package org.esa.beam.snowradiance.operator;
 
 import org.esa.beam.collocation.CollocateOp;
+import org.esa.beam.framework.datamodel.Product;
 import org.esa.beam.framework.datamodel.TiePointGrid;
 import org.esa.beam.framework.gpf.GPF;
-import org.esa.beam.framework.gpf.annotations.SourceProduct;
-import org.esa.beam.framework.gpf.annotations.TargetProduct;
-import org.esa.beam.framework.gpf.annotations.Parameter;
-import org.esa.beam.framework.gpf.annotations.OperatorMetadata;
+import org.esa.beam.framework.gpf.Operator;
 import org.esa.beam.framework.gpf.OperatorException;
 import org.esa.beam.framework.gpf.OperatorSpi;
-import org.esa.beam.framework.gpf.Operator;
-import org.esa.beam.framework.datamodel.Product;
+import org.esa.beam.framework.gpf.annotations.OperatorMetadata;
+import org.esa.beam.framework.gpf.annotations.Parameter;
+import org.esa.beam.framework.gpf.annotations.SourceProduct;
+import org.esa.beam.framework.gpf.annotations.TargetProduct;
 import org.esa.beam.snowradiance.util.SnowRadianceUtils;
 import org.esa.beam.synergy.operators.CreateSynergyOp;
 
@@ -23,7 +23,7 @@ import java.util.Map;
  * @author Olaf Danne
  * @version $Revision: 8267 $ $Date: 2010-02-05 16:39:24 +0100 (Fr, 05 Feb 2010) $
  */
-@OperatorMetadata(alias="SnowRadiance.Master")
+@OperatorMetadata(alias = "SnowRadiance.Master")
 public class SnowRadianceMasterOp extends Operator {
 
     @SourceProduct(alias = "sourceMeris",
@@ -32,10 +32,15 @@ public class SnowRadianceMasterOp extends Operator {
     private Product merisSourceProduct;
 
     @SourceProduct(alias = "sourceAatsr",
+                   optional = true,
                    label = "Name (MERIS product)",
                    description = "Select a MERIS product for snow grains retrieval.")
     private Product aatsrSourceProduct;
 
+    @Parameter(defaultValue = "true",
+               description = "Only Compute Snow Grain Size and Pollution (requires MERIS only)",
+               label = "Only Compute Snow Grain Size and Pollution (requires MERIS only)")
+    private boolean computeSnowGrainSizePollutionOnly = true;
 
     // Target bands
     @Parameter(defaultValue = "false",
@@ -153,15 +158,15 @@ public class SnowRadianceMasterOp extends Operator {
     private double aatsr0670LowerThreshold = Double.parseDouble(SnowRadianceConstants.aatsr0670LowerDefaultValue);
 
 
-
     @TargetProduct(description = "The target product.")
     private Product targetProduct;
 
 
-
     public void initialize() throws OperatorException {
 
-         // Collocation
+
+
+            // Collocation
 //        Map<String, Product> collocateInput = new HashMap<String, Product>(2);
 //        collocateInput.put("masterProduct", merisSourceProduct);
 //        collocateInput.put("slaveProduct", aatsrSourceProduct);
@@ -174,65 +179,95 @@ public class SnowRadianceMasterOp extends Operator {
 
 
         SnowRadianceUtils.validateMerisProduct(merisSourceProduct);
-        SnowRadianceUtils.validateAatsrProduct(aatsrSourceProduct);
-
-        // get the colocated 'preprocessing' product from Synergy...
-        Product preprocessingProduct = null;
-        Map<String, Product> preprocessingInput = new HashMap<String, Product>(2);
-        preprocessingInput.put("MERIS", merisSourceProduct);
-        preprocessingInput.put("AATSR", aatsrSourceProduct);
-        Map<String, Object> preprocessingParams = new HashMap<String, Object>();
-        preprocessingParams.put("subsetOvAreas", false);
-        preprocessingProduct = GPF.createProduct(OperatorSpi.getOperatorAlias(CreateSynergyOp.class), preprocessingParams, preprocessingInput);
-
-
-        // Fix collocation output (tie point grids lost their units and descriptions)
-//        for (TiePointGrid tpg : colocatedProduct.getTiePointGrids()) {
-        for (TiePointGrid tpg : preprocessingProduct.getTiePointGrids()) {
-            tpg.setUnit(merisSourceProduct.getTiePointGrid(tpg.getName()).getUnit());
-            tpg.setDescription(merisSourceProduct.getTiePointGrid(tpg.getName()).getDescription());
-        }
 
         Product snowPropertiesProduct = null;
         if (computeSnowTemperatureFub || computeEmissivityFub ||
                 computeSnowGrainSize || computeSnowSootContent || computeSnowAlbedo) {
-            Map<String, Product> snowPropertiesInput = new HashMap<String, Product>(2);
-//            snowPropertiesInput.put("colocatedProduct", colocatedProduct);
-            snowPropertiesInput.put("colocatedProduct", preprocessingProduct);
-            snowPropertiesInput.put("merisProduct", merisSourceProduct);
-            Map<String, Object> snowPropertiesParams = new HashMap<String, Object>(4);
-            snowPropertiesParams.put("applyCloudMask", applyCloudMask);
-            snowPropertiesParams.put("getCloudMaskFromSynergy", getCloudMaskFromSynergy);
-            snowPropertiesParams.put("apply100PercentSnowMask", apply100PercentSnowMask);
-            snowPropertiesParams.put("copyInputBands", copyInputBands);
-            snowPropertiesParams.put("computeSnowGrainSize", computeSnowGrainSize);
-            snowPropertiesParams.put("computeSnowAlbedo", computeSnowAlbedo);
-            snowPropertiesParams.put("computeSnowSootContent", computeSnowSootContent);
-            snowPropertiesParams.put("computeEmissivityFub", computeEmissivityFub);
-            snowPropertiesParams.put("computeSnowTemperatureFub", computeSnowTemperatureFub);
-            snowPropertiesParams.put("computeMerisWaterVapour", computeMerisWaterVapour);
-            snowPropertiesParams.put("computeMerisNdvi", computeMerisNdvi);
-            snowPropertiesParams.put("computeAatsrNdsi", computeAatsrNdsi);
-            snowPropertiesParams.put("computeMerisMdsi", computeMerisMdsi);
-            snowPropertiesParams.put("copyAatsrL1Flags", copyAatsrL1Flags);
-            snowPropertiesParams.put("assumedEmissivityAt11Microns", assumedEmissivityAt11Microns);
-            snowPropertiesParams.put("cloudProbabilityThreshold", cloudProbabilityThreshold);
-            snowPropertiesParams.put("ndsiUpperThreshold", ndsiUpperThreshold);
-            snowPropertiesParams.put("ndsiLowerThreshold", ndsiLowerThreshold);
-            snowPropertiesParams.put("aatsr1610UpperThreshold", aatsr1610UpperThreshold);
-            snowPropertiesParams.put("aatsr1610LowerThreshold", aatsr1610LowerThreshold);
-            snowPropertiesParams.put("aatsr0670UpperThreshold", aatsr0670UpperThreshold);
-            snowPropertiesParams.put("aatsr0670LowerThreshold", aatsr0670LowerThreshold);
 
-            SnowRadianceUtils.validateParameters(snowPropertiesParams);
-            snowPropertiesProduct = GPF.createProduct(OperatorSpi.getOperatorAlias(SnowPropertiesOp.class), snowPropertiesParams, snowPropertiesInput);
+            if (computeSnowGrainSizePollutionOnly) {
+                Map<String, Product> snowPropertiesInput = new HashMap<String, Product>(2);
+                snowPropertiesInput.put("merisProduct", merisSourceProduct);
+                Map<String, Object> snowPropertiesParams = new HashMap<String, Object>(4);
+                snowPropertiesParams.put("applyCloudMask", applyCloudMask);
+                snowPropertiesParams.put("copyInputBands", copyInputBands);
+                snowPropertiesParams.put("computeSnowGrainSize", computeSnowGrainSize);
+                snowPropertiesParams.put("computeSnowAlbedo", computeSnowAlbedo);
+                snowPropertiesParams.put("computeSnowSootContent", computeSnowSootContent);
+                snowPropertiesParams.put("computeMerisWaterVapour", computeMerisWaterVapour);
+                snowPropertiesParams.put("computeMerisNdvi", computeMerisNdvi);
+                snowPropertiesParams.put("computeMerisMdsi", computeMerisMdsi);
+                snowPropertiesParams.put("cloudProbabilityThreshold", cloudProbabilityThreshold);
+
+                snowPropertiesProduct = GPF.createProduct(OperatorSpi.getOperatorAlias(SnowGrainSizePollutionOp.class), snowPropertiesParams, snowPropertiesInput);
+            } else {
+                SnowRadianceUtils.validateAatsrProduct(aatsrSourceProduct);
+
+                Product colocatedProduct = null;
+
+                Map<String, Product> collocateInput = new HashMap<String, Product>(2);
+                Map<String, Object> collocateParams = new HashMap<String, Object>(2);
+                if (getCloudMaskFromSynergy) {
+                    // get the colocated product from Synergy...
+                    collocateInput.put("MERIS", merisSourceProduct);
+                    collocateInput.put("AATSR", aatsrSourceProduct);
+                    collocateParams.put("subsetOvAreas", false);
+                    colocatedProduct = GPF.createProduct(OperatorSpi.getOperatorAlias(CreateSynergyOp.class), collocateParams, collocateInput);
+                } else {
+                    collocateInput.put("masterProduct", merisSourceProduct);
+                    collocateInput.put("slaveProduct", aatsrSourceProduct);
+                    collocateParams.put("masterComponentPattern", "${ORIGINAL_NAME}_MERIS");
+                    collocateParams.put("slaveComponentPattern", "${ORIGINAL_NAME}_AATSR");
+                    colocatedProduct =
+                            GPF.createProduct(OperatorSpi.getOperatorAlias(CollocateOp.class), collocateParams, collocateInput);
+                }
+                colocatedProduct.setProductType(merisSourceProduct.getProductType());
+
+                // Fix collocation output (tie point grids lost their units and descriptions)
+                for (TiePointGrid tpg : colocatedProduct.getTiePointGrids()) {
+                    tpg.setUnit(merisSourceProduct.getTiePointGrid(tpg.getName()).getUnit());
+                    tpg.setDescription(merisSourceProduct.getTiePointGrid(tpg.getName()).getDescription());
+                }
+
+                Map<String, Product> snowPropertiesInput = new HashMap<String, Product>(2);
+                snowPropertiesInput.put("colocatedProduct", colocatedProduct);
+                snowPropertiesInput.put("merisProduct", merisSourceProduct);
+                Map<String, Object> snowPropertiesParams = new HashMap<String, Object>(4);
+                snowPropertiesParams.put("applyCloudMask", applyCloudMask);
+                snowPropertiesParams.put("getCloudMaskFromSynergy", getCloudMaskFromSynergy);
+                snowPropertiesParams.put("apply100PercentSnowMask", apply100PercentSnowMask);
+                snowPropertiesParams.put("copyInputBands", copyInputBands);
+                snowPropertiesParams.put("computeSnowGrainSize", computeSnowGrainSize);
+                snowPropertiesParams.put("computeSnowGrainSizePollutionOnly", computeSnowGrainSizePollutionOnly);
+                snowPropertiesParams.put("computeSnowAlbedo", computeSnowAlbedo);
+                snowPropertiesParams.put("computeSnowSootContent", computeSnowSootContent);
+                snowPropertiesParams.put("computeEmissivityFub", computeEmissivityFub);
+                snowPropertiesParams.put("computeSnowTemperatureFub", computeSnowTemperatureFub);
+                snowPropertiesParams.put("computeMerisWaterVapour", computeMerisWaterVapour);
+                snowPropertiesParams.put("computeMerisNdvi", computeMerisNdvi);
+                snowPropertiesParams.put("computeAatsrNdsi", computeAatsrNdsi);
+                snowPropertiesParams.put("computeMerisMdsi", computeMerisMdsi);
+                snowPropertiesParams.put("copyAatsrL1Flags", copyAatsrL1Flags);
+                snowPropertiesParams.put("assumedEmissivityAt11Microns", assumedEmissivityAt11Microns);
+                snowPropertiesParams.put("cloudProbabilityThreshold", cloudProbabilityThreshold);
+                snowPropertiesParams.put("ndsiUpperThreshold", ndsiUpperThreshold);
+                snowPropertiesParams.put("ndsiLowerThreshold", ndsiLowerThreshold);
+                snowPropertiesParams.put("aatsr1610UpperThreshold", aatsr1610UpperThreshold);
+                snowPropertiesParams.put("aatsr1610LowerThreshold", aatsr1610LowerThreshold);
+                snowPropertiesParams.put("aatsr0670UpperThreshold", aatsr0670UpperThreshold);
+                snowPropertiesParams.put("aatsr0670LowerThreshold", aatsr0670LowerThreshold);
+
+                SnowRadianceUtils.validateParameters(snowPropertiesParams);
+                snowPropertiesProduct = GPF.createProduct(OperatorSpi.getOperatorAlias(SnowAllPropertiesOp.class), snowPropertiesParams, snowPropertiesInput);
+            }
+        } else {
+            String message = "Nothing to do - select at least one snow property to be computed.";
+            throw new OperatorException(message);
         }
 
 //        targetProduct = colocatedProduct;
         targetProduct = snowPropertiesProduct;
     }
 
-    
 
     /**
      * The Service Provider Interface (SPI) for the operator.

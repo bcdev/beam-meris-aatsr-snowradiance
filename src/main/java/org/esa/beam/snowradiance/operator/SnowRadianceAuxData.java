@@ -86,7 +86,7 @@ public class SnowRadianceAuxData {
                 final String inputFileString = "pr" + sb2 + "_" + SnowRadianceConstants.AATSR_WVL[j] + ".nc";
 
                 try {
-                    final URL url = SnowPropertiesOp.class.getResource(inputFileString);
+                    final URL url = SnowAllPropertiesOp.class.getResource(inputFileString);
                     final String path = URLDecoder.decode(url.getPath(), "UTF-8");
                     final File file = new File(path);
                     final String inputPath = file.getAbsolutePath();
@@ -95,7 +95,7 @@ public class SnowRadianceAuxData {
 //                    final String netcdfPath = "C:" + File.separator + "temp" + File.separator + inputFileString;
                     final String netcdfPath = System.getProperty("java.io.tmpdir") + 
                             File.separator + inputFileString;
-                    InputStream inputStream = SnowPropertiesOp.class.getResourceAsStream(inputFileString);
+                    InputStream inputStream = SnowAllPropertiesOp.class.getResourceAsStream(inputFileString);
                     SnowRadianceUtils.copyStreamToFile(inputStream, netcdfPath);
 
 //                    final NetcdfFile netcdfFile = NetcdfFile.open(inputPath + File.separator + inputFileString);
@@ -168,7 +168,7 @@ public class SnowRadianceAuxData {
                 final String inputFileString = "pr" + sb2 + "_" + SnowRadianceConstants.AATSR_WVL[j] + ".nc";
 
                 try {
-                    final URL url = SnowPropertiesOp.class.getResource(inputFileString);
+                    final URL url = SnowAllPropertiesOp.class.getResource(inputFileString);
                     final String path = URLDecoder.decode(url.getPath(), "UTF-8");
                     final File file = new File(path);
                     final String inputPath = file.getAbsolutePath();
@@ -177,7 +177,7 @@ public class SnowRadianceAuxData {
 //                    final String netcdfPath = "C:" + File.separator + "temp" + File.separator + inputFileString;
                     final String netcdfPath = System.getProperty("java.io.tmpdir") +
                             File.separator + inputFileString;
-                    InputStream inputStream = SnowPropertiesOp.class.getResourceAsStream(inputFileString);
+                    InputStream inputStream = SnowAllPropertiesOp.class.getResourceAsStream(inputFileString);
                     SnowRadianceUtils.copyStreamToFile(inputStream, netcdfPath);
 //                    final NetcdfFile netcdfFile = NetcdfFile.open(inputPath);
                     final NetcdfFile netcdfFile = NetcdfFile.open(netcdfPath);

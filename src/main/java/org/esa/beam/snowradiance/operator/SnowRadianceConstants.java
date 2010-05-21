@@ -41,6 +41,9 @@ public class SnowRadianceConstants {
     public static final float TSFC_MIN = 243.15f;
     public static final float TSFC_MAX = 274.15f;
 
+    public static final double SNOW_GRAIN_SIZE_POLLUTION_NODATAVALUE = -1.0;
+    public static final double SNOW_TEMPERATURE_EMISSIVITY_NODATAVALUE = -1.0;
+
     public static final String UNPOLLUTED_SNOW_GRAIN_SIZE_BAND_NAME= "snow_grain_size";
     public static final double UNPOLLUTED_SNOW_GRAIN_SIZE_BAND_NODATAVALUE = -1.0;
     public static final boolean UNPOLLUTED_SNOW_GRAIN_SIZE_BAND_NODATAVALUE_USED = true;
@@ -60,11 +63,13 @@ public class SnowRadianceConstants {
 
     public static final String copyInputBandsLabel = "Copy input bands";
     public static final String computeSnowGrainSizeLabel = "Compute snow grain size";
+    public static final String computeSnowGrainSizePollutionOnlyLabel = "Compute snow grain size / pollution only (no AATSR L1b required)";
     public static final String computeSnowAlbedoLabel = "Compute snow albedo";
     public static final String computeSnowSootContentLabel = "Compute snow soot content";
     public static final String computeEmissivityLabel = "Compute emissivity";
     public static final String computeSnowTemperatureLabel = "Compute temperature";
 
+    public static final String snowPropertiesLabel = "Snow properties:";
     public static final String complementaryQuantitiesLabel = "Complementary quantities:";
     public static final String waterVapourMerisLabel = "Water vapour (from MERIS)";
     public static final String ndviMerisLabel = "NDVI (from MERIS)";
@@ -78,7 +83,7 @@ public class SnowRadianceConstants {
     public static final String applySnowMaskLabel = "Mask 100% snow";
 
     public static final String assumedEmissivity11MicronsLabel = "Assumed emissivity at 11 microns:";
-    public static final String parametersForMaskingLabel = "Thresholds for snow/ice flags:";
+    public static final String snowIceThresholdsLabel = "Thresholds for snow/ice flags:";
 
     public static final String ndsiLabel = "NDSI";
     public static final String cloudProbThresholdLabel = "Cloud probability threshold:";
@@ -97,5 +102,18 @@ public class SnowRadianceConstants {
     public static final String aatsr1610UpperDefaultValue = "10.0";
     public static final String aatsr0670LowerDefaultValue = "60.0";
     public static final String aatsr0670UpperDefaultValue = "100.0";
+
+    public static final String SNOWRADIANCE_FLAG_BAND_NAME = "snowradiance_flags";
+
+//    public static final int F_UNCERTAIN = 0;
+    public static final int F_NO_AATSR= 0;
+    public static final int F_CLOUD = 1;
+    public static final int F_ICE = 2;
+    public static final int F_SNOW = 3;
+
+    public static final String AATSR_CONFID_NADIR_FLAG_BAND_NAME = "confid_flags_nadir_AATSR";
+    public static final String AATSR_CONFID_FWARD_FLAG_BAND_NAME = "confid_flags_fward_AATSR";
+    public static final String AATSR_CLOUD_NADIR_FLAG_BAND_NAME = "cloud_flags_nadir_AATSR";
+    public static final String AATSR_CLOUD_FWARD_FLAG_BAND_NAME = "cloud_flags_fward_AATSR";
 
 }
