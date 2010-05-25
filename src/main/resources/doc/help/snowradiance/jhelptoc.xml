@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="iso-8859-1" standalone="no"?>
+<!DOCTYPE toc PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp TOC Version 1.0//EN" "http://java.sun.com/products/javahelp/toc_1_0.dtd">
+<toc version="1.0">
+  <tocitem target="add" text="Snow Radiance Processor">
+    <tocitem target="sum.introduction" text="Introduction">
+      <tocitem target="sum.introduction.scope" text="Scope"/>
+      <tocitem target="sum.introduction.objectives" text="Objectives"/>
+      <tocitem target="sum.introduction.readerLevel" text="Reader Level"/>
+      <tocitem target="sum.introduction.acronymsAndNomenclature" text="Acronyms and Nomenclature">
+        <tocitem target="sum.introduction.acronyms" text="Acronyms"/>
+        <tocitem target="sum.introduction.nomenclature" text="Nomenclature"/>
+      </tocitem>
+      <tocitem target="sum.introduction.referenceDocuments" text="References"/>
+    </tocitem>
+    <tocitem target="sum.installation" text="Software Installation">
+      <tocitem target="sum.installation.plugin" text="The Snow Radiance Processor as BEAM plugin"/>
+      <tocitem target="sum.installation.auxdata" text="Auxiliary Data"/>
+      <tocitem target="sum.installation.addons" text="Additional Requirements"/>
+    </tocitem>
+    <tocitem target="sum.products" text="Products"/>
+    <tocitem target="sum.toolbox" text="Processors">
+      <tocitem target="sum.toolbox.io" text="I/O Parameters and Preprocessing">
+        <tocitem target="sum.toolbox.io.io" text="I/O Parameters Tab Pane"/>
+        <tocitem target="sum.toolbox.io.control" text="Control Buttons"/>
+      </tocitem>
+      <tocitem target="sum.toolbox.cloudscreening" text="Cloudscreening"/>
+      <tocitem target="sum.toolbox.aerosol" text="Aerosol Retrieval and Atmospheric Correction"/>
+      <tocitem target="sum.toolbox.commandline" text="Processing from command line"/>
+    </tocitem>
+  </tocitem>
+</toc>
