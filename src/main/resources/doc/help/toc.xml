@@ -4,10 +4,10 @@
 
 <toc version="2.0" categoryclosedimage="folder" categoryopenimage="folder" topicimage="doc">
 
-    <tocitem text="Snow Properties (MERIS/AATSR)" target="snowRadianceHelp">
-        <!--<tocitem text="Introduction" target="snowradiancehelpIntro"/>-->
-        <!--<tocitem text="Software Installation" target="snowradiancehelpInstall"/>-->
-        <!--<tocitem text="Products" target="snowradiancehelpProducts"/>-->
-        <!--<tocitem text="Processors" target="snowradiancehelpCreateSynergy"/>-->
+    <tocitem text="Snow Radiance Processor" target="snowRadiance">
+        <tocitem text="Introduction" target="snowRadianceIntro"/>
+        <tocitem text="Software Installation" target="snowRadianceInstall"/>
+        <tocitem text="Products" target="snowRadianceProducts"/>
+        <tocitem text="GUI" target="snowRadianceGui"/>
     </tocitem>
 </toc>

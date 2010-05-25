@@ -299,7 +299,6 @@ public class SnowGrainSizePollutionOp extends Operator {
         Tile merisRefl14Tile = merisSpectralBandTiles[13];
 
         Tile merisL1FlagsTile = getSourceTile(merisProduct.getBand(("l1_flags")), rectangle, pm);
-        Tile snowradianceFlagsTile = getSourceTile(merisProduct.getBand((SnowRadianceConstants.SNOWRADIANCE_FLAG_BAND_NAME)), rectangle, pm);
 
         Tile cloudProbTile = null;
         if (applyCloudMask) {
@@ -319,8 +318,6 @@ public class SnowGrainSizePollutionOp extends Operator {
 
                 if (targetBand.isFlagBand() && targetBand.getName().equals("l1_flags")) {
                     targetTile.setSample(x, y, merisL1FlagsTile.getSampleInt(x, y));
-                } else if (targetBand.isFlagBand() && !targetBand.getName().equals(SnowRadianceConstants.SNOWRADIANCE_FLAG_BAND_NAME)) {
-                    targetTile.setSample(x, y, snowradianceFlagsTile.getSampleInt(x, y));
                 } else {
 
                     // first determine cloud mask...

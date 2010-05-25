@@ -14,13 +14,13 @@
     <dependency>
         <module>beam-meris-brr</module>
     </dependency>
-     <dependency>
+    <dependency>
         <module>beam-meris-sdr</module>
     </dependency>
     <dependency>
         <module>beam-collocation</module>
     </dependency>
-     <dependency>
+    <dependency>
         <module>beam-meris-l2auxdata</module>
     </dependency>
     <dependency>
@@ -29,7 +29,7 @@
     <dependency>
         <module>beam-meris-aatsr-synergy-preprocessing</module>
     </dependency>
-     <dependency>
+    <dependency>
         <module>lib-netcdf</module>
     </dependency>
     <dependency>
@@ -41,40 +41,22 @@
 
     <extension point="beam-ui:actions">
         <action>
-            <id>snowRadiance</id>
+            <id>snowradAction</id>
             <class>org.esa.beam.snowradiance.ui.SnowRadianceAction</class>
-            <text>Snow Properties (MERIS/(A)ATSR)... </text>
+            <text>Snow Properties (MERIS/(A)ATSR)...</text>
             <shortDescr>Snow Properties Retrieval</shortDescr>
             <longDescr>Performs a snow properties retrieval on the selected Product</longDescr>
             <mnemonic/>
             <parent>tools</parent>
-            <helpID>snowRadianceHelp</helpID>
+            <helpID>snowRadiance</helpID>
         </action>
-
-        <extension point="beam-ui:helpSets">
-            <helpSet>
-                <parent>beam-help</parent>
-                <path>doc/help/snowradiance.hs</path>
-            </helpSet>
-        </extension>
-
-       <!--<action>-->
-            <!--<id>snowRadianceFubProcessor</id>-->
-            <!--<class>org.esa.beam.snowradiance.ui.SnowTemperatureEmissivityAction</class>-->
-            <!--<text>Retrieve snow temperature...</text>-->
-            <!--<shortDescr>snowTemp</shortDescr>-->
-            <!--<mnemonic/>-->
-            <!--<parent>snowRadiance</parent>-->
-            <!--<helpID>snowRadianceFubProcessor</helpID>-->
-        <!--</action>-->
-        <!--<action>-->
-            <!--<id>snowGrainsProcessor</id>-->
-            <!--<class>org.esa.beam.snowradiance.ui.SnowGrainSizePollutionAction</class>-->
-            <!--<text>Retrieve snow grain size and pollution...</text>-->
-            <!--<shortDescr>snowGrains</shortDescr>-->
-            <!--<mnemonic/>-->
-            <!--<parent>snowRadiance</parent>-->
-            <!--<helpID>snowGrainsProcessor</helpID>-->
-        <!--</action>-->
     </extension>
+
+    <extension point="beam-ui:helpSets">
+        <helpSet>
+            <parent>beam-help</parent>
+            <path>doc/help/snowradiance.hs</path>
+        </helpSet>
+    </extension>
+
 </module>

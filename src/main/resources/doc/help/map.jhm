@@ -5,10 +5,10 @@
 
 <map version="2.0">
 
-    <mapID target="snowRadianceHelp" url="snowradiancehelp/snowradiancehelp.html"/>
-    <!--<mapID target="snowradiancehelpIndex" url="snowradiancehelp/index.html"/>-->
-    <!--<mapID target="snowradiancehelpIntro" url="snowradiancehelp/ch01.html"/>-->
-    <!--<mapID target="snowradiancehelpInstall" url="snowradiancehelp/ch02.html"/>-->
-    <!--<mapID target="snowradiancehelpProducts" url="snowradiancehelp/ch03.html"/>-->
-    <!--<mapID target="snowradiancehelpCreateSynergy" url="snowradiancehelp/ch04.html"/>-->
+    <mapID target="snowRadiance" url="snowradiance/SnowRadiance.html"/>
+    <mapID target="snowRadianceIndex" url="snowradiance/index.html"/>
+    <mapID target="snowRadianceIntro" url="snowradiance/ch01.html"/>
+    <mapID target="snowRadianceInstall" url="snowradiance/ch02.html"/>
+    <mapID target="snowRadianceProducts" url="snowradiance/ch03.html"/>
+    <mapID target="snowRadianceGui" url="snowradiance/ch04.html"/>
 </map>

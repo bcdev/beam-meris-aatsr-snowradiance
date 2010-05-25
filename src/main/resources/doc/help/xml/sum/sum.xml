@@ -3,21 +3,20 @@
         "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd"
         [
                 <!ENTITY ch01     SYSTEM "ch01-introduction.xml">
-                <!ENTITY ch02     SYSTEM "ch02-installation.xml">
-                <!ENTITY ch03     SYSTEM "ch03-products.xml">
-				<!ENTITY ch04     SYSTEM "ch04-snowradiancetoolbox.xml">
+				<!ENTITY ch02     SYSTEM "ch02-installation.xml">
+				<!ENTITY ch03     SYSTEM "ch03-products.xml">
+				<!ENTITY ch04     SYSTEM "ch04-gui.xml">
+				<!ENTITY ch05     SYSTEM "ch05-cli.xml">
                 ]>
 
-<book id="sum">
-    <title>Snow Properties (MERIS/AATSR)</title>
-
-	<subtitle>Software User Manual</subtitle>
+<book id="add">
+    <title>Snow Radiance Processor</title>
 
     <bookinfo>
-        <issuenum revision="1">1.1</issuenum>
-        <date>22 May 2010</date>
+        <issuenum revision="1">1.0</issuenum>
+        <date>25 May 2010</date>
 
-        <pubsnumber>1.0</pubsnumber>
+        <pubsnumber>Version 1.0</pubsnumber>
 
         <author>
             <firstname>Olaf</firstname>
@@ -35,7 +34,7 @@
             <email>olaf.danne@brockmann-consult.de</email>
         </author>
 
-        <pubdate>13 April 2010</pubdate>
+        <pubdate>25 May 2010</pubdate>
 
         <copyright>
             <year>2010</year>
@@ -43,21 +42,14 @@
         </copyright>
 
         <legalnotice>
-            <para>ESA and the ESA logo are trademarks of the European Space Agency. The Brockmann Consult
-                logo is a trademark of Brockmann Consult GmbH. Java is a trademark of Sun Microsystems, Inc. 
-				All other trademarks are acknowledged as the property of their respective owners.
-            </para>
             <para>
-                Copyright 2007 - 2010 by the European Space Agency. All Rights Reserved. This document is subject to
-                copyright protection. No portion may be copied without prior written consent from the European Space
-                Agency.
             </para>
         </legalnotice>
 
         <revhistory>
-            <revision>
+			<revision>
                 <revnumber>1.0</revnumber>
-                <date>22/05/10</date>
+                <date>25/05/10</date>
                 <authorinitials>O. Danne</authorinitials>
                 <revdescription>
                     <para>
@@ -71,9 +63,8 @@
     <!-- External entity refs -->
 	
     &ch01;
-    &ch02;
-	&ch03;
-	&ch04;
+	&ch02;
+    &ch03;
+    &ch04;
 
 </book>
-

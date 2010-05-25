@@ -15,6 +15,7 @@ import org.esa.beam.util.BitSetter;
 import org.esa.beam.util.Guardian;
 import org.esa.beam.util.ProductUtils;
 
+import javax.swing.JOptionPane;
 import java.awt.Color;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -50,7 +51,7 @@ public class SnowRadianceUtils {
             EnvisatConstants.AATSR_TIE_POINT_GRID_NAMES;
 
 
-
+    private static java.util.logging.Logger logger = java.util.logging.Logger.getLogger("snowradiance");
 
     /**
      * This method computed the index of the nearest higher value in a float array
@@ -123,7 +124,7 @@ public class SnowRadianceUtils {
         if (aatsrProduct != null) {
             final String missedBand = validateAatsrProductBands(aatsrProduct);
             if (!missedBand.isEmpty()) {
-                String message = MessageFormat.format("Missing required band in AATSR input product: {0} . Is this really a MERIS L1b product?",
+                String message = MessageFormat.format("Missing required band in AATSR input product: {0} . Is this really an AATSR L1b product?",
                                                       missedBand);
                 throw new OperatorException(message);
             }
@@ -257,4 +258,51 @@ public class SnowRadianceUtils {
     public static boolean emissivityAlgoFailed(double result) {
         return (result < 0.0 || result > 1.0 || result == Double.NaN || Math.abs(result) == Double.POSITIVE_INFINITY);
     }
+
+    public static void logInfoMessage(String msg) {
+        if (System.getProperty("snowradianceMode") != null && System.getProperty("snowradianceMode").equals("GUI")) {
+            JOptionPane.showOptionDialog(null, msg, "Snow Properties - Info Message", JOptionPane.DEFAULT_OPTION,
+                                         JOptionPane.INFORMATION_MESSAGE, null, null, null);
+        } else {
+            info(msg);
+        }
+    }
+
+    public static void logErrorMessage(String msg) {
+        if (System.getProperty("snowradianceMode") != null && System.getProperty("snowradianceMode").equals("GUI")) {
+            JOptionPane.showOptionDialog(null, msg, "Snow Properties - Error Message", JOptionPane.DEFAULT_OPTION,
+                                         JOptionPane.ERROR_MESSAGE, null, null, null);
+        } else {
+            info(msg);
+        }
+    }
+
+    public static void info(final String msg) {
+        logger.info(msg);
+        System.out.println(msg);
+    }
+
+    /**
+     * Copies all bands which contain a flagcoding from the source product to the target product.
+     *
+     * @param sourceProduct the source product
+     * @param targetProduct the target product
+     */
+    public static void copySingleFlagBand(Product sourceProduct, Product targetProduct, String bandName) {
+        Guardian.assertNotNull("source", sourceProduct);
+        Guardian.assertNotNull("target", targetProduct);
+        if (sourceProduct.getFlagCodingGroup().getNodeCount() > 0) {
+            for (int i = 0; i < sourceProduct.getNumBands(); i++) {
+                Band sourceBand = sourceProduct.getBandAt(i);
+                String sourceBandName = sourceBand.getName();
+                FlagCoding coding = sourceBand.getFlagCoding();
+                if (coding != null && sourceBandName.equals(bandName)) {
+                    Band targetBand = ProductUtils.copyBand(bandName, sourceProduct, targetProduct);
+                    ProductUtils.copyFlagCoding(coding, targetProduct);
+                    targetBand.setSampleCoding(targetProduct.getFlagCodingGroup().get(coding.getName()));
+                }
+            }
+        }
+    }
+
 }

@@ -20,7 +20,7 @@ public class SnowRadianceAction extends AbstractVisatAction {
 //                "SnowRadiance.temperature", getAppContext(), "Snow Temperature Retrieval", "");
         final SnowRadianceDialog productDialog = new SnowRadianceDialog(
                 OperatorSpi.getOperatorAlias(SnowRadianceMasterOp.class),
-                        getAppContext(), "Snow Properties", "snowRadianceHelp");
+                        getAppContext(), "Snow Properties", "snowRadiance");
 
         productDialog.getJDialog().setPreferredSize(new Dimension(500, 500));
         productDialog.setTargetProductNameSuffix("_SNOWRAD");

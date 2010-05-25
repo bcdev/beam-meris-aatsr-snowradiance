@@ -4,35 +4,22 @@
     <sect1 id="sum.introduction.scope">
         <title>Scope</title>
         <para>
-            This document is the software user manual (SUM) for the MERIS/(A)ATSR Synergy Toolbox.
+            This document is the software user manual (SUM) for the BEAM Snow Radiance Processor.
         </para>
     </sect1>
 
     <sect1 id="sum.introduction.objectives">
         <title>Objectives</title>
         <para>
-            As outlined in [1], the aim of developing a MERIS/(A)ATSR Synergy Toolbox is to undertake research and
-            algorithm development on MERIS/AATSR synergy, with stated objectives:
+            As outlined in [1], the aim of developing a BEAM Snow Radiance Processor is to undertake research and
+            algorithm development on snow properties derived from both MERIS standalone as well as
+            synergetic MERIS/AATSR datasets, with stated objectives:
             <itemizedlist mark='bullet'>
             <listitem>
-                define and prototype algorithms and processing schemes for improved cloud screening,
-                global aerosol retrieval and land atmospheric correction using the combined multi-spectral
-                and multi-angle information from geo-located and geo-registered MERIS and AATSR measurements
+               todo
             </listitem>
-            <listitem>
-                verify the prototyped algorithms and processing schemes and demonstrate their benefit in
-                terms of accuracy as compared to single-sensor algorithms
-            </listitem>
-            <listitem>
-                implement these algorithms and processing schemes for the BEAM toolbox
-            </listitem>
-            <listitem>
-                formulate recommendations for the development of future synergy algorithms and processing
-                concepts for the Sentinel-3 OLCI and SLST instruments
-            </listitem>
-            </itemizedlist>	
-            This SUM specifically describes the software developed for Synergy preprocessing, cloud screening,
-            ocean and land aerosol retrieval, and atmospheric correction.
+            </itemizedlist>
+            This SUM specifically describes the software developed for the two processors SIC and SIP.
         </para>
     </sect1>
 
@@ -43,7 +30,7 @@
 			This specification is mainly written for the following audiences:
 			<itemizedlist mark='bullet'>
 				<listitem>
-					MERIS/(A)ATSR Synergy Toolbox users
+					BEAM Snow Radiance Processor
 				</listitem>
 			</itemizedlist>	
 		</para>
@@ -96,18 +83,14 @@
 					<listitem>
 						SDR - Surface Downwelling Reflectance
 					</listitem>
-                    <listitem>
-						SU - Swansea University
-					</listitem>
+
                     <listitem>
 						SUM - Software User Manual
 					</listitem>
                     <listitem>
 						VISAT - Visualization and Analysis Tool
 					</listitem>
-                    <listitem>
-						UV - University of Valencia
-					</listitem>
+
 				</itemizedlist>	
 			</para>
         </sect2>

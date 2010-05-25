@@ -32,6 +32,8 @@ public class SnowRadianceDialog extends SingleTargetProductDialog {
         super(appContext, TITLE, helpID);
         targetProductNameSuffix = "";
 
+        System.setProperty("snowradianceMode", "GUI");
+
         parameterMap = new HashMap<String, Object>(17);
 
         final OperatorSpi operatorSpi = GPF.getDefaultInstance().getOperatorSpiRegistry().getOperatorSpi(operatorName);

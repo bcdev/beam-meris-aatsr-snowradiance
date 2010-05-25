@@ -18,12 +18,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Snow radiance 'master operator' (CURRENTLY NOT USED)
+ * Snow radiance 'master operator'
  *
  * @author Olaf Danne
  * @version $Revision: 8267 $ $Date: 2010-02-05 16:39:24 +0100 (Fr, 05 Feb 2010) $
  */
-@OperatorMetadata(alias = "SnowRadiance.Master")
+@OperatorMetadata(alias = "SnowRadiance.Master",
+                  version = "1.0",
+                  authors = "Olaf Danne",
+                  copyright = "(c) 2010 by Brockmann Consult",
+                  description = "The master operator for the SnowRadiance processor.")
 public class SnowRadianceMasterOp extends Operator {
 
     @SourceProduct(alias = "sourceMeris",
@@ -180,6 +184,7 @@ public class SnowRadianceMasterOp extends Operator {
 
         SnowRadianceUtils.validateMerisProduct(merisSourceProduct);
 
+        Product colocatedProduct = null;
         Product snowPropertiesProduct = null;
         if (computeSnowTemperatureFub || computeEmissivityFub ||
                 computeSnowGrainSize || computeSnowSootContent || computeSnowAlbedo) {
@@ -201,8 +206,6 @@ public class SnowRadianceMasterOp extends Operator {
                 snowPropertiesProduct = GPF.createProduct(OperatorSpi.getOperatorAlias(SnowGrainSizePollutionOp.class), snowPropertiesParams, snowPropertiesInput);
             } else {
                 SnowRadianceUtils.validateAatsrProduct(aatsrSourceProduct);
-
-                Product colocatedProduct = null;
 
                 Map<String, Product> collocateInput = new HashMap<String, Product>(2);
                 Map<String, Object> collocateParams = new HashMap<String, Object>(2);
@@ -261,7 +264,7 @@ public class SnowRadianceMasterOp extends Operator {
             }
         } else {
             String message = "Nothing to do - select at least one snow property to be computed.";
-            throw new OperatorException(message);
+            SnowRadianceUtils.logErrorMessage(message);
         }
 
 //        targetProduct = colocatedProduct;

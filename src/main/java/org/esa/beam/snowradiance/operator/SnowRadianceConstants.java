@@ -116,4 +116,6 @@ public class SnowRadianceConstants {
     public static final String AATSR_CLOUD_NADIR_FLAG_BAND_NAME = "cloud_flags_nadir_AATSR";
     public static final String AATSR_CLOUD_FWARD_FLAG_BAND_NAME = "cloud_flags_fward_AATSR";
 
+    public static final String SYNERGY_CLOUD_FLAG_BAND_NAME = "cloud_flags_synergy";
+
 }
