@@ -386,14 +386,15 @@ public class SnowAllPropertiesOp extends Operator {
             ProductUtils.copyFlagBands(merisProduct, targetProduct);
         }
 
-        if (getCloudMaskFromSynergy) {
-//            ProductUtils.copyFlagBands(cloudScreeningProduct, targetProduct);
-            SnowRadianceUtils.copySingleFlagBand(cloudScreeningProduct, targetProduct, SnowRadianceConstants.SYNERGY_CLOUD_FLAG_BAND_NAME);
-        } else {
-            Band cloudProbBand = targetProduct.addBand("cloud_probability", ProductData.TYPE_FLOAT32);
-            cloudProbBand.setDescription("cloud_probability");
-            cloudProbBand.setNoDataValue(-1.0f);
-            cloudProbBand.setNoDataValueUsed(true);
+        if (applyCloudMask) {
+            if (getCloudMaskFromSynergy) {
+                SnowRadianceUtils.copySingleFlagBand(cloudScreeningProduct, targetProduct, SnowRadianceConstants.SYNERGY_CLOUD_FLAG_BAND_NAME);
+            } else {
+                Band cloudProbBand = targetProduct.addBand("cloud_probability", ProductData.TYPE_FLOAT32);
+                cloudProbBand.setDescription("cloud_probability");
+                cloudProbBand.setNoDataValue(-1.0f);
+                cloudProbBand.setNoDataValueUsed(true);
+            }
         }
     }
 
@@ -514,42 +515,41 @@ public class SnowAllPropertiesOp extends Operator {
 
                     // first determine cloud mask...
                     boolean considerPixelAsCloudy = applyCloudMask && isCloud(cloudFlagsTile, cloudProbTile, x, y);
+                    boolean considerPixelAsSnow = false;
+                    boolean considerPixelAsIce = false;
 
                     if (!considerPixelAsCloudy) {
-
                         // temperature/emissivity retrieval...
                         if (doSnowTemperatureEmissivityRetrieval()) {
+                            // compute temperature and emissivity if at least one of both user options was set...
                             if (aatsrDataAvailable(aatsrBt11, aatsrBt12)) {
+                                // compute temperature and emissivity only if AATSR data is available...
+                                float aatsr865 = aatsrReflecNadir870Tile.getSampleFloat(x, y);
+                                float aatsr1610 = aatsrReflecNadir1600Tile.getSampleFloat(x, y);
+                                float aatsr0670 = aatsrReflecNadir670Tile.getSampleFloat(x, y);
+                                float ndsi = (aatsr865 - aatsr1610) / (aatsr865 + aatsr1610);
+                                if (ndsi > ndsiLowerThreshold && ndsi < ndsiUpperThreshold) {
+                                    considerPixelAsSnow = true;
+                                } else if (ndsi > ndsiUpperThreshold) {
+                                    considerPixelAsIce = true;
+                                }
+                                if (apply100PercentSnowMask && !(ndsi > ndsiUpperThreshold)) {
+                                    boolean is1600InInterval = aatsr1610 >= aatsr1610LowerThreshold && aatsr1610 <= aatsr1610UpperThreshold;
+                                    boolean is0670InInterval = aatsr0670 >= aatsr0670LowerThreshold && aatsr0670 <= aatsr0670UpperThreshold;
+                                    considerPixelAsSnow = is1600InInterval && is0670InInterval;
+                                }
 
                                 if (targetBand.getName().equals(SnowRadianceConstants.SNOWRADIANCE_FLAG_BAND_NAME)) {
-                                    // cloud, ice, snow retrieval using NDSI thresholds
-//                                    targetTile.setSample(x, y, SnowRadianceConstants.F_UNCERTAIN, true);
-                                    float aatsr865 = aatsrReflecNadir870Tile.getSampleFloat(x, y);
-                                    float aatsr1610 = aatsrReflecNadir1600Tile.getSampleFloat(x, y);
-                                    float aatsr0670 = aatsrReflecNadir670Tile.getSampleFloat(x, y);
-                                    float ndsi = (aatsr865 - aatsr1610) / (aatsr865 + aatsr1610);
-                                    if (ndsi > ndsiLowerThreshold && ndsi < ndsiUpperThreshold) {
+                                    if (considerPixelAsSnow) {
                                         targetTile.setSample(x, y, SnowRadianceConstants.F_SNOW, true);
-//                                        targetTile.setSample(x, y, SnowRadianceConstants.F_UNCERTAIN, false);
-                                    } else if (ndsi > ndsiUpperThreshold) {
-                                        targetTile.setSample(x, y, SnowRadianceConstants.F_ICE, true);
-//                                        targetTile.setSample(x, y, SnowRadianceConstants.F_UNCERTAIN, false);
-                                    }
-                                    if (apply100PercentSnowMask && !(ndsi > ndsiUpperThreshold)) {
-                                        boolean is1600InInterval = aatsr1610 >= aatsr1610LowerThreshold && aatsr1610 <= aatsr1610UpperThreshold;
-                                        boolean is0670InInterval = aatsr0670 >= aatsr0670LowerThreshold && aatsr0670 <= aatsr0670UpperThreshold;
-                                        boolean isSnow = is1600InInterval && is0670InInterval;
-                                        if (isSnow) {
-                                            targetTile.setSample(x, y, SnowRadianceConstants.F_SNOW, true);
-                                            targetTile.setSample(x, y, SnowRadianceConstants.F_ICE, false);
+                                        targetTile.setSample(x, y, SnowRadianceConstants.F_ICE, false);
 //                                            targetTile.setSample(x, y, SnowRadianceConstants.F_UNCERTAIN, false);
-                                        } else {
+                                    } else if (considerPixelAsIce) {
 //                                            targetTile.setSample(x, y, SnowRadianceConstants.F_UNCERTAIN, true);
-                                            targetTile.setSample(x, y, SnowRadianceConstants.F_SNOW, false);
-                                            targetTile.setSample(x, y, SnowRadianceConstants.F_ICE, false);
-                                        }
+                                        targetTile.setSample(x, y, SnowRadianceConstants.F_SNOW, false);
+                                        targetTile.setSample(x, y, SnowRadianceConstants.F_ICE, true);
                                     }
-                                } else {
+                                } else if (considerPixelAsSnow || considerPixelAsIce) {
                                     // 3.2.3 Calculation of water vapour
 
 //                                  float waterVapourColumn = SnowTemperatureEmissivityRetrieval.computeWaterVapour(neuralNetWv, zonalWind, meridWind, merisAzimuthDifference,
@@ -582,21 +582,31 @@ public class SnowAllPropertiesOp extends Operator {
                                     } else {
                                         targetTile.setSample(x, y, SnowRadianceConstants.SNOW_TEMPERATURE_BAND_NODATAVALUE);
                                     }
+                                } else {
+                                    targetTile.setSample(x, y, SnowRadianceConstants.SNOW_TEMPERATURE_BAND_NODATAVALUE);
                                 }
                             } else {
                                 if (targetBand.getName().equals(SnowRadianceConstants.SNOWRADIANCE_FLAG_BAND_NAME)) {
                                     targetTile.setSample(x, y, SnowRadianceConstants.F_NO_AATSR, true);
-//                                    targetTile.setSample(x, y, SnowRadianceConstants.F_UNCERTAIN, true);
                                     targetTile.setSample(x, y, SnowRadianceConstants.F_SNOW, false);
                                     targetTile.setSample(x, y, SnowRadianceConstants.F_ICE, false);
                                 } else {
                                     targetTile.setSample(x, y, (SnowRadianceConstants.SNOW_TEMPERATURE_EMISSIVITY_NODATAVALUE));
                                 }
                             }
+                        } else {
+                            if (targetBand.getName().equals(SnowRadianceConstants.SNOWRADIANCE_FLAG_BAND_NAME)) {
+                                targetTile.setSample(x, y, SnowRadianceConstants.F_CLOUD, false);
+                                targetTile.setSample(x, y, SnowRadianceConstants.F_SNOW, false);
+                                targetTile.setSample(x, y, SnowRadianceConstants.F_ICE, false);
+                                if (!aatsrDataAvailable(aatsrBt11, aatsrBt12)) {
+                                    targetTile.setSample(x, y, SnowRadianceConstants.F_NO_AATSR, true);
+                                }
+                            }
                         }
 
                         // snow grain size / pollution retrieval...
-                        if (doSnowGrainSizePollutionRetrieval()) {
+                        if (doSnowGrainSizePollutionRetrieval() || !doSnowTemperatureEmissivityRetrieval()) {
                             double saa = saMerisTile.getSampleDouble(x, y);
                             double sza = szMerisTile.getSampleDouble(x, y);
                             double vaa = vaMerisTile.getSampleDouble(x, y);
@@ -611,70 +621,67 @@ public class SnowAllPropertiesOp extends Operator {
                             double sootConcentration = 0.0;
 
                             if (computeSnowGrainSize && targetBand.getName().equals(SnowRadianceConstants.UNPOLLUTED_SNOW_GRAIN_SIZE_BAND_NAME)) {
-                                double pal =
-                                        SnowGrainSizePollutionRetrieval.getParticleAbsorptionLength(merisRefl2, merisRefl13, reflFunction, sza, vza);
-                                if (!SnowRadianceUtils.snowGrainSizePollutionAlgoFailed(pal)) {
-                                    unpollutedSnowGrainSize =
-                                            SnowGrainSizePollutionRetrieval.getUnpollutedSnowGrainSize(pal);
-                                    if (SnowRadianceUtils.snowGrainSizePollutionAlgoFailed(unpollutedSnowGrainSize)) {
-                                        targetTile.setSample(x, y, SnowRadianceConstants.SNOW_ALBEDO_BAND_NODATAVALUE);
+                                if (!doSnowTemperatureEmissivityRetrieval() || (considerPixelAsSnow || considerPixelAsIce)) {
+                                    double pal =
+                                            SnowGrainSizePollutionRetrieval.getParticleAbsorptionLength(merisRefl2, merisRefl13, reflFunction, sza, vza);
+                                    if (!SnowRadianceUtils.snowGrainSizePollutionAlgoFailed(pal)) {
+                                        unpollutedSnowGrainSize =
+                                                SnowGrainSizePollutionRetrieval.getUnpollutedSnowGrainSize(pal);
+                                        if (SnowRadianceUtils.snowGrainSizePollutionAlgoFailed(unpollutedSnowGrainSize)) {
+                                            targetTile.setSample(x, y, SnowRadianceConstants.SNOW_GRAIN_SIZE_POLLUTION_NODATAVALUE);
+                                        } else {
+                                            targetTile.setSample(x, y, unpollutedSnowGrainSize);
+                                        }
                                     } else {
-                                        targetTile.setSample(x, y, unpollutedSnowGrainSize);
+                                        targetTile.setSample(x, y, SnowRadianceConstants.SNOW_GRAIN_SIZE_POLLUTION_NODATAVALUE);
                                     }
                                 } else {
-                                    targetTile.setSample(x, y, SnowRadianceConstants.SNOW_ALBEDO_BAND_NODATAVALUE);
+                                    targetTile.setSample(x, y, SnowRadianceConstants.SNOW_GRAIN_SIZE_POLLUTION_NODATAVALUE);
                                 }
                             }
 
                             if (computeSnowSootContent && targetBand.getName().equals(SnowRadianceConstants.SOOT_CONCENTRATION_BAND_NAME)) {
-                                double pal =
-                                        SnowGrainSizePollutionRetrieval.getParticleAbsorptionLength(merisRefl2, merisRefl13, reflFunction, sza, vza);
-                                if (!SnowRadianceUtils.snowGrainSizePollutionAlgoFailed(pal)) {
-                                    unpollutedSnowGrainSize =
-                                            SnowGrainSizePollutionRetrieval.getUnpollutedSnowGrainSize(pal);
-                                    if (!SnowRadianceUtils.snowGrainSizePollutionAlgoFailed(unpollutedSnowGrainSize)) {
-                                        sootConcentration =
-                                                SnowGrainSizePollutionRetrieval.getSootConcentrationInPollutedSnow(merisRefl13, reflFunction, sza, vza,
-                                                                                                                   unpollutedSnowGrainSize);
-                                        if (SnowRadianceUtils.snowGrainSizePollutionAlgoFailed(sootConcentration)) {
-                                            targetTile.setSample(x, y, SnowRadianceConstants.SNOW_ALBEDO_BAND_NODATAVALUE);
+                                if (!doSnowTemperatureEmissivityRetrieval() || considerPixelAsSnow || considerPixelAsIce) {
+                                    double pal =
+                                            SnowGrainSizePollutionRetrieval.getParticleAbsorptionLength(merisRefl2, merisRefl13, reflFunction, sza, vza);
+                                    if (!SnowRadianceUtils.snowGrainSizePollutionAlgoFailed(pal)) {
+                                        unpollutedSnowGrainSize =
+                                                SnowGrainSizePollutionRetrieval.getUnpollutedSnowGrainSize(pal);
+                                        if (!SnowRadianceUtils.snowGrainSizePollutionAlgoFailed(unpollutedSnowGrainSize)) {
+                                            sootConcentration =
+                                                    SnowGrainSizePollutionRetrieval.getSootConcentrationInPollutedSnow(merisRefl13, reflFunction, sza, vza,
+                                                                                                                       unpollutedSnowGrainSize);
+                                            if (SnowRadianceUtils.snowGrainSizePollutionAlgoFailed(sootConcentration)) {
+                                                targetTile.setSample(x, y, SnowRadianceConstants.SOOT_CONCENTRATION_BAND_NODATAVALUE);
+                                            } else {
+                                                targetTile.setSample(x, y, sootConcentration);
+                                            }
                                         } else {
-                                            targetTile.setSample(x, y, sootConcentration);
+                                            targetTile.setSample(x, y, SnowRadianceConstants.SOOT_CONCENTRATION_BAND_NODATAVALUE);
                                         }
                                     } else {
-                                        targetTile.setSample(x, y, SnowRadianceConstants.SNOW_ALBEDO_BAND_NODATAVALUE);
+                                        targetTile.setSample(x, y, SnowRadianceConstants.SOOT_CONCENTRATION_BAND_NODATAVALUE);
                                     }
+                                } else {
+                                    targetTile.setSample(x, y, SnowRadianceConstants.SOOT_CONCENTRATION_BAND_NODATAVALUE);
+                                }
+                            }
+
+                            if (computeSnowAlbedo &&
+                                    targetBand.getName().startsWith(SnowRadianceConstants.SNOW_ALBEDO_BAND_NAME)) {
+                                if (!doSnowTemperatureEmissivityRetrieval() || considerPixelAsSnow || considerPixelAsIce) {
+                                    int snowAlbedoBandPrefixLength = SnowRadianceConstants.SNOW_ALBEDO_BAND_NAME.length();
+                                    String snowAlbedoBandIndexString = targetBand.getName().
+                                            substring(snowAlbedoBandPrefixLength + 1, targetBand.getName().length());
+                                    int snowAlbedoBandIndex = Integer.parseInt(snowAlbedoBandIndexString);
+                                    double merisRefl = merisSpectralBandTiles[snowAlbedoBandIndex].getSampleDouble(x, y);
+                                    double snowAlbedo =
+                                            SnowGrainSizePollutionRetrieval.getSnowAlbedo(merisRefl, reflFunction, sza, vza);
+                                    targetTile.setSample(x, y, snowAlbedo);
                                 } else {
                                     targetTile.setSample(x, y, SnowRadianceConstants.SNOW_ALBEDO_BAND_NODATAVALUE);
                                 }
                             }
-
-                            if (computeSnowAlbedo && targetBand.getName().startsWith(SnowRadianceConstants.SNOW_ALBEDO_BAND_NAME)) {
-                                int snowAlbedoBandPrefixLength = SnowRadianceConstants.SNOW_ALBEDO_BAND_NAME.length();
-                                String snowAlbedoBandIndexString = targetBand.getName().
-                                        substring(snowAlbedoBandPrefixLength + 1, targetBand.getName().length());
-                                int snowAlbedoBandIndex = Integer.parseInt(snowAlbedoBandIndexString);
-                                double merisRefl = merisSpectralBandTiles[snowAlbedoBandIndex].getSampleDouble(x, y);
-                                double snowAlbedo =
-                                        SnowGrainSizePollutionRetrieval.getSnowAlbedo(merisRefl, reflFunction, sza, vza);
-                                targetTile.setSample(x, y, snowAlbedo);
-                            }
-                        }
-
-
-                        if (!doSnowTemperatureEmissivityRetrieval()) {
-                            if (targetBand.getName().equals(SnowRadianceConstants.SNOWRADIANCE_FLAG_BAND_NAME)) {
-                                targetTile.setSample(x, y, SnowRadianceConstants.F_CLOUD, true);
-//                                targetTile.setSample(x, y, SnowRadianceConstants.F_UNCERTAIN, true);
-                                targetTile.setSample(x, y, SnowRadianceConstants.F_SNOW, false);
-                                targetTile.setSample(x, y, SnowRadianceConstants.F_ICE, false);
-                                if (!aatsrDataAvailable(aatsrBt11, aatsrBt12)) {
-                                    targetTile.setSample(x, y, SnowRadianceConstants.F_NO_AATSR, true);
-                                }
-                            }
-//                            else {
-//                                targetTile.setSample(x, y, (SnowRadianceConstants.SNOW_TEMPERATURE_EMISSIVITY_NODATAVALUE));
-//                            }
                         }
 
                         // complementary quantities...
@@ -718,7 +725,7 @@ public class SnowAllPropertiesOp extends Operator {
                     } else {
                         if (targetBand.getName().equals(SnowRadianceConstants.SNOWRADIANCE_FLAG_BAND_NAME)) {
                             targetTile.setSample(x, y, SnowRadianceConstants.F_CLOUD, true);
-//                            targetTile.setSample(x, y, SnowRadianceConstants.F_UNCERTAIN, true);
+                            targetTile.setSample(x, y, SnowRadianceConstants.F_UNSPECIFIED, false);
                             targetTile.setSample(x, y, SnowRadianceConstants.F_SNOW, false);
                             targetTile.setSample(x, y, SnowRadianceConstants.F_ICE, false);
                             if (!aatsrDataAvailable(aatsrBt11, aatsrBt12)) {
@@ -729,8 +736,14 @@ public class SnowAllPropertiesOp extends Operator {
                         }
                     }
 
-                    if (!getCloudMaskFromSynergy && targetBand.getName().equals("cloud_probability")) {
+                    if (applyCloudMask && !getCloudMaskFromSynergy && targetBand.getName().equals("cloud_probability")) {
                         targetTile.setSample(x, y, cloudProbTile.getSampleFloat(x, y));
+                    }
+
+                    if (targetBand.getName().equals(SnowRadianceConstants.SNOWRADIANCE_FLAG_BAND_NAME)) {
+                        boolean unspecified = !considerPixelAsCloudy && !considerPixelAsSnow && !considerPixelAsIce &&
+                                aatsrDataAvailable(aatsrBt11, aatsrBt12);
+                        targetTile.setSample(x, y, SnowRadianceConstants.F_UNSPECIFIED, unspecified);
                     }
                 }
             }

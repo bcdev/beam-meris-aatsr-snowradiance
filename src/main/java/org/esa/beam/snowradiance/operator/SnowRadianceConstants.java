@@ -93,11 +93,11 @@ public class SnowRadianceConstants {
     public static final String aatsr0670Label = "AATSR  670nm";
     public static final String lowerLabel = "lower:";
     public static final String upperLabel = "upper:";
-    public static final String ndsiLowerDefaultValue = "0.90";
+    public static final String ndsiLowerDefaultValue = "0.75";
 
     public static final String assumedEmissivity11MicronsDefaultValue = "0.99";
-    public static final String ndsiUpperDefaultValue = "0.96";
-    public static final String cloudProbThresholdDefaultValue = "0.8";       // tbd
+    public static final String ndsiUpperDefaultValue = "0.9";
+    public static final String cloudProbThresholdDefaultValue = "0.4";       // tbd
     public static final String aatsr1610LowerDefaultValue = "1.0";
     public static final String aatsr1610UpperDefaultValue = "10.0";
     public static final String aatsr0670LowerDefaultValue = "60.0";
@@ -105,11 +105,11 @@ public class SnowRadianceConstants {
 
     public static final String SNOWRADIANCE_FLAG_BAND_NAME = "snowradiance_flags";
 
-//    public static final int F_UNCERTAIN = 0;
     public static final int F_NO_AATSR= 0;
     public static final int F_CLOUD = 1;
     public static final int F_ICE = 2;
     public static final int F_SNOW = 3;
+    public static final int F_UNSPECIFIED= 4;
 
     public static final String AATSR_CONFID_NADIR_FLAG_BAND_NAME = "confid_flags_nadir_AATSR";
     public static final String AATSR_CONFID_FWARD_FLAG_BAND_NAME = "confid_flags_fward_AATSR";

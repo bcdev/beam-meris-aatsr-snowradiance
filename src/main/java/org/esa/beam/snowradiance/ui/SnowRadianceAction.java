@@ -6,6 +6,7 @@ import org.esa.beam.framework.ui.command.CommandEvent;
 import org.esa.beam.snowradiance.operator.SnowRadianceMasterOp;
 import org.esa.beam.visat.actions.AbstractVisatAction;
 
+import javax.media.jai.JAI;
 import java.awt.Dimension;
 
 /**

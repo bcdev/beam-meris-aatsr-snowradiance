@@ -5,6 +5,7 @@
 <toc version="2.0" categoryclosedimage="folder" categoryopenimage="folder" topicimage="doc">
 
     <tocitem text="Snow Radiance Processor" target="snowRadiance">
+        <tocitem text="About / TOC" target="snowRadianceIndex"/>
         <tocitem text="Introduction" target="snowRadianceIntro"/>
         <tocitem text="Software Installation" target="snowRadianceInstall"/>
         <tocitem text="Products" target="snowRadianceProducts"/>

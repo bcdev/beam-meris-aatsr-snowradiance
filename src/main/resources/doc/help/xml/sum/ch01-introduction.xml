@@ -15,9 +15,36 @@
             algorithm development on snow properties derived from both MERIS standalone as well as
             synergetic MERIS/AATSR datasets, with stated objectives:
             <itemizedlist mark='bullet'>
-            <listitem>
-               todo
-            </listitem>
+                <listitem>
+                    Cloud screening
+                </listitem>
+                <listitem>
+                    Ice / snow discrimination
+                </listitem>
+                <listitem>
+                    Snow cover determination (including the snow index);
+                </listitem>
+                <listitem>
+                    retrieval of
+                    <listitem>
+                        snow temperature
+                    </listitem>
+                    <listitem>
+                        snow emissivity
+                    </listitem>
+                    <listitem>
+                        snow grain size
+                    </listitem>
+                    <listitem>
+                        snow albedo
+                    </listitem>
+                    <listitem>
+                        concentration of pollutants
+                    </listitem>
+                </listitem>
+                <listitem>
+                    deriving recommendations for future missions
+                </listitem>
             </itemizedlist>
             This SUM specifically describes the software developed for the two processors SIC and SIP.
         </para>
@@ -32,7 +59,7 @@
 				<listitem>
 					BEAM Snow Radiance Processor
 				</listitem>
-			</itemizedlist>	
+			</itemizedlist>
 		</para>
 		<para>
 			This user manual specifications assumes that the reader is familiar with basic concepts in

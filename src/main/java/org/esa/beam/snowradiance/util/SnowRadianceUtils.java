@@ -2,24 +2,17 @@ package org.esa.beam.snowradiance.util;
 
 import org.esa.beam.dataio.envisat.EnvisatConstants;
 import org.esa.beam.framework.datamodel.Band;
-import org.esa.beam.framework.datamodel.BitmaskDef;
 import org.esa.beam.framework.datamodel.FlagCoding;
-import org.esa.beam.framework.datamodel.Mask;
-import org.esa.beam.framework.datamodel.MetadataAttribute;
 import org.esa.beam.framework.datamodel.Product;
-import org.esa.beam.framework.datamodel.ProductData;
 import org.esa.beam.framework.gpf.OperatorException;
 import org.esa.beam.snowradiance.operator.SnowRadianceConstants;
-import org.esa.beam.synergy.util.SynergyConstants;
 import org.esa.beam.util.BitSetter;
 import org.esa.beam.util.Guardian;
 import org.esa.beam.util.ProductUtils;
 
 import javax.swing.JOptionPane;
-import java.awt.Color;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -244,6 +237,7 @@ public class SnowRadianceUtils {
         flagCoding.addFlag("F_CLOUD", BitSetter.setFlag(0, SnowRadianceConstants.F_CLOUD), "is with more than 80% cloudy");
         flagCoding.addFlag("F_ICE", BitSetter.setFlag(0, SnowRadianceConstants.F_ICE), "is covered with ice (AATSR NDSI criterion)");
         flagCoding.addFlag("F_SNOW", BitSetter.setFlag(0, SnowRadianceConstants.F_SNOW), "is covered with snow (AATSR band criterion)");
+        flagCoding.addFlag("F_UNSPECIFIED", BitSetter.setFlag(0, SnowRadianceConstants.F_UNSPECIFIED), "unspecified coverage (no cloud, ice or snow)");
         return flagCoding;
     }
 
