@@ -5,4 +5,186 @@
         The input and output products of BEAM Snow Radiance processor are:
     </para>
 
+    <para>
+        Input:
+        <itemizedlist mark='bullet'>
+            <listitem>
+                MERIS L1b (mandatory for all retrievals)
+            </listitem>
+            <listitem>
+                AATSR L1b (mandatory for snow temperature/emissivity retrieval)
+            </listitem>
+        </itemizedlist>
+    </para>
+
+    <para>
+        Output: The output is a 'Snowradiance L2 product' which can contain the following bands:
+
+        <table frame='all'>
+            <title>Regular bands</title>
+            <tgroup cols='3' align='left' colsep='1' rowsep='1'>
+                <colspec colname='c1'/>
+                <colspec colname='c2'/>
+                <colspec colname='c3'/>
+                <thead>
+                    <row>
+                        <entry>Quantity</entry>
+                        <entry>Bandname</entry>
+                        <entry>Unit</entry>
+                    </row>
+                </thead>
+                <tbody>
+                    <row>
+                        <entry>Snow temperature</entry>
+                        <entry>snow_temperature</entry>
+                        <entry>K</entry>
+                    </row>
+                    <row>
+                        <entry>Snow emissivity</entry>
+                        <entry>snow_emissivity</entry>
+                        <entry>dl</entry>
+                    </row>
+                    <row>
+                        <entry>Snow grain size</entry>
+                        <entry>snow_grain_size</entry>
+                        <entry>mm</entry>
+                    </row>
+                    <row>
+                        <entry>Soot concentration</entry>
+                        <entry>soot_concentration</entry>
+                        <entry>ng/g</entry>
+                    </row>
+                    <row>
+                        <entry>Snow albedo (15 MERIS channels)</entry>
+                        <entry>snow_albedo_n</entry>
+                        <entry>dl</entry>
+                    </row>
+                    <row>
+                        <entry>Water vapour</entry>
+                        <entry>water_vapour</entry>
+                        <entry>kg/m^2</entry>
+                    </row>
+                    <row>
+                        <entry>NDVI</entry>
+                        <entry>ndvi</entry>
+                        <entry>dl</entry>
+                    </row>
+                    <row>
+                        <entry>NDSI</entry>
+                        <entry>ndsi</entry>
+                        <entry>dl</entry>
+                    </row>
+                    <row>
+                        <entry>MDSI</entry>
+                        <entry>mdsi</entry>
+                        <entry>dl</entry>
+                    </row>
+                </tbody>
+            </tgroup>
+        </table>
+
+        <table frame='all'>
+            <title>Flag bands</title>
+            <tgroup cols='3' align='left' colsep='1' rowsep='1'>
+                <colspec colname='c1'/>
+                <colspec colname='c2'/>
+                <colspec colname='c3'/>
+                <thead>
+                    <row>
+                        <entry>Quantity</entry>
+                        <entry>Bandname</entry>
+                        <entry>Unit</entry>
+                    </row>
+                </thead>
+                <tbody>
+                    <row>
+                        <entry>Snow Radiance flags</entry>
+                        <entry>snowradiance_flags</entry>
+                        <entry>dl</entry>
+                    </row>
+                    <row>
+                        <entry>MERIS L1 flags</entry>
+                        <entry>l1_flags_MERIS</entry>
+                        <entry>dl</entry>
+                    </row>
+                    <row>
+                        <entry>AATSR L1 confidence flags nadir</entry>
+                        <entry>confid_flags_nadir_AATSR</entry>
+                        <entry>dl</entry>
+                    </row>
+                    <row>
+                        <entry>AATSR L1 confidence flags forward</entry>
+                        <entry>confid_flags_fward_AATSR</entry>
+                        <entry>dl</entry>
+                    </row>
+                    <row>
+                        <entry>AATSR L1 cloud flags nadir</entry>
+                        <entry>cloud_flags_nadir_AATSR</entry>
+                        <entry>dl</entry>
+                    </row>
+                    <row>
+                        <entry>AATSR L1 cloud flags forward</entry>
+                        <entry>cloud_flags_fward_AATSR</entry>
+                        <entry>dl</entry>
+                    </row>
+
+                </tbody>
+            </tgroup>
+        </table>
+    </para>
+    <para>
+        From the user interface it can be specified which of these bands shall be computed and written
+        to the output product.
+    </para>
+    <para>
+        The MERIS and AATSR L1 flags are simply copied from their input products, respectively.
+        The 'Snow Radiance flags' reflect the results of the cloud/ice/snow discrimination. The coding of these
+        flags is listed in the following table:
+
+        <table frame='all'>
+            <title>Flag bands</title>
+            <tgroup cols='3' align='left' colsep='1' rowsep='1'>
+                <colspec colname='c1'/>
+                <colspec colname='c2'/>
+                <colspec colname='c3'/>
+                <thead>
+                    <row>
+                        <entry>Name</entry>
+                        <entry>Value</entry>
+                        <entry>Description</entry>
+                    </row>
+                </thead>
+                <tbody>
+                    <row>
+                        <entry>F_NO_AATSR</entry>
+                        <entry>0</entry>
+                        <entry>pixel is outside AATSR coverage (in case of colocated product)</entry>
+                    </row>
+                    <row>
+                        <entry>F_CLOUD</entry>
+                        <entry>1</entry>
+                        <entry>pixel was specified as cloudy</entry>
+                    </row>
+                    <row>
+                        <entry>F_ICE</entry>
+                        <entry>2</entry>
+                        <entry>is covered with ice (AATSR NDSI criterion)</entry>
+                    </row>
+                    <row>
+                        <entry>F_SNOW</entry>
+                        <entry>4</entry>
+                        <entry>is covered with snow (AATSR band criterion)</entry>
+                    </row>
+                    <row>
+                        <entry>F_UNSPECIFIED</entry>
+                        <entry>8</entry>
+                        <entry>unspecified coverage (no cloud, ice or snow)</entry>
+                    </row>
+                </tbody>
+            </tgroup>
+        </table>
+        
+    </para>
+
+
 </chapter>

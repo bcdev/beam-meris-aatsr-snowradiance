@@ -27,6 +27,7 @@ import org.esa.beam.util.ProductUtils;
 import org.esa.beam.util.math.LookupTable;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.io.IOException;
 import java.util.HashMap;
@@ -289,6 +290,7 @@ public class SnowAllPropertiesOp extends Operator {
                                     colocatedProduct.getSceneRasterWidth(),
                                     colocatedProduct.getSceneRasterHeight());
 
+        targetProduct.setPreferredTileSize(new Dimension(256, 256));
         createTargetProductBands();
     }
 
@@ -314,7 +316,7 @@ public class SnowAllPropertiesOp extends Operator {
             Band emissivityBand = targetProduct.addBand(SnowRadianceConstants.EMISSIVITY_BAND_NAME, ProductData.TYPE_FLOAT32);
             emissivityBand.setNoDataValue(SnowRadianceConstants.EMISSIVITY_BAND_NODATAVALUE);
             emissivityBand.setNoDataValueUsed(SnowRadianceConstants.EMISSIVITY_BAND_NODATAVALUE_USED);
-            emissivityBand.setUnit("K");
+            emissivityBand.setUnit("dl");
         }
 
         Band cloudIceSnowBand = targetProduct.addBand(SnowRadianceConstants.SNOWRADIANCE_FLAG_BAND_NAME, ProductData.TYPE_INT16);

@@ -13,11 +13,11 @@ public class SnowRadianceConstants {
     public static final String LUT_PATH_PARAM_DESCRIPTION = "File path to LookUpTables root directory";
     public static final String LUT_PATH_PARAM_DEFAULT = "C:/snowradiance/LUT";
 
-    public static final String SNOW_TEMPERATURE_BAND_NAME= "snowtemperature";
+    public static final String SNOW_TEMPERATURE_BAND_NAME= "snow_temperature";
     public static final double SNOW_TEMPERATURE_BAND_NODATAVALUE = -1.0;
     public static final boolean SNOW_TEMPERATURE_BAND_NODATAVALUE_USED = true;
 
-    public static final String EMISSIVITY_BAND_NAME= "emissivity";
+    public static final String EMISSIVITY_BAND_NAME= "snow_emissivity";
     public static final double EMISSIVITY_BAND_NODATAVALUE = -1.0;
     public static final boolean EMISSIVITY_BAND_NODATAVALUE_USED = true;
 

@@ -11,7 +11,7 @@
     <sect1 id="sum.introduction.objectives">
         <title>Objectives</title>
         <para>
-            As outlined in [1], the aim of developing a BEAM Snow Radiance Processor is to undertake research and
+            As outlined in detail in [1], the aim of developing a BEAM Snow Radiance Processor is to undertake research and
             algorithm development on snow properties derived from both MERIS standalone as well as
             synergetic MERIS/AATSR datasets, with stated objectives:
             <itemizedlist mark='bullet'>
@@ -46,7 +46,8 @@
                     deriving recommendations for future missions
                 </listitem>
             </itemizedlist>
-            This SUM specifically describes the software developed for the two processors SIC and SIP.
+            This SUM specifically describes the software developed to address all these objectives, and
+            how to use the corresponding BEAM Snow Radiance Processor.
         </para>
     </sect1>
 
@@ -78,22 +79,13 @@
 						AATSR - Advanced Along-Track Scanning Radiometer
 					</listitem>
                     <listitem>
-						AOD - Aerosol Optical Depth
-					</listitem>
-                    <listitem>
-						AOD - Aerosol Optical Thickness
-					</listitem>
-                    <listitem>
 						ATBD - Algorithm Theoretical Baseline Document
 					</listitem>
 					<listitem>
 						BC - Brockmann Consult
 					</listitem>
                     <listitem>
-						DEM - Digital Elevation Model
-					</listitem>
-                    <listitem>
-						DPM - Detailed Processing Model
+						dl - dimensionless
 					</listitem>
 					<listitem>
 						ESA - European Space Agency
@@ -102,15 +94,26 @@
 						FUB - Free University of Berlin
 					</listitem>
                     <listitem>
+						IUP - Institute of Environmental Physics, University of Bremen
+					</listitem>
+                    <listitem>
+						MDSI - MERIS Difference Snow Index
+					</listitem>
+                    <listitem>
 						MERIS - Medium Resolution Imaging Spectrometer Instrument
 					</listitem>
                     <listitem>
-						IODD - Input/Output Data Definition
+						NDVI - Normalized Difference Vegetation Index
+					</listitem>
+                    <listitem>
+						NDSI - Normalized Difference Snow Index 
 					</listitem>
 					<listitem>
-						SDR - Surface Downwelling Reflectance
+						SIC - Snow/Ice/Cloud Identification Processor
 					</listitem>
-
+                    <listitem>
+						SIP - Snow/Ice Properties Processor
+					</listitem>
                     <listitem>
 						SUM - Software User Manual
 					</listitem>
@@ -132,34 +135,15 @@
 		<para>
 			<itemizedlist mark='bullet'>
 				<listitem>
-					[1] ENVI-DTEX-EOPS-SW-07-0007, "MERIS/AATSR Synergy – Algorithms for cloud screening,
-                    aerosol retrieval and atmospheric correction", STATEMENT OF WORK, June 2007.
+					[1] STSE SnowRadiance: Statement of Work, ESA, EOP-SM/1789, iss. 2, rev. 2, April 2008
 				</listitem>
                 <listitem>
-					[2] Preusker, R., and J. Fischer: Remote Sensing of Aerosol over Ocean Using a Synergy
-                    of MERIS and AATSR. SYNAO ATBD, Free University of Berlin, Version 1.0, June 2009.
+					[2] : Kokhanovsky, A.: Retrieval algorithm of snow/ice properties. STSE SnowRadiance, SIP-ATBD,
+                    IUP, October 2009.
 				</listitem>
                 <listitem>
-					[3] North, P., Grey, W., Heckel, A., Fischer, J., Preusker, R., and C. Brockmann:
-                    MERIS/AATSR Synergy – Algorithms for cloud screening,
-                    aerosol retrieval and atmospheric correction: Land Aerosol and Surface Reflectance ATBD.
-                    Swansea University, Free University of Berlin, Brockmann Consult Geesthacht, Version 3.1, June 2009.
-				</listitem>
-                <listitem>
-					[4] Gomez-Chova, L., Camps-Valls, G., Calpe, J., Munoz, J., and J. Moreno:
-                    MERIS/AATSR Synergy Algorithms for cloud screening,
-                    aerosol retrieval and atmospheric correction: Cloud Screening ATBD.
-                    University of Valencia, Version 1.0, January 2009.
-				</listitem>
-                <listitem>
-					[5] MERIS/AATSR Synergy Algorithms for cloud screening,
-                    aerosol retrieval and atmospheric correction: Detailed Processing Model.
-                    Brockmann Consult, Draft Version, March 2010.
-				</listitem>
-                <listitem>
-					[6] MERIS/AATSR Synergy Algorithms for cloud screening,
-                    aerosol retrieval and atmospheric correction: Input/Output Data Definition.
-                    Brockmann Consult, Draft Version, March 2010.
+					[3] Preusker, R., and J. Fischer: Estimation of snow temperature and emissivity using AATSR
+                    measurements at 11um and 12um. STSE SnowRadiance, Snow Temperature ATBD, FUB, January 2010.
 				</listitem>
 			</itemizedlist>
 		</para>

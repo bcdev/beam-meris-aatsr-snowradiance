@@ -86,9 +86,8 @@
     <sect1 id="sum.installation.auxdata">
         <title>Auxiliary Data</title>
         <para>
-            The auxiliary data required for the Snow Radiance Processor consists of files
-            which are all included in the jar archives described above.
-            No additional data needs to be downloaded.
+            The auxiliary data files required for the Snow Radiance Processor are all included in the jar archives
+            described above. No additional data needs to be downloaded.
         </para>
     </sect1>
 

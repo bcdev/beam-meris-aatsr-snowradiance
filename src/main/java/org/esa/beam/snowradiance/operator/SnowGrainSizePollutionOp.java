@@ -25,6 +25,7 @@ import org.esa.beam.meris.brr.Rad2ReflOp;
 import org.esa.beam.meris.cloud.CloudProbabilityOp;
 import org.esa.beam.util.math.LookupTable;
 
+import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.Color;
 import java.io.IOException;
@@ -177,6 +178,7 @@ public class SnowGrainSizePollutionOp extends Operator {
                                     merisProduct.getSceneRasterWidth(),
                                     merisProduct.getSceneRasterHeight());
 
+        targetProduct.setPreferredTileSize(new Dimension(256, 256));
         createTargetProductBands();
     }
 
@@ -230,6 +232,7 @@ public class SnowGrainSizePollutionOp extends Operator {
             wvBand.setDescription("NDSI");
             wvBand.setNoDataValue(-1.0f);
             wvBand.setNoDataValueUsed(true);
+            wvBand.setUnit("kg/m^2");
         }
 
         if (computeMerisNdvi) {
@@ -237,6 +240,7 @@ public class SnowGrainSizePollutionOp extends Operator {
             ndviBand.setDescription("NDVI");
             ndviBand.setNoDataValue(-1.0f);
             ndviBand.setNoDataValueUsed(true);
+            ndviBand.setUnit("dl");
         }
 
         if (computeMerisMdsi) {
@@ -244,6 +248,7 @@ public class SnowGrainSizePollutionOp extends Operator {
             mdsiBand.setDescription("MDSI");
             mdsiBand.setNoDataValue(-1.0f);
             mdsiBand.setNoDataValueUsed(true);
+            mdsiBand.setUnit("dl");
         }
 
         ProductUtils.copyFlagBands(merisProduct, targetProduct);

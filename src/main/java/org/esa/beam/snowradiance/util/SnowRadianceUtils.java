@@ -234,7 +234,7 @@ public class SnowRadianceUtils {
 
 //        flagCoding.addFlag("F_UNCERTAIN", BitSetter.setFlag(0, SnowRadianceConstants.F_UNCERTAIN), "coverage is uncertain");
         flagCoding.addFlag("F_NO_AATSR", BitSetter.setFlag(0, SnowRadianceConstants.F_NO_AATSR), "pixel is outside AATSR coverage (in case of colocated product)");
-        flagCoding.addFlag("F_CLOUD", BitSetter.setFlag(0, SnowRadianceConstants.F_CLOUD), "is with more than 80% cloudy");
+        flagCoding.addFlag("F_CLOUD", BitSetter.setFlag(0, SnowRadianceConstants.F_CLOUD), "pixel was specified as cloudy");
         flagCoding.addFlag("F_ICE", BitSetter.setFlag(0, SnowRadianceConstants.F_ICE), "is covered with ice (AATSR NDSI criterion)");
         flagCoding.addFlag("F_SNOW", BitSetter.setFlag(0, SnowRadianceConstants.F_SNOW), "is covered with snow (AATSR band criterion)");
         flagCoding.addFlag("F_UNSPECIFIED", BitSetter.setFlag(0, SnowRadianceConstants.F_UNSPECIFIED), "unspecified coverage (no cloud, ice or snow)");
