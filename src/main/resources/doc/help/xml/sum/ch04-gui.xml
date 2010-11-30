@@ -10,7 +10,7 @@
     </figure>
 
     <sect1 id="sum.toolbox.io">
-        <title>I/O Parameters and Preprocessing</title>
+        <title>I/O Parameters</title>
         <para>
             The Synergy Preprocessor is the first of three main modules within the MERIS/(A)ATSR Synergy toolbox.
             Its purpose is to create a colocated MERIS/(A)ATSR L1b product containing radiances/reflectances of

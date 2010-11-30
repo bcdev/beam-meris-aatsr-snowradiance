@@ -3,6 +3,7 @@ package org.esa.beam.snowradiance.util;
 import org.esa.beam.dataio.envisat.EnvisatConstants;
 import org.esa.beam.framework.datamodel.Band;
 import org.esa.beam.framework.datamodel.FlagCoding;
+import org.esa.beam.framework.datamodel.Mask;
 import org.esa.beam.framework.datamodel.Product;
 import org.esa.beam.framework.gpf.OperatorException;
 import org.esa.beam.snowradiance.operator.SnowRadianceConstants;
@@ -11,6 +12,7 @@ import org.esa.beam.util.Guardian;
 import org.esa.beam.util.ProductUtils;
 
 import javax.swing.JOptionPane;
+import java.awt.Color;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
@@ -21,6 +23,7 @@ import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 /**
  * Utility class for snow radiance algorithms
@@ -45,6 +48,12 @@ public class SnowRadianceUtils {
 
 
     private static java.util.logging.Logger logger = java.util.logging.Logger.getLogger("snowradiance");
+
+    private static String DESCRIPTION_FLAG_NO_AATSR = "Pixel is outside AATSR coverage (in case of colocated product)";
+    private static String DESCRIPTION_FLAG_CLOUD = "Pixel classified as cloudy";
+    private static String DESCRIPTION_FLAG_ICE  = "Pixel classified as ice-covered";
+    private static String DESCRIPTION_FLAG_SNOW = "Pixel classified as snow_covered";
+    private static String DESCRIPTION_FLAG_UNSPECIFIED = "Pixel neither classified as cloudy nor ice or snow-covered";
 
     /**
      * This method computed the index of the nearest higher value in a float array
@@ -133,53 +142,6 @@ public class SnowRadianceUtils {
         }
     }
 
-    private static String validateMerisProductBands(Product product) {
-        List<String> sourceBandNameList = Arrays.asList(product.getBandNames());
-        for (String bandName : EnvisatConstants.MERIS_L1B_SPECTRAL_BAND_NAMES) {
-            if (!sourceBandNameList.contains(bandName)) {
-                return bandName;
-            }
-        }
-        if (!sourceBandNameList.contains(EnvisatConstants.MERIS_L1B_FLAGS_DS_NAME)) {
-            return EnvisatConstants.MERIS_L1B_FLAGS_DS_NAME;
-        }
-
-        return "";
-    }
-
-    private static String validateAatsrProductBands(Product product) {
-        List<String> sourceBandNameList = Arrays.asList(product.getBandNames());
-        for (String bandName : EnvisatConstants.AATSR_L1B_BAND_NAMES) {
-            if (!sourceBandNameList.contains(bandName)) {
-                return bandName;
-            }
-        }
-
-        return "";
-    }
-
-    private static String validateMerisProductTpgs(Product product) {
-        List<String> sourceTpgNameList = Arrays.asList(product.getTiePointGridNames());
-        for (String tpgName : REQUIRED_MERIS_TPG_NAMES) {
-            if (!sourceTpgNameList.contains(tpgName)) {
-                return tpgName;
-            }
-        }
-
-        return "";
-    }
-
-    private static String validateAatsrProductTpgs(Product product) {
-        List<String> sourceTpgNameList = Arrays.asList(product.getTiePointGridNames());
-        for (String tpgName : REQUIRED_AATSR_TPG_NAMES) {
-            if (!sourceTpgNameList.contains(tpgName)) {
-                return tpgName;
-            }
-        }
-
-        return "";
-    }
-
     public static void validateParameters(Map<String, Object> parameterMap) {
 
         double ndsiUpperThreshold = ((Double) parameterMap.get("ndsiUpperThreshold")).doubleValue();
@@ -233,12 +195,39 @@ public class SnowRadianceUtils {
         flagCoding.setDescription("Snow Radiance Flag Coding");
 
 //        flagCoding.addFlag("F_UNCERTAIN", BitSetter.setFlag(0, SnowRadianceConstants.F_UNCERTAIN), "coverage is uncertain");
-        flagCoding.addFlag("F_NO_AATSR", BitSetter.setFlag(0, SnowRadianceConstants.F_NO_AATSR), "pixel is outside AATSR coverage (in case of colocated product)");
-        flagCoding.addFlag("F_CLOUD", BitSetter.setFlag(0, SnowRadianceConstants.F_CLOUD), "pixel was specified as cloudy");
-        flagCoding.addFlag("F_ICE", BitSetter.setFlag(0, SnowRadianceConstants.F_ICE), "is covered with ice (AATSR NDSI criterion)");
-        flagCoding.addFlag("F_SNOW", BitSetter.setFlag(0, SnowRadianceConstants.F_SNOW), "is covered with snow (AATSR band criterion)");
-        flagCoding.addFlag("F_UNSPECIFIED", BitSetter.setFlag(0, SnowRadianceConstants.F_UNSPECIFIED), "unspecified coverage (no cloud, ice or snow)");
+        flagCoding.addFlag("F_NO_AATSR", BitSetter.setFlag(0, SnowRadianceConstants.F_NO_AATSR), DESCRIPTION_FLAG_NO_AATSR);
+        flagCoding.addFlag("F_CLOUD", BitSetter.setFlag(0, SnowRadianceConstants.F_CLOUD), DESCRIPTION_FLAG_CLOUD);
+        flagCoding.addFlag("F_ICE", BitSetter.setFlag(0, SnowRadianceConstants.F_ICE), DESCRIPTION_FLAG_ICE);
+        flagCoding.addFlag("F_SNOW", BitSetter.setFlag(0, SnowRadianceConstants.F_SNOW), DESCRIPTION_FLAG_SNOW);
+        flagCoding.addFlag("F_UNSPECIFIED", BitSetter.setFlag(0, SnowRadianceConstants.F_UNSPECIFIED), DESCRIPTION_FLAG_UNSPECIFIED);
         return flagCoding;
+    }
+
+    public static int setupGlobAlbedoCloudscreeningBitmasks(Product sourceProduct, Product targetProduct) {
+
+        int index = 0;
+        int w = sourceProduct.getSceneRasterWidth();
+        int h = sourceProduct.getSceneRasterHeight();
+        Mask mask;
+        Random r = new Random();
+
+        mask = Mask.BandMathsType.create("NO_AATSR", DESCRIPTION_FLAG_NO_AATSR, w, h, "snowradiance_flags.F_NO_AATSR",
+                                         Color.RED, 0.5f);
+        targetProduct.getMaskGroup().add(index++, mask);
+        mask = Mask.BandMathsType.create("CLOUD", DESCRIPTION_FLAG_CLOUD, w, h, "snowradiance_flags.F_CLOUD",
+                                         Color.YELLOW, 0.5f);
+        targetProduct.getMaskGroup().add(index++, mask);
+        mask = Mask.BandMathsType.create("ICE", DESCRIPTION_FLAG_ICE, w, h,
+                                         "snowradiance_flags.F_ICE", Color.CYAN, 0.5f);
+        targetProduct.getMaskGroup().add(index++, mask);
+        mask = Mask.BandMathsType.create("SNOW", DESCRIPTION_FLAG_SNOW, w, h,
+                                         "snowradiance_flags.F_SNOW", Color.BLUE, 0.5f);
+        targetProduct.getMaskGroup().add(index++, mask);
+        mask = Mask.BandMathsType.create("UNSPECIFIED", DESCRIPTION_FLAG_UNSPECIFIED, w, h,
+                                         "snowradiance_flags.F_UNSPECIFIED", Color.GREEN, 0.5f);
+        targetProduct.getMaskGroup().add(index++, mask);
+
+        return index;
     }
 
     public static boolean snowGrainSizePollutionAlgoFailed(double result) {
@@ -297,6 +286,61 @@ public class SnowRadianceUtils {
                 }
             }
         }
+    }
+
+    private static String validateMerisProductBands(Product product) {
+        List<String> sourceBandNameList = Arrays.asList(product.getBandNames());
+        for (String bandName : EnvisatConstants.MERIS_L1B_SPECTRAL_BAND_NAMES) {
+            if (!sourceBandNameList.contains(bandName)) {
+                return bandName;
+            }
+        }
+        if (!sourceBandNameList.contains(EnvisatConstants.MERIS_L1B_FLAGS_DS_NAME)) {
+            return EnvisatConstants.MERIS_L1B_FLAGS_DS_NAME;
+        }
+
+        return "";
+    }
+
+    private static String validateAatsrProductBands(Product product) {
+        List<String> sourceBandNameList = Arrays.asList(product.getBandNames());
+        for (String bandName : EnvisatConstants.AATSR_L1B_BAND_NAMES) {
+            if (!sourceBandNameList.contains(bandName)) {
+                return bandName;
+            }
+        }
+
+        return "";
+    }
+
+    private static String validateMerisProductTpgs(Product product) {
+        List<String> sourceTpgNameList = Arrays.asList(product.getTiePointGridNames());
+        for (String tpgName : REQUIRED_MERIS_TPG_NAMES) {
+            if (!sourceTpgNameList.contains(tpgName)) {
+                return tpgName;
+            }
+        }
+
+        return "";
+    }
+
+    private static String validateAatsrProductTpgs(Product product) {
+        List<String> sourceTpgNameList = Arrays.asList(product.getTiePointGridNames());
+        for (String tpgName : REQUIRED_AATSR_TPG_NAMES) {
+            if (!sourceTpgNameList.contains(tpgName)) {
+                return tpgName;
+            }
+        }
+
+        return "";
+    }
+
+
+    private static Color getRandomColour(Random random) {
+        int rColor = random.nextInt(256);
+        int gColor = random.nextInt(256);
+        int bColor = random.nextInt(256);
+        return new Color(rColor, gColor, bColor);
     }
 
 }

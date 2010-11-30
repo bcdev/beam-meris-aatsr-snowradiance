@@ -14,6 +14,7 @@ import org.esa.beam.framework.gpf.annotations.TargetProduct;
 import org.esa.beam.snowradiance.util.SnowRadianceUtils;
 import org.esa.beam.synergy.operators.CreateSynergyOp;
 
+import javax.media.jai.JAI;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -211,6 +212,8 @@ public class SnowRadianceMasterOp extends Operator {
                 Map<String, Object> collocateParams = new HashMap<String, Object>(2);
                 if (getCloudMaskFromSynergy) {
                     // get the colocated product from Synergy...
+                    // todo: check why we get thread unsafety from Synergy cloud screening module, then remove next line
+                    JAI.getDefaultInstance().getTileScheduler().setParallelism(1);
                     collocateInput.put("MERIS", merisSourceProduct);
                     collocateInput.put("AATSR", aatsrSourceProduct);
                     collocateParams.put("subsetOvAreas", false);

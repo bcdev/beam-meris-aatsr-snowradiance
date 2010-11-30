@@ -7,6 +7,7 @@ import org.esa.beam.dataio.envisat.EnvisatConstants;
 import org.esa.beam.framework.datamodel.Band;
 import org.esa.beam.framework.datamodel.BitmaskDef;
 import org.esa.beam.framework.datamodel.FlagCoding;
+import org.esa.beam.framework.datamodel.Mask;
 import org.esa.beam.framework.datamodel.MetadataAttribute;
 import org.esa.beam.framework.datamodel.Product;
 import org.esa.beam.framework.datamodel.ProductData;
@@ -26,12 +27,14 @@ import org.esa.beam.synergy.util.SynergyConstants;
 import org.esa.beam.util.ProductUtils;
 import org.esa.beam.util.math.LookupTable;
 
+import javax.media.jai.JAI;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 /**
  * @author Olaf Danne
@@ -231,7 +234,6 @@ public class SnowAllPropertiesOp extends Operator {
      */
     @Override
     public void initialize() throws OperatorException {
-
         if (applyCloudMask) {
             if (getCloudMaskFromSynergy) {
                 Map<String, Product> cloudScreeningInput = new HashMap<String, Product>(1);
@@ -283,7 +285,6 @@ public class SnowAllPropertiesOp extends Operator {
 
     }
 
-
     private void createTargetProduct() {
         targetProduct = new Product(productName,
                                     productType,
@@ -292,6 +293,8 @@ public class SnowAllPropertiesOp extends Operator {
 
         targetProduct.setPreferredTileSize(new Dimension(256, 256));
         createTargetProductBands();
+
+        SnowRadianceUtils.setupGlobAlbedoCloudscreeningBitmasks(colocatedProduct, targetProduct);
     }
 
     private void createTargetProductBands() {
@@ -763,7 +766,8 @@ public class SnowAllPropertiesOp extends Operator {
         }
 
         if (getCloudMaskFromSynergy) {
-            isCloud = cloudFlagsTile.getSampleBit(x, y, SynergyConstants.FLAGMASK_CLOUD);
+            final int isCloudBitIndex = (int) (Math.log((double)SynergyConstants.FLAGMASK_CLOUD)/Math.log(2.0));
+            isCloud = cloudFlagsTile.getSampleBit(x, y, isCloudBitIndex);
         } else {
             float cloudProb = cloudProbTile.getSampleFloat(x, y);
             isCloud = (cloudProb > cloudProbabilityThreshold);

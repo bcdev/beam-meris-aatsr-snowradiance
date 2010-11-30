@@ -180,6 +180,8 @@ public class SnowGrainSizePollutionOp extends Operator {
 
         targetProduct.setPreferredTileSize(new Dimension(256, 256));
         createTargetProductBands();
+
+        SnowRadianceUtils.setupGlobAlbedoCloudscreeningBitmasks(merisProduct, targetProduct);
     }
 
     private void createTargetProductBands() {
