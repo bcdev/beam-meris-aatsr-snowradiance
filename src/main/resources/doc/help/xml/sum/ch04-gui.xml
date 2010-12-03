@@ -1,35 +1,43 @@
-<chapter id="sum.toolbox">
-    <title>Processors</title>
+<chapter id="sum.gui">
+    <title>The BEAM Snow Radiance processor</title>
 
     <para>
         The BEAM Snow Radiance processor can be invoked from the Visat 'Tools' menu as shown below.
     </para>
-    <figure id="figure.visat.snowradiance">
+    <figure id="figure.gui.visat.snowradiance">
         <title>The Snow Radiance processor in BEAM Visat</title>
         <graphic scale="40" fileref="figures/snowradiance_in_beam.png"/>
     </figure>
 
-    <sect1 id="sum.toolbox.io">
+    <para>
+        The GUI for the Snow Radiance processor consists of three tab panes
+        <itemizedlist mark='bullet'>
+            <listitem>
+                I/O Parameters
+            </listitem>
+            <listitem>
+                Target Bands
+            </listitem>
+            <listitem>
+                Processing Parameters
+            </listitem>
+        </itemizedlist>
+        which will be described below.
+    </para>
+
+    <sect1 id="sum.gui.io">
         <title>I/O Parameters</title>
         <para>
-            The Synergy Preprocessor is the first of three main modules within the MERIS/(A)ATSR Synergy toolbox.
-            Its purpose is to create a colocated MERIS/(A)ATSR L1b product containing radiances/reflectances of
-            all channels of both MERIS and AATSR. This colocated product shall be used as input for the cloud screening
-            module.
-        </para>
-        <para>
-            There is no separate user interface for the Synergy Preprocessor,
-            also, there are no processing parameters. The preprocessor is invoked automatically
-            when a MERIS/AATSR colocated product is generated either as final product or as intermediate
-            product required for cloud screening or aerosol retrieval. These options are provided through
-            radio buttons on the Synergy Toolbox I/O Parameters Tab Pane (see below).
+            The Snow Radiance processor needs as input a MERIS and an (A)ATSR L1b product to derive all the quantities
+            listed in the previous chapter. For the derival of only snow grain size, snow albedo and soot content,
+            an (A)ATSR L1b product is not required.
         </para>
 
-        <sect2 id="sum.toolbox.io.io">
+        <sect2 id="sum.gui.io.io">
             <title>I/O Parameters Tab Pane</title>
 
-            <figure id="figure.toolbox.io.iotab">
-                <title>Synergy Toolbox: I/O Parameters Tab Pane</title>
+            <figure id="figure.gui.io.iotab">
+                <title>Snow Radiance processor: I/O Parameters Tab Pane</title>
                 <graphic scale="60" fileref="figures/iotab.png"/>
             </figure>
 
@@ -40,6 +48,12 @@
                     text
                     filed or by pressing the file selection button to invoke a standard file dialog.
                     This source product must be a standard MERIS L1b product.
+                </listitem>
+                <listitem>
+                    Checkbox 'Compute snow grain size / pollution only (no AATSR L1b required)':
+                    If this checkbox is selected, only snow grain size, snow albedo and soot content will be computed.
+                    The text field to select an AATSR L1b product (see below) will be hidden
+                    (<xref linkend="figure.gui.io.iotabmerisonly" xrefstyle="select: label"/>).
                 </listitem>
                 <listitem>
                     AATSR source product file: Select the source product file by either typing the product path into the
@@ -70,37 +84,16 @@
                     'Open in Visat': If this checkbox is selected, the output product is opened in Visat
                     after successful processing.
                 </listitem>
-                <listitem>
-                    Target product specification: This user option is represented by radio buttons
-                    and specifies the computation type and results written to the target product:
-                    <itemizedlist mark='bullet'>
-                        <listitem>
-                            'Only create a colocated MERIS/AATSR product':
-                            If this radio button is selected, just a colocated MERIS/AATSR product
-                            will be generated. No cloud screening or aerosol retrieval is performed.
-                        </listitem>
-                        <listitem>
-                            'Create a cloud screening product':
-                            If this radio button is selected, a cloud screening product
-                            will be generated. A colocated MERIS/AATSR product is created as intermediate
-                            product. No aerosol retrieval is performed.
-                        </listitem>
-                        <listitem>
-                            'Create an aerosol and atmospheric correction product':
-                            If this radio button is selected, an aerosol and atmospheric correction product
-                            will be generated. Atmospheric correction over land can be added by aerosol
-                            retrieval user option
-                            (see<xref linkend="sum.toolbox.aerosol" xrefstyle="select: label"/>)
-                            The aerosol retrieval processor automatically
-                            creates a colocated MERIS/AATSR product and performs cloud screening
-                            as foregoing steps.
-                        </listitem>
-                    </itemizedlist>
-                </listitem>
             </itemizedlist>
+
+            <figure id="figure.gui.io.iotabmerisonly">
+                <title>Snow Radiance processor: I/O Parameters Tab Pane in case no AATSR product shall be used</title>
+                <graphic scale="60" fileref="figures/iotab_merisonly.png"/>
+            </figure>
+
         </sect2>
 
-        <sect2 id="sum.toolbox.io.control">
+        <sect2 id="sum.gui.io.control">
             <title>Control Buttons</title>
 
             From the 'I/O Parameters' tab pane, the following control buttons can be accessed:
@@ -116,7 +109,7 @@
                 </listitem>
             </itemizedlist>
 
-            <figure id="figure.toolbox.io.controlbuttons">
+            <figure id="figure.gui.io.controlbuttons">
                 <title>Synergy Toolbox: control buttons</title>
                 <graphic scale="60" fileref="figures/controlbuttons.png"/>
             </figure>
@@ -126,54 +119,92 @@
     </sect1>
 
 
-    <sect1 id="sum.toolbox.cloudscreening">
-        <title>Cloudscreening</title>
-        <para>
-            The Cloud Screening Processor is the second of three main modules within the MERIS/(A)ATSR Synergy toolbox.
-            Its purpose is to add various bands (i.e cloud flags) to the colocated MERIS/(A)ATSR L1b product
-            obtained from the preprocessor. The output product from the cloud screening shall be used as input for the
-            third module (aerosol retrieval and atmospheric correction).
-        </para>
-        <para>
-            The user interface for the Cloud Screening Processor can be accessed by clicking the 'Cloud Screening'
-            tab in the 'MERIS/(A)ATSR Synergy Toolbox' dialog.
-            (<xref linkend="figure.toolbox.cloudscreening" xrefstyle="select: label"/>):
+    <sect1 id="sum.gui.targetbands">
+        <title>Target Bands</title>
 
-            <figure id="figure.toolbox.cloudscreening">
-                <title>Synergy Toolbox: Cloud Screening Tab Pane</title>
-                <graphic scale="60" fileref="figures/cloudscreeningtab.png"/>
+        <para>
+            The user interface for the quantities to be computed and written to the target product consists of two
+            lists of check boxes (<xref linkend="figure.targetbands.default" xrefstyle="select: label"/>):
+            <itemizedlist mark='bullet'>
+                <listitem>
+                    Snow properties
+                </listitem>
+                <listitem>
+                    Complementary quantities
+                </listitem>
+            </itemizedlist>
+
+            <figure id="figure.targetbands.default">
+                <title>Snow Radiance processor: Target Bands Tab Pane</title>
+                <graphic scale="60" fileref="figures/targetbandstab.png"/>
             </figure>
         </para>
 
         <para>
-            The Cloud Screening tab pane consists of the following components:
+            The snow properties which can be selected are:
             <itemizedlist mark='bullet'>
                 <listitem>
-                    'Use the AATSR forward view when classifying': If his checkbox is selected, the AATSR forward view
-                    is considered in the cloud classification algorithm (otherwise nadir view only).
+                    'Compute snow grain size': If this checkbox is selected, the snow grain size will be computed
+                    and written as single band to the target product.
                 </listitem>
                 <listitem>
-                    'Compute cloud index': If this checkbox is selected, a cloud index is computed and written
-                    as single band 'cloud_index_synergy' to the target product.
+                    'Compute snow albedo': If this checkbox is selected, the snow albedo will be computed
+                    and written as single band to the target product.
                 </listitem>
                 <listitem>
-                    'Compute snow risk flag': If this checkbox is selected, a snow risk flag is computed
-                    and added to a flag band 'cloud_flags_synergy', which is written to the target product.
+                    'Compute snow soot content': If this checkbox is selected, the snow soot content will be computed
+                    and written as single band to the target product.
                 </listitem>
                 <listitem>
-                    'Compute cloud shadow risk flag': If this checkbox is selected, a cloud shadow risk flag is computed
-                    and added to a flag band 'cloud_flags_synergy', which is written to the target product.
+                    'Compute emissivity': If this checkbox is selected, the emissivity will be computed
+                    and written as single band to the target product. This option is enabled only if both MERIS and AATSR
+                    products were given as inputs.
+                </listitem>
+                <listitem>
+                    'Compute temperature': If this checkbox is selected, the snow temperature will be computed
+                    and written as single band to the target product. This option is enabled only if both MERIS and AATSR
+                    products were given as inputs.
                 </listitem>
             </itemizedlist>
         </para>
+
         <para>
-            See [4] for more details on the computation and physical meaning of the quantities listed above.
+            The complementary quantities which can be selected are:
+            <itemizedlist mark='bullet'>
+                <listitem>
+                    'Water vapour (from MERIS)': If this checkbox is selected, the water vapour derived from the
+                    MERIS product will be written as single band to the target product.
+                </listitem>
+                <listitem>
+                    'NDVI (from MERIS)': If this checkbox is selected, the NDVI derived from the
+                    MERIS product will be written as single band to the target product.
+                </listitem>
+                <listitem>
+                    'NDSI (from AATSR)': If this checkbox is selected, the NDSI derived from the
+                    AATSR product will be written as single band to the target product.
+                    This option is enabled only if both MERIS and AATSR
+                    products were given as inputs.
+                </listitem>
+                <listitem>
+                    'MDSI (from MERIS)': If this checkbox is selected, the MDSI derived from the
+                    MERIS product will be written as single band to the target product.
+                </listitem>
+                <listitem>
+                    'AATSR L1 flags': If this checkbox is selected, the AATSR L1 flags taken from the
+                    AATSR product will be written as single band to the target product.
+                    This option is enabled only if both MERIS and AATSR
+                    products were given as inputs.
+                </listitem>
+
+            </itemizedlist>
         </para>
 
     </sect1>
 
-    <sect1 id="sum.toolbox.aerosol">
-        <title>Aerosol Retrieval and Atmospheric Correction</title>
+    <sect1 id="sum.gui.processing">
+        <title>Processing Parameters</title>
+
+        TODO!!!
 
         <para>
             The Processor for Aerosol Retrieval and Atmospheric Correction is the third of three main modules
