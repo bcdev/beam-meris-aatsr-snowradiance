@@ -157,12 +157,14 @@
                 </listitem>
                 <listitem>
                     'Compute emissivity': If this checkbox is selected, the emissivity will be computed
-                    and written as single band to the target product. This option is enabled only if both MERIS and AATSR
+                    and written as single band to the target product. This option is enabled only if both MERIS and
+                    AATSR
                     products were given as inputs.
                 </listitem>
                 <listitem>
                     'Compute temperature': If this checkbox is selected, the snow temperature will be computed
-                    and written as single band to the target product. This option is enabled only if both MERIS and AATSR
+                    and written as single band to the target product. This option is enabled only if both MERIS and
+                    AATSR
                     products were given as inputs.
                 </listitem>
             </itemizedlist>
@@ -204,139 +206,83 @@
     <sect1 id="sum.gui.processing">
         <title>Processing Parameters</title>
 
-        TODO!!!
-
         <para>
-            The Processor for Aerosol Retrieval and Atmospheric Correction is the third of three main modules
-            within the MERIS/(A)ATSR Synergy toolbox.
-            Its purpose is to derive aerosol optical depths over land and/or ocean and (optionally) provide an
-            atmospheric correction by using the derived AODs. The processor also makes use of quantities
-            derived from the cloud screening module. Therefore, the input for the aerosol retrieval must be
-            an output product from the cloud screening.
+            From the Processing Parameters tab pane, the parameters to apply and tune the cloud and snow masks
+            can be specified.
         </para>
 
-         <para>
-            The user interface for the Aerosol Retrieval and Atmospheric Correction
-             can be accessed by clicking the 'Aerosol Retrieval and Atmospheric Correction'
-            tab in the 'MERIS/(A)ATSR Synergy Toolbox' dialog.
-            (<xref linkend="figure.toolbox.aerosol" xrefstyle="select: label"/>):
+        <sect2 id="sum.gui.io.io">
+            <title>Processing Parameters Tab Pane</title>
 
-            <figure id="figure.toolbox.aerosol">
-                <title>Synergy Toolbox: Aerosol Retrieval and Atmospheric Correction Tab Pane</title>
-                <graphic scale="60" fileref="figures/aerosolretrievaltab.png"/>
+            <figure id="figure.gui.io.iotab">
+                <title>Snow Radiance processor: Processing Parameters Tab Pane</title>
+                <graphic scale="60" fileref="figures/processingtab.png"/>
             </figure>
-        </para>
 
-        <para>
-            The Aerosol Retrieval and Atmospheric Correction tab pane consists of the following components:
+            This tab pane consists of the following components:
             <itemizedlist mark='bullet'>
                 <listitem>
-                    'Retrieve AODs over ocean': If this checkbox is selected, aerosol optical depths will
-                    be retrieved over ocean. The default is 'true'.
+                    Checkbox 'Apply cloud mask': If this checkbox is selected, a cloud mask (as specified below)
+                    will be applied, which means that pixels classified as cloudy will not be considered
+                    for snow properties retrieval.
                 </listitem>
                 <listitem>
-                    'Retrieve AODs over land': If this checkbox is selected, aerosol optical depths will
-                    be retrieved over land. The default is 'true'.
+                    Radio button 'Cloud probability (MERIS O2 Project)':
+                    If this radio button is selected, the cloud mask will be computed with the algorithms
+                    developed within the MERIS O2 Project, which are based on a cloud probability approach (see [4]).
+                    This radio button is enabled only if the 'Apply cloud mask' checkbox is selected.
                 </listitem>
                 <listitem>
-                    <para>
-                        'Retrieve surface directional reflectances over land (time consuming!)':
-                        If this checkbox is selected,
-                        SDRs will be retrieved from rescaled AODs. This computation is performed over land only.
-                    </para>
-                    <para>
-                       Due to the nature of the algorithm, the retrieval of surface directional
-                       reflectances requires much more computation time than the pure aerosol retrieval.
-                       If you are interested in aerosol quantities only, it is recommended to keep
-                       this option unselected. For the computation of surface directional reflectances
-                       on larger datasets, it is further recommended to create in advance subsets of
-                       the input data which just cover the regions of interest.
-                    </para>
+                    Radio button 'Feature classification (MERIS/AATSR Synergy Project)':
+                    If this radio button is selected, the cloud mask will be computed with the algorithms
+                    developed within the MERIS/AATSR Synergy Project, which are based on a feature
+                    classification approach  (see [5]).
+                    This radio button is enabled only if the 'Apply cloud mask' checkbox is selected.
+                </listitem>
+                <listitem>
+                    Text field 'Cloud probability threshold':
+                    In this text field, a cloud probability threshold can be set if the cloud mask shall be computed with
+                    the cloud probability approach. Range is [0,1], default value is 0.4.
+                    This text field is enabled only if the 'Apply cloud mask' checkbox and the
+                    Radio button 'Cloud probability (MERIS O2 Project) are selected.
+                </listitem>
+                <listitem>
+                    Text fields 'Thresholds for snow/ice flags':
+                    In these text fields, NDSI lower and upper thresholds for the snow and ice flag computation 
+                    can be set. Lower default value is 0.75, upper default value is 0.9.
+                </listitem>
+                <listitem>
+                    Checkbox 'Mask 100% snow': If this checkbox is selected, a '100% snow' mask
+                    will be applied as specified in ATBDs ([2], [3]).
+                </listitem>
+                <listitem>
+                    Text fields '100% snow thresholds' for AATSR 1610nm:
+                    In these text fields, lower and upper thresholds for AATSR reflectance at 1610nm for the usage
+                    in the '100% snow' mask algorithm can be set. Lower default value is 1.0, upper default value is 10.0.
+                    These text fields are enabled only if the 'Mask 100% snow' checkbox is selected.
                 </listitem>
                  <listitem>
-                    'N x N average for AOD retrieval': Text field to set
-                    the number of pixels to average over in the aerosol retrieval. The default number is '7',
-                    which corresponds to a square with 3 pixels to each side of a center pixel.
-                </listitem>
-
-                <listitem>
-                    'Soil surface reflectance spectrum': Text field to set the filename containing
-                    the soil surface reflectance spectrum. The default is 'spec_soil.dat',
-                    this file is included in the auxiliary data
-                    (see <xref linkend="sum.installation.auxdata" xrefstyle="select: label"/>)
-                    If the user wants to use a different file, it must be selected via the
-                    file chooser button right to the test field. Note that any user selected file
-                    must exactly follow the format of the default file.
+                    Text fields '100% snow thresholds' for AATSR 670nm:
+                    In these text fields, lower and upper thresholds for AATSR reflectance at 670nm for the usage
+                    in the '100% snow' mask algorithm can be set. Lower default value is 60.0, upper default value is 100.0.
+                    These text fields are enabled only if the 'Mask 100% snow' checkbox is selected.
                 </listitem>
                 <listitem>
-                    'Vegetation surface reflectance spectrum': Text field to set the filename containing
-                    the vegetation surface reflectance spectrum. The default is 'veg_soil.dat',
-                    this file is included in the auxiliary data
-                    (see<xref linkend="sum.installation.auxdata" xrefstyle="select: label"/>)
-                    If the user wants to use a different file, it must be selected via the
-                    file chooser button right to the test field. Note that any user selected file
-                    must exactly follow the format of the default file.
-                </listitem>
-
-                 <listitem>
-                     <para>
-                         'Use default land aerosol models (recommended)': If this radio button is selected,
-                         the default land aerosol models are used for aerosol retrieval. This set of
-                         models is included in the 'standard' auxiliary data set
-                         (see<xref linkend="sum.installation.auxdata" xrefstyle="select: label"/>).
-                         No further user action is required. This option is recommended not only for
-                         simplicity, but also because only a small number of models is used.
-                         For most purposes, this option will be sufficient.
-                         A large number of models (which can be specified with the option below)
-                         significantly increases computation time for the aerosol retrieval.
-                     </para>
-                     <para>
-                         For more details on these aerosol models and underlying lookup tables see [3] and [6].
-                     </para>
-                </listitem>
-
-                <listitem>
-                    <para>
-                        'Use specific land aerosol models (for advanced users)': If this radio button is selected,
-                        specific land aerosol models must be entered by a comma-separated list of model indices
-                        in the text field below.
-                        To use this option for aerosol retrieval,
-                        the 'full' auxiliary data set
-                        (see<xref linkend="sum.installation.auxdata" xrefstyle="select: label"/>)
-                        must be downloaded and installed.
-                    </para>
-                    <para>
-                        For more details on these aerosol models and underlying lookup tables see [3] and [6].
-                    </para>
-                </listitem>
-                <listitem>
-                    <para>
-                        'List of land aerosol models': Text field to set a comma separated list of the indices of
-                        the aerosol models to be used for the land aerosol retrieval
-                        (<xref linkend="figure.toolbox.aerosol.custommodels" xrefstyle="select: label"/>).
-                        This text field is enabled only if the 'Use specific land aerosol models (for advanced users)'
-                        radio button is selected.
-                        The valid range of indices is [1,40].
-                        In principle, up to all 40 models could be entered. However,
-                        to keep computation time in an acceptable frame, it is recommended to use as few
-                        models as possible.
-                    </para>
-                    <para>
-                        For more details on these aerosol models and underlying lookup tables see [3] and [6].
-                    </para>
+                    Text field 'Assumed emissivity at 11 microns':
+                    In this text field, a value for the assumed emissivity at 11 microns can be set.
+                    Range is [0,1], default value is 0.99.
+                    This text field is enabled only if the 'Apply cloud mask' checkbox and the
+                    Radio button 'Cloud probability (MERIS O2 Project) are selected.
                 </listitem>
             </itemizedlist>
-        </para>
+        </sect2>
 
-        <figure id="figure.toolbox.aerosol.custommodels">
-            <title>Synergy Toolbox: Selection of aerosol models for land aerosol retrieval</title>
-            <graphic scale="60" fileref="figures/customLandAerosolModels.png"/>
-        </figure>
+
     </sect1>
 
-    <sect1 id="sum.toolbox.commandline">
+    <sect1 id="sum.cli">
         <title>Processing from command line</title>
-        Since the MERIS/(A)ATSR Synergy toolbox makes use of the BEAM graph processing framework, it can be
+        Since the Snow Radiance processor makes use of the BEAM graph processing framework, it can be
         used also as a command line tool outside BEAM-VISAT. The graph processing is invoked
         by the command
         <itemizedlist mark='bullet'>
@@ -352,21 +298,13 @@
             </listitem>
         </itemizedlist>
 
-        Specific help on the MERIS/(A)ATSR Synergy toolbox can be obtained with
+        Specific help on the Snow Radiance processor can be obtained with
         <itemizedlist mark='bullet'>
             <listitem>
-                ${BEAM-INSTALL-DIR}/bin/gpt -h synergy.Master
+                ${BEAM-INSTALL-DIR}/bin/gpt -h SnowRadiance.Master
             </listitem>
         </itemizedlist>
-        In this case, information on the usage and a list of all available parameters are given
-        (see <xref linkend="figure.toolbox.gpt" xrefstyle="select: label"/>).
-
-
-        <figure id="figure.toolbox.gpt">
-            <title>'Synergy Toolbox: command line processing</title>
-            <graphic scale="40" fileref="figures/synergy_gpt.png"/>
-        </figure>
-
+        In this case, information on the usage and a list of all available parameters are given.
     </sect1>
 
 </chapter>

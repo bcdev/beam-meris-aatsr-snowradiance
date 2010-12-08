@@ -145,6 +145,19 @@
 					[3] Preusker, R., and J. Fischer: Estimation of snow temperature and emissivity using AATSR
                     measurements at 11um and 12um. STSE SnowRadiance, Snow Temperature ATBD, FUB, January 2010.
 				</listitem>
+                <listitem>
+                    [4] Krämer, U. and C. Brockmann: Using O2 Products for the
+                    Cloud Screening in the MERIS and S3 operational
+                    processing. ESA O2 Project
+                    Deliverable D6.3c, September 2009
+				</listitem>
+                <listitem>
+                    [5] Gomez-Chova, L., G. Camps-Valls, Calpe, J., Munoz, J., and J. Moreno:
+                    MERIS/AATSR Synergy Algorithms for
+                    Cloud Screening, Aerosol Retrieval, and
+                    Atmospheric Correction.
+                    ESRIN Contract No. 21090/07/I-LG, March 2010.
+				</listitem>
 			</itemizedlist>
 		</para>
     </sect1>
