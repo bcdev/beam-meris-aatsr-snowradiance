@@ -2,8 +2,30 @@
     <manifestVersion>1.0.0</manifestVersion>
     <symbolicName>beam-meris-aatsr-snowradiance</symbolicName>
     <version>1.1</version>
-    <name>snowradiance</name>
-    <description>BEAM GPF Module snowradiance</description>
+    <name>MERIS/(A)ATSR Snow Properties</name>
+    <description><![CDATA[
+            <p>The purpose of the MERIS/(A)ATSR Snow Properties processor is to compute quantities such as snow
+            temperature, emissivity, snow grain size and snow pollution from colocated MERIS and AATSR L1b products.</p>
+
+            <p>Algorithm: A. Kokhanovsky (IUP Bremen, Germany) / R.Preusker, J. Fischer (WeW, FU Berlin) </p>
+            <p>Software: O.Danne, Brockmann Consult</p>
+
+            <p>Documentation:</p>
+            <ul>
+                <li><a href="http://github.com/downloads/bcdev/beam-meris-aatsr-snowradiance/ATBD_D10.pdf">ATBD: Snow / ice / cloud detection algorithm  </a></li>
+                <li><a href="http://github.com/downloads/bcdev/beam-meris-aatsr-snowradiance/ATBD_D13.pdf">ATBD: Retrieval algorithm of snow / ice properties </a></li>
+                <li><a href="http://github.com/downloads/bcdev/beam-meris-aatsr-snowradiance/VR_D14.pdf">Validation Report</a></li>
+            </ul>
+        ]]>
+    </description>
+
+    <vendor>Brockmann Consult GmbH</vendor>
+    <contactAddress>
+        Max Planck Str.2, 21502 Geesthacht (Germany)
+    </contactAddress>
+    <copyright>(C) 2007 by Brockmann Consult GmbH</copyright>
+    <url>http://www.brockmann-consult.de</url>
+    <licenseUrl>http://www.gnu.org/licenses/gpl.html</licenseUrl>
 
     <dependency>
         <module>beam-gpf</module>
