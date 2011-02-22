@@ -29,6 +29,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Form for Snow Radiance GUI
+ *
  * @author Olaf Danne
  * @version $Revision: $ $Date:  $
  */
@@ -396,12 +398,6 @@ public class SnowRadianceForm extends JTabbedPane {
 
 
         return panel;
-    }
-
-    private int addEmptyLine(JPanel panel, int rowIndex) {
-        panel.add(new JLabel(" "), new TableLayout.Cell(rowIndex, 0));
-        rowIndex++;
-        return rowIndex;
     }
 
     private void updateUIState() {

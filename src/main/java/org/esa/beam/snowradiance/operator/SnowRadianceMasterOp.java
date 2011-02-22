@@ -169,20 +169,6 @@ public class SnowRadianceMasterOp extends Operator {
 
     public void initialize() throws OperatorException {
 
-
-
-            // Collocation
-//        Map<String, Product> collocateInput = new HashMap<String, Product>(2);
-//        collocateInput.put("masterProduct", merisSourceProduct);
-//        collocateInput.put("slaveProduct", aatsrSourceProduct);
-//        Map<String, Object> collocateParams = new HashMap<String, Object>(2);
-//        collocateParams.put("masterComponentPattern", "${ORIGINAL_NAME}_M");
-//        collocateParams.put("slaveComponentPattern", "${ORIGINAL_NAME}_S");
-//        Product colocatedProduct =
-//            GPF.createProduct(OperatorSpi.getOperatorAlias(CollocateOp.class), collocateParams, collocateInput);
-//        colocatedProduct.setProductType(merisSourceProduct.getProductType());
-
-
         SnowRadianceUtils.validateMerisProduct(merisSourceProduct);
 
         Product colocatedProduct = null;
@@ -212,7 +198,6 @@ public class SnowRadianceMasterOp extends Operator {
                 Map<String, Object> collocateParams = new HashMap<String, Object>(2);
                 if (getCloudMaskFromSynergy) {
                     // get the colocated product from Synergy...
-                    // todo: check why we get thread unsafety from Synergy cloud screening module, then remove next line
                     JAI.getDefaultInstance().getTileScheduler().setParallelism(1);
                     collocateInput.put("MERIS", merisSourceProduct);
                     collocateInput.put("AATSR", aatsrSourceProduct);
@@ -270,7 +255,6 @@ public class SnowRadianceMasterOp extends Operator {
             SnowRadianceUtils.logErrorMessage(message);
         }
 
-//        targetProduct = colocatedProduct;
         targetProduct = snowPropertiesProduct;
     }
 

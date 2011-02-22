@@ -51,7 +51,7 @@ public class SnowRadianceUtils {
 
     private static String DESCRIPTION_FLAG_NO_AATSR = "Pixel is outside AATSR coverage (in case of colocated product)";
     private static String DESCRIPTION_FLAG_CLOUD = "Pixel classified as cloudy";
-    private static String DESCRIPTION_FLAG_ICE  = "Pixel classified as ice-covered";
+    private static String DESCRIPTION_FLAG_ICE = "Pixel classified as ice-covered";
     private static String DESCRIPTION_FLAG_SNOW = "Pixel classified as snow_covered";
     private static String DESCRIPTION_FLAG_UNSPECIFIED = "Pixel neither classified as cloudy nor ice or snow-covered";
 
@@ -61,6 +61,7 @@ public class SnowRadianceUtils {
      *
      * @param x     - input value
      * @param array - the float array
+     *
      * @return int
      */
     public static int getNearestHigherValueIndexInDoubleArray(double x, double[] array) {
@@ -106,14 +107,16 @@ public class SnowRadianceUtils {
         if (merisProduct != null) {
             final String missedBand = validateMerisProductBands(merisProduct);
             if (!missedBand.isEmpty()) {
-                String message = MessageFormat.format("Missing required band in MERIS input product: {0} . Not a L1b product?",
-                                                      missedBand);
+                String message = MessageFormat.format(
+                        "Missing required band in MERIS input product: {0} . Not a L1b product?",
+                        missedBand);
                 throw new OperatorException(message);
             }
             final String missedTPG = validateMerisProductTpgs(merisProduct);
             if (!missedTPG.isEmpty()) {
-                String message = MessageFormat.format("Missing required tie-point grid in MERIS input product: {0} . Not a L1b product?",
-                                                      missedTPG);
+                String message = MessageFormat.format(
+                        "Missing required tie-point grid in MERIS input product: {0} . Not a L1b product?",
+                        missedTPG);
                 throw new OperatorException(message);
             }
         } else {
@@ -126,14 +129,16 @@ public class SnowRadianceUtils {
         if (aatsrProduct != null) {
             final String missedBand = validateAatsrProductBands(aatsrProduct);
             if (!missedBand.isEmpty()) {
-                String message = MessageFormat.format("Missing required band in AATSR input product: {0} . Is this really an AATSR L1b product?",
-                                                      missedBand);
+                String message = MessageFormat.format(
+                        "Missing required band in AATSR input product: {0} . Is this really an AATSR L1b product?",
+                        missedBand);
                 throw new OperatorException(message);
             }
             final String missedTPG = validateAatsrProductTpgs(aatsrProduct);
             if (!missedTPG.isEmpty()) {
-                String message = MessageFormat.format("Missing required tie-point grid in AATSR input product: {0} . Is this really an AATSR L1b product?",
-                                                      missedTPG);
+                String message = MessageFormat.format(
+                        "Missing required tie-point grid in AATSR input product: {0} . Is this really an AATSR L1b product?",
+                        missedTPG);
                 throw new OperatorException(message);
             }
         } else {
@@ -144,12 +149,12 @@ public class SnowRadianceUtils {
 
     public static void validateParameters(Map<String, Object> parameterMap) {
 
-        double ndsiUpperThreshold = ((Double) parameterMap.get("ndsiUpperThreshold")).doubleValue();
-        double ndsiLowerThreshold = ((Double) parameterMap.get("ndsiLowerThreshold")).doubleValue();
-        double aatsr1610UpperThreshold = ((Double) parameterMap.get("aatsr1610UpperThreshold")).doubleValue();
-        double aatsr1610LowerThreshold = ((Double) parameterMap.get("aatsr1610LowerThreshold")).doubleValue();
-         double aatsr0670UpperThreshold = ((Double) parameterMap.get("aatsr0670UpperThreshold")).doubleValue();
-        double aatsr0670LowerThreshold = ((Double) parameterMap.get("aatsr0670LowerThreshold")).doubleValue();
+        double ndsiUpperThreshold = (Double) parameterMap.get("ndsiUpperThreshold");
+        double ndsiLowerThreshold = (Double) parameterMap.get("ndsiLowerThreshold");
+        double aatsr1610UpperThreshold = (Double) parameterMap.get("aatsr1610UpperThreshold");
+        double aatsr1610LowerThreshold = (Double) parameterMap.get("aatsr1610LowerThreshold");
+        double aatsr0670UpperThreshold = (Double) parameterMap.get("aatsr0670UpperThreshold");
+        double aatsr0670LowerThreshold = (Double) parameterMap.get("aatsr0670LowerThreshold");
 
         if (ndsiUpperThreshold < ndsiLowerThreshold) {
             String message = "NDSI: lower threshold must be less than upper threshold";
@@ -194,12 +199,13 @@ public class SnowRadianceUtils {
         final FlagCoding flagCoding = new FlagCoding(SnowRadianceConstants.SNOWRADIANCE_FLAG_BAND_NAME);
         flagCoding.setDescription("Snow Radiance Flag Coding");
 
-//        flagCoding.addFlag("F_UNCERTAIN", BitSetter.setFlag(0, SnowRadianceConstants.F_UNCERTAIN), "coverage is uncertain");
-        flagCoding.addFlag("F_NO_AATSR", BitSetter.setFlag(0, SnowRadianceConstants.F_NO_AATSR), DESCRIPTION_FLAG_NO_AATSR);
+        flagCoding.addFlag("F_NO_AATSR", BitSetter.setFlag(0, SnowRadianceConstants.F_NO_AATSR),
+                           DESCRIPTION_FLAG_NO_AATSR);
         flagCoding.addFlag("F_CLOUD", BitSetter.setFlag(0, SnowRadianceConstants.F_CLOUD), DESCRIPTION_FLAG_CLOUD);
         flagCoding.addFlag("F_ICE", BitSetter.setFlag(0, SnowRadianceConstants.F_ICE), DESCRIPTION_FLAG_ICE);
         flagCoding.addFlag("F_SNOW", BitSetter.setFlag(0, SnowRadianceConstants.F_SNOW), DESCRIPTION_FLAG_SNOW);
-        flagCoding.addFlag("F_UNSPECIFIED", BitSetter.setFlag(0, SnowRadianceConstants.F_UNSPECIFIED), DESCRIPTION_FLAG_UNSPECIFIED);
+        flagCoding.addFlag("F_UNSPECIFIED", BitSetter.setFlag(0, SnowRadianceConstants.F_UNSPECIFIED),
+                           DESCRIPTION_FLAG_UNSPECIFIED);
         return flagCoding;
     }
 
@@ -209,7 +215,6 @@ public class SnowRadianceUtils {
         int w = sourceProduct.getSceneRasterWidth();
         int h = sourceProduct.getSceneRasterHeight();
         Mask mask;
-        Random r = new Random();
 
         mask = Mask.BandMathsType.create("NO_AATSR", DESCRIPTION_FLAG_NO_AATSR, w, h, "snowradiance_flags.F_NO_AATSR",
                                          Color.RED, 0.5f);
@@ -270,6 +275,7 @@ public class SnowRadianceUtils {
      *
      * @param sourceProduct the source product
      * @param targetProduct the target product
+     * @param bandName  - band name
      */
     public static void copySingleFlagBand(Product sourceProduct, Product targetProduct, String bandName) {
         Guardian.assertNotNull("source", sourceProduct);
@@ -333,14 +339,6 @@ public class SnowRadianceUtils {
         }
 
         return "";
-    }
-
-
-    private static Color getRandomColour(Random random) {
-        int rColor = random.nextInt(256);
-        int gColor = random.nextInt(256);
-        int bColor = random.nextInt(256);
-        return new Color(rColor, gColor, bColor);
     }
 
 }

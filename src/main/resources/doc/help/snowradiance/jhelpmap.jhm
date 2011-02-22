@@ -12,22 +12,21 @@
   <mapID target="sum.introduction.referenceDocuments" url="ch01s05.html"/>
   <mapID target="sum.installation" url="ch02.html"/>
   <mapID target="sum.installation.plugin" url="ch02.html#sum.installation.plugin"/>
-  <mapID target="figure.installation.beammodules" url="ch02.html#figure.installation.beammodules"/>
   <mapID target="sum.installation.auxdata" url="ch02s02.html"/>
   <mapID target="sum.installation.addons" url="ch02s03.html"/>
   <mapID target="sum.products" url="ch03.html"/>
-  <mapID target="sum.toolbox" url="ch04.html"/>
-  <mapID target="figure.visat.snowradiance" url="ch04.html#figure.visat.snowradiance"/>
-  <mapID target="sum.toolbox.io" url="ch04.html#sum.toolbox.io"/>
-  <mapID target="sum.toolbox.io.io" url="ch04.html#sum.toolbox.io.io"/>
-  <mapID target="figure.toolbox.io.iotab" url="ch04.html#figure.toolbox.io.iotab"/>
-  <mapID target="sum.toolbox.io.control" url="ch04.html#sum.toolbox.io.control"/>
-  <mapID target="figure.toolbox.io.controlbuttons" url="ch04.html#figure.toolbox.io.controlbuttons"/>
-  <mapID target="sum.toolbox.cloudscreening" url="ch04s02.html"/>
-  <mapID target="figure.toolbox.cloudscreening" url="ch04s02.html#figure.toolbox.cloudscreening"/>
-  <mapID target="sum.toolbox.aerosol" url="ch04s03.html"/>
-  <mapID target="figure.toolbox.aerosol" url="ch04s03.html#figure.toolbox.aerosol"/>
-  <mapID target="figure.toolbox.aerosol.custommodels" url="ch04s03.html#figure.toolbox.aerosol.custommodels"/>
-  <mapID target="sum.toolbox.commandline" url="ch04s04.html"/>
-  <mapID target="figure.toolbox.gpt" url="ch04s04.html#figure.toolbox.gpt"/>
+  <mapID target="sum.gui" url="ch04.html"/>
+  <mapID target="figure.gui.visat.snowradiance" url="ch04.html#figure.gui.visat.snowradiance"/>
+  <mapID target="sum.gui.io" url="ch04.html#sum.gui.io"/>
+  <mapID target="sum.gui.io.io" url="ch04.html#sum.gui.io.io"/>
+  <mapID target="figure.gui.io.iotab" url="ch04.html#figure.gui.io.iotab"/>
+  <mapID target="figure.gui.io.iotabmerisonly" url="ch04.html#figure.gui.io.iotabmerisonly"/>
+  <mapID target="sum.gui.io.control" url="ch04.html#sum.gui.io.control"/>
+  <mapID target="figure.gui.io.controlbuttons" url="ch04.html#figure.gui.io.controlbuttons"/>
+  <mapID target="sum.gui.targetbands" url="ch04s02.html"/>
+  <mapID target="figure.targetbands.default" url="ch04s02.html#figure.targetbands.default"/>
+  <mapID target="sum.gui.processing" url="ch04s03.html"/>
+  <mapID target="sum.gui.io.io" url="ch04s03.html#sum.gui.io.io"/>
+  <mapID target="figure.gui.io.iotab" url="ch04s03.html#figure.gui.io.iotab"/>
+  <mapID target="sum.cli" url="ch04s04.html"/>
 </map>

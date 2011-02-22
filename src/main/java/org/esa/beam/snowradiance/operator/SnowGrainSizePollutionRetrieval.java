@@ -81,7 +81,7 @@ public class SnowGrainSizePollutionRetrieval {
                                                       double sunZenith, double viewZenith,
                                                       double grainSize) {
 
-         // todo: variable names taken from Fortran breadboard - replace by meaningful ones!
+         // variable names taken from Fortran breadboard - could be replaced by meaningful ones!
 
          final double mus = Math.cos(sunZenith * MathUtils.DTOR);
          final double muv = Math.cos(viewZenith * MathUtils.DTOR);
@@ -145,7 +145,6 @@ public class SnowGrainSizePollutionRetrieval {
         final double nuv = Math.sin(vza*MathUtils.DTOR);
         final double azimDiff = (vaa - saa)*MathUtils.DTOR;
 
-        final double theta = sza*MathUtils.DTOR;
         final double arcTheta = Math.acos(-mus*muv+nus*nuv*azimDiff) * MathUtils.RTOD;
 
         final double px = 11.1*Math.exp(-0.087*arcTheta) + 1.1*Math.exp(-0.014*arcTheta);

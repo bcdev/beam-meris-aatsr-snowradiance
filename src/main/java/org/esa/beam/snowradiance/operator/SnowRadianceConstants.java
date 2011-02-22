@@ -8,11 +8,6 @@ package org.esa.beam.snowradiance.operator;
  */
 public class SnowRadianceConstants {
 
-    public static final String LUT_PATH_PARAM_NAME    = "lutpath";
-    public static final String LUT_PATH_PARAM_LABEL = "Path to LUTs for snowradiance algorithms";
-    public static final String LUT_PATH_PARAM_DESCRIPTION = "File path to LookUpTables root directory";
-    public static final String LUT_PATH_PARAM_DEFAULT = "C:/snowradiance/LUT";
-
     public static final String SNOW_TEMPERATURE_BAND_NAME= "snow_temperature";
     public static final double SNOW_TEMPERATURE_BAND_NODATAVALUE = -1.0;
     public static final boolean SNOW_TEMPERATURE_BAND_NODATAVALUE_USED = true;
@@ -23,7 +18,6 @@ public class SnowRadianceConstants {
 
     public static final int NUMBER_ATMOSPHERIC_PROFILES = 4;
     public static final int NUMBER_AATSR_WVL = 2;
-    public static final int NUMBER_RTM = 2;
     public static final int NUMBER_TSFC_LUT = 25;
 
     public static final long[] ATMOSPHERIC_PROFILE_INDICES = {3, 5, 6, 7};
@@ -31,9 +25,6 @@ public class SnowRadianceConstants {
     public static final String[] AATSR_WVL = {"10.8", "12.0"};
 
     public static final float WATER_VAPOUR_STANDARD_VALUE = 2.8f;
-
-     public static final float EMISSIVITY_11_DEFAULT = 0.99f;
-     public static final float EMISSIVITY_12_DEFAULT = 0.98f;
 
     public static final float EMISSIVITY_MIN = 0.95f;
     public static final float EMISSIVITY_MAX = 0.99f;
@@ -56,11 +47,6 @@ public class SnowRadianceConstants {
     public static final double SNOW_ALBEDO_BAND_NODATAVALUE = -1.0;
     public static final boolean SNOW_ALBEDO_BAND_NODATAVALUE_USED = true;
 
-    public static final double REFLECTION_LUT_NODATAVALUE = -1.0;
-    public static final String REFLECTION_LUT_FILENAME = "reflectionLUT.dat";
-    public static final int REFLECTION_LUT_BLOCKS_TO_USE = 1846;
-    public static final int REFLECTION_LUT_TESTBLOCKS_TO_USE = 2;
-
     public static final String copyInputBandsLabel = "Copy input bands";
     public static final String computeSnowGrainSizeLabel = "Compute snow grain size";
     public static final String computeSnowGrainSizePollutionOnlyLabel = "Compute snow grain size / pollution only (no AATSR L1b required)";
@@ -77,20 +63,20 @@ public class SnowRadianceConstants {
     public static final String mdsiMerisLabel = "MDSI (from MERIS)";
     public static final String aatsrL1FlagsLabel = "AATSR L1 flags";
 
-    public static final String applyCloudMaskLabel = "Apply cloud mask";
+    public static final String applyCloudMaskLabel = "Identify cloud pixels";
     public static final String applyCloudMaskMepixLabel = "Cloud probability (MERIS O2 Project)";
     public static final String applyCloudMaskSynergyLabel = "Feature classification (MERIS/AATSR Synergy Project)";
-    public static final String applySnowMaskLabel = "Mask 100% snow";
+    public static final String applySnowMaskLabel = "Identify 100% snow pixels";
 
-    public static final String assumedEmissivity11MicronsLabel = "Assumed emissivity at 11 microns:";
+    public static final String assumedEmissivity11MicronsLabel = "Assumed emissivity at 11 microns [dl]:";
     public static final String snowIceThresholdsLabel = "Thresholds for snow/ice flags:";
 
-    public static final String ndsiLabel = "NDSI";
-    public static final String cloudProbThresholdLabel = "Cloud probability threshold:";
+    public static final String ndsiLabel = "NDSI [dl]";
+    public static final String cloudProbThresholdLabel = "Cloud probability threshold [dl]:";
     public static final String snowBoundariesLabel = "100% snow thresholds:";
 
-    public static final String aatsr1610Label = "AATSR 1610nm";
-    public static final String aatsr0670Label = "AATSR  670nm";
+    public static final String aatsr1610Label = "AATSR 1610nm [%]";
+    public static final String aatsr0670Label = "AATSR  670nm [%]";
     public static final String lowerLabel = "lower:";
     public static final String upperLabel = "upper:";
     public static final String ndsiLowerDefaultValue = "0.75";

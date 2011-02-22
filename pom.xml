@@ -4,8 +4,8 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.esa.beam.snowradiance</groupId>
-    <artifactId>snowradiance</artifactId>
-    <version>1.1-SNAPSHOT</version>
+    <artifactId>beam-meris-aatsr-snowradiance</artifactId>
+    <version>1.1</version>
     <name>BEAM GPF Module 'snowradiance'</name>
     <description></description>
     <packaging>jar</packaging>
@@ -109,17 +109,17 @@
         <dependency>
             <groupId>org.esa.beam</groupId>
             <artifactId>beam-visat</artifactId>
-            <version>4.8</version>
+            <version>4.8.1</version>
         </dependency>
         <dependency>
             <groupId>org.esa.beam</groupId>
             <artifactId>beam-core</artifactId>
-            <version>4.8</version>
+            <version>4.8.2</version>
         </dependency>
         <dependency>
             <groupId>org.esa.beam</groupId>
             <artifactId>beam-gpf</artifactId>
-            <version>4.8.1-SNAPSHOT</version>
+            <version>4.8.2</version>
         </dependency>
         <dependency>
             <groupId>org.esa.beam</groupId>

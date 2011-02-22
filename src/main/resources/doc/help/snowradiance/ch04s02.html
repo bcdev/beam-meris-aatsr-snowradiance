@@ -1,29 +1,55 @@
-<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>4.2. Cloudscreening</title><meta name="generator" content="DocBook XSL Stylesheets V1.73.2"><link rel="start" href="index.html" title="Snow Radiance Processor"><link rel="up" href="ch04.html" title="Chapter 4. Processors"><link rel="prev" href="ch04.html" title="Chapter 4. Processors"><link rel="next" href="ch04s03.html" title="4.3. Aerosol Retrieval and Atmospheric Correction"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="sum.toolbox.cloudscreening"></a>4.2. Cloudscreening</h2></div></div></div><p>
-            The Cloud Screening Processor is the second of three main modules within the MERIS/(A)ATSR Synergy toolbox.
-            Its purpose is to add various bands (i.e cloud flags) to the colocated MERIS/(A)ATSR L1b product
-            obtained from the preprocessor. The output product from the cloud screening shall be used as input for the
-            third module (aerosol retrieval and atmospheric correction).
-        </p><p>
-            The user interface for the Cloud Screening Processor can be accessed by clicking the 'Cloud Screening'
-            tab in the 'MERIS/(A)ATSR Synergy Toolbox' dialog.
-            (<a class="xref" href="ch04s02.html#figure.toolbox.cloudscreening" title="Figure 4.4. Synergy Toolbox: Cloud Screening Tab Pane">Figure 4.4</a>):
-
-            </p><div class="figure"><a name="figure.toolbox.cloudscreening"></a><div class="figure-contents"><div><img src="figures/cloudscreeningtab.png" alt="Synergy Toolbox: Cloud Screening Tab Pane"></div></div><p class="title"><b>Figure 4.4. Synergy Toolbox: Cloud Screening Tab Pane</b></p></div><p><br class="figure-break">
-        </p><p>
-            The Cloud Screening tab pane consists of the following components:
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>4.2. Target Bands</title><meta name="generator" content="DocBook XSL Stylesheets V1.73.2"><link rel="start" href="index.html" title="Snow Radiance Processor"><link rel="up" href="ch04.html" title="Chapter 4. The BEAM Snow Radiance processor"><link rel="prev" href="ch04.html" title="Chapter 4. The BEAM Snow Radiance processor"><link rel="next" href="ch04s03.html" title="4.3. Processing Parameters"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="sum.gui.targetbands"></a>4.2. Target Bands</h2></div></div></div><p>
+            The user interface for the quantities to be computed and written to the target product consists of two
+            lists of check boxes (<a class="xref" href="ch04s02.html#figure.targetbands.default" title="Figure 4.5. Snow Radiance processor: Target Bands Tab Pane">Figure 4.5</a>):
             </p><div class="itemizedlist"><ul type="bullet"><li style="list-style-type: disc">
-                    'Use the AATSR forward view when classifying': If his checkbox is selected, the AATSR forward view
-                    is considered in the cloud classification algorithm (otherwise nadir view only).
+                    Snow properties
                 </li><li style="list-style-type: disc">
-                    'Compute cloud index': If this checkbox is selected, a cloud index is computed and written
-                    as single band 'cloud_index_synergy' to the target product.
+                    Complementary quantities
+                </li></ul></div><p>
+
+            </p><div class="figure"><a name="figure.targetbands.default"></a><div class="figure-contents"><div><img src="figures/targetbandstab.png" alt="Snow Radiance processor: Target Bands Tab Pane"></div></div><p class="title"><b>Figure 4.5. Snow Radiance processor: Target Bands Tab Pane</b></p></div><p><br class="figure-break">
+        </p><p>
+            The snow properties which can be selected are:
+            </p><div class="itemizedlist"><ul type="bullet"><li style="list-style-type: disc">
+                    'Compute snow grain size': If this checkbox is selected, the snow grain size will be computed
+                    and written as single band to the target product.
                 </li><li style="list-style-type: disc">
-                    'Compute snow risk flag': If this checkbox is selected, a snow risk flag is computed
-                    and added to a flag band 'cloud_flags_synergy', which is written to the target product.
+                    'Compute snow albedo': If this checkbox is selected, the snow albedo will be computed
+                    and written as single band to the target product.
                 </li><li style="list-style-type: disc">
-                    'Compute cloud shadow risk flag': If this checkbox is selected, a cloud shadow risk flag is computed
-                    and added to a flag band 'cloud_flags_synergy', which is written to the target product.
+                    'Compute snow soot content': If this checkbox is selected, the snow soot content will be computed
+                    and written as single band to the target product.
+                </li><li style="list-style-type: disc">
+                    'Compute emissivity': If this checkbox is selected, the emissivity will be computed
+                    and written as single band to the target product. This option is enabled only if both MERIS and
+                    AATSR
+                    products were given as inputs.
+                </li><li style="list-style-type: disc">
+                    'Compute temperature': If this checkbox is selected, the snow temperature will be computed
+                    and written as single band to the target product. This option is enabled only if both MERIS and
+                    AATSR
+                    products were given as inputs.
                 </li></ul></div><p>
         </p><p>
-            See [4] for more details on the computation and physical meaning of the quantities listed above.
+            The complementary quantities which can be selected are:
+            </p><div class="itemizedlist"><ul type="bullet"><li style="list-style-type: disc">
+                    'Water vapour (from MERIS)': If this checkbox is selected, the water vapour derived from the
+                    MERIS product will be written as single band to the target product.
+                </li><li style="list-style-type: disc">
+                    'NDVI (from MERIS)': If this checkbox is selected, the NDVI derived from the
+                    MERIS product will be written as single band to the target product.
+                </li><li style="list-style-type: disc">
+                    'NDSI (from AATSR)': If this checkbox is selected, the NDSI derived from the
+                    AATSR product will be written as single band to the target product.
+                    This option is enabled only if both MERIS and AATSR
+                    products were given as inputs.
+                </li><li style="list-style-type: disc">
+                    'MDSI (from MERIS)': If this checkbox is selected, the MDSI derived from the
+                    MERIS product will be written as single band to the target product.
+                </li><li style="list-style-type: disc">
+                    'AATSR L1 flags': If this checkbox is selected, the AATSR L1 flags taken from the
+                    AATSR product will be written as single band to the target product.
+                    This option is enabled only if both MERIS and AATSR
+                    products were given as inputs.
+                </li></ul></div><p>
         </p></div></body></html>

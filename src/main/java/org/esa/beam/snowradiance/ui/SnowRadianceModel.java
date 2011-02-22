@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Model for Snow Radiance parameters
+ *
  * @author Olaf Danne
  * @version $Revision: $ $Date:  $
  */

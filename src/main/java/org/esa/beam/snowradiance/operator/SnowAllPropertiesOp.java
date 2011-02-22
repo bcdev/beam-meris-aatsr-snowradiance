@@ -37,6 +37,8 @@ import java.util.Map;
 import java.util.Random;
 
 /**
+ * Operator for computation of both snow temperature/emissivity and grainsize/pollution
+ *
  * @author Olaf Danne
  * @version $Revision: $ $Date:  $
  */
@@ -180,17 +182,6 @@ public class SnowAllPropertiesOp extends Operator {
     private Product cloudProbabilityProduct;
     private Product cloudScreeningProduct;
 
-    private Band aatsrBt11NadirBand;
-    private Band aatsrBt12NadirBand;
-
-    private Band aatsrReflecNadir0670Band;
-    private Band aatsrReflecNadir0870Band;
-    private Band aatsrReflecNadir1600Band;
-
-    private Band merisRad13Band;
-    private Band merisRad14Band;
-    private Band merisRad15Band;
-
     public static final String WV_BAND_NAME = "water_vapour";
     public static final String NDVI_BAND_NAME = "ndvi";
     public static final String NDSI_BAND_NAME = "ndsi";
@@ -203,10 +194,6 @@ public class SnowAllPropertiesOp extends Operator {
 
     private double[][][] tsfcLut;
     private double[] tLowestLayer = new double[SnowRadianceConstants.NUMBER_ATMOSPHERIC_PROFILES];
-
-    private static float NDSI_THRESH_CLOUD_LOWER = 0.2f;
-    private static float NDSI_THRESH_SNOW_LOWER = 0.6f;
-    private static float NDSI_THRESH_SNOW_UPPER = 0.85f;
 
     private SnowGrainSizePollutionRetrieval snowGrainSizePollutionRetrieval;
     private Band[] merisReflectanceBands;
@@ -548,17 +535,13 @@ public class SnowAllPropertiesOp extends Operator {
                                     if (considerPixelAsSnow) {
                                         targetTile.setSample(x, y, SnowRadianceConstants.F_SNOW, true);
                                         targetTile.setSample(x, y, SnowRadianceConstants.F_ICE, false);
-//                                            targetTile.setSample(x, y, SnowRadianceConstants.F_UNCERTAIN, false);
                                     } else if (considerPixelAsIce) {
-//                                            targetTile.setSample(x, y, SnowRadianceConstants.F_UNCERTAIN, true);
                                         targetTile.setSample(x, y, SnowRadianceConstants.F_SNOW, false);
                                         targetTile.setSample(x, y, SnowRadianceConstants.F_ICE, true);
                                     }
                                 } else if (considerPixelAsSnow || considerPixelAsIce) {
                                     // 3.2.3 Calculation of water vapour
 
-//                                  float waterVapourColumn = SnowTemperatureEmissivityRetrieval.computeWaterVapour(neuralNetWv, zonalWind, meridWind, merisAzimuthDifference,
-//                                                                                              merisViewZenith, merisSunZenith, merisRad14, merisRad15);
                                     float waterVapourColumn = 0.3f; // simplification, might be sufficient (RP, 2010/04/14)
 
                                     // 3.2.4 temperature retrieval

@@ -17,8 +17,6 @@ public class SnowRadianceAction extends AbstractVisatAction {
     @Override
     public void actionPerformed(CommandEvent event) {
 //        JAI.getDefaultInstance().getTileScheduler().setParallelism(1);
-//        final DefaultSingleTargetProductDialog productDialog = new DefaultSingleTargetProductDialog(
-//                "SnowRadiance.temperature", getAppContext(), "Snow Temperature Retrieval", "");
         final SnowRadianceDialog productDialog = new SnowRadianceDialog(
                 OperatorSpi.getOperatorAlias(SnowRadianceMasterOp.class),
                         getAppContext(), "Snow Properties", "snowRadiance");

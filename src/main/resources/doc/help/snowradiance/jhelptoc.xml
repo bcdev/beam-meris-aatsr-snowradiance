@@ -18,14 +18,16 @@
       <tocitem target="sum.installation.addons" text="Additional Requirements"/>
     </tocitem>
     <tocitem target="sum.products" text="Products"/>
-    <tocitem target="sum.toolbox" text="Processors">
-      <tocitem target="sum.toolbox.io" text="I/O Parameters and Preprocessing">
-        <tocitem target="sum.toolbox.io.io" text="I/O Parameters Tab Pane"/>
-        <tocitem target="sum.toolbox.io.control" text="Control Buttons"/>
+    <tocitem target="sum.gui" text="The BEAM Snow Radiance processor">
+      <tocitem target="sum.gui.io" text="I/O Parameters">
+        <tocitem target="sum.gui.io.io" text="I/O Parameters Tab Pane"/>
+        <tocitem target="sum.gui.io.control" text="Control Buttons"/>
       </tocitem>
-      <tocitem target="sum.toolbox.cloudscreening" text="Cloudscreening"/>
-      <tocitem target="sum.toolbox.aerosol" text="Aerosol Retrieval and Atmospheric Correction"/>
-      <tocitem target="sum.toolbox.commandline" text="Processing from command line"/>
+      <tocitem target="sum.gui.targetbands" text="Target Bands"/>
+      <tocitem target="sum.gui.processing" text="Processing Parameters">
+        <tocitem target="sum.gui.io.io" text="Processing Parameters Tab Pane"/>
+      </tocitem>
+      <tocitem target="sum.cli" text="Processing from command line"/>
     </tocitem>
   </tocitem>
 </toc>

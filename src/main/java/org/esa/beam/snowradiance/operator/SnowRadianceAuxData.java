@@ -87,22 +87,13 @@ public class SnowRadianceAuxData {
 
                 try {
                     final URL url = SnowAllPropertiesOp.class.getResource(inputFileString);
-                    final String path = URLDecoder.decode(url.getPath(), "UTF-8");
-                    final File file = new File(path);
-                    final String inputPath = file.getAbsolutePath();
 
-//                    final String netcdfPath = "C:" + File.separator + "temp" + File.separator + inputFileString;
-//                    final String netcdfPath = "C:" + File.separator + "temp" + File.separator + inputFileString;
-                    final String netcdfPath = System.getProperty("java.io.tmpdir") + 
+                    final String netcdfPath = System.getProperty("java.io.tmpdir") +
                             File.separator + inputFileString;
                     InputStream inputStream = SnowAllPropertiesOp.class.getResourceAsStream(inputFileString);
                     SnowRadianceUtils.copyStreamToFile(inputStream, netcdfPath);
 
-//                    final NetcdfFile netcdfFile = NetcdfFile.open(inputPath + File.separator + inputFileString);
-//                    final NetcdfFile netcdfFile = NetcdfFile.open(inputPath);
                     final NetcdfFile netcdfFile = NetcdfFile.open(netcdfPath);
-
-                    List variables = netcdfFile.getVariables();
 
                     // the variables in the netcdf file are defined like this (as obtained from an ncdump):
                     //       float WVA(WVA_dimension_1=21);
@@ -115,10 +106,8 @@ public class SnowRadianceAuxData {
                     final Variable wva = netcdfFile.findVariable("WVA");
                     final Variable emi = netcdfFile.findVariable("EMI");
                     final Variable tem = netcdfFile.findVariable("TEM");
-                    final Variable tsfc = netcdfFile.findVariable("TMP");
                     final Variable vie = netcdfFile.findVariable("VIE");
                     final Variable mt = netcdfFile.findVariable("MT");
-                    final Variable st = netcdfFile.findVariable("ST");
 
                     final float[] wvaArray = getJavaFloat1DFromNetcdfVariable(wva);
                     final float[] emiArray = getJavaFloat1DFromNetcdfVariable(emi);
@@ -168,18 +157,10 @@ public class SnowRadianceAuxData {
                 final String inputFileString = "pr" + sb2 + "_" + SnowRadianceConstants.AATSR_WVL[j] + ".nc";
 
                 try {
-                    final URL url = SnowAllPropertiesOp.class.getResource(inputFileString);
-                    final String path = URLDecoder.decode(url.getPath(), "UTF-8");
-                    final File file = new File(path);
-                    final String inputPath = file.getAbsolutePath();
-
-//                    final NetcdfFile netcdfFile = NetcdfFile.open(inputPath + File.separator + inputFileString);
-//                    final String netcdfPath = "C:" + File.separator + "temp" + File.separator + inputFileString;
                     final String netcdfPath = System.getProperty("java.io.tmpdir") +
                             File.separator + inputFileString;
                     InputStream inputStream = SnowAllPropertiesOp.class.getResourceAsStream(inputFileString);
                     SnowRadianceUtils.copyStreamToFile(inputStream, netcdfPath);
-//                    final NetcdfFile netcdfFile = NetcdfFile.open(inputPath);
                     final NetcdfFile netcdfFile = NetcdfFile.open(netcdfPath);
 
                     final Variable tsfc = netcdfFile.findVariable("TMP");

@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.HashMap;
 
 /**
- * Operator for snow grain size retrieval
+ * Operator for snow grain size and pollutionretrieval
  *
  * @author Olaf Danne
  * @version $Revision: 8313 $ $Date: 2010-02-09 17:57:24 +0100 (Di, 09 Feb 2010) $
@@ -100,10 +100,6 @@ public class SnowGrainSizePollutionOp extends Operator {
 
     private Product cloudProbabilityProduct;
 
-    private Band merisRad13Band;
-    private Band merisRad14Band;
-    private Band merisRad15Band;
-
     public static final String WV_BAND_NAME = "water_vapour";
     public static final String NDVI_BAND_NAME = "ndvi";
     public static final String MDSI_BAND_NAME = "mdsi";
@@ -113,10 +109,6 @@ public class SnowGrainSizePollutionOp extends Operator {
     private static String productName = "SNOWRADIANCE PRODUCT";
     private static String productType = "SNOWRADIANCE PRODUCT";
 
-    private double[][][] tsfcLut;
-    private double[] tLowestLayer = new double[SnowRadianceConstants.NUMBER_ATMOSPHERIC_PROFILES];
-
-//    private SnowGrainSizePollutionRetrieval snowGrainSizePollutionRetrieval;
     private Band[] merisReflectanceBands;
 
 
@@ -167,8 +159,6 @@ public class SnowGrainSizePollutionOp extends Operator {
         for (int i = 0; i < EnvisatConstants.MERIS_L1B_NUM_SPECTRAL_BANDS; i++) {
             merisReflectanceBands[i] = rad2reflProduct.getBand("rho_toa_" + (i + 1));
         }
-
-//        snowGrainSizePollutionRetrieval = new SnowGrainSizePollutionRetrieval();
 
     }
 
@@ -346,8 +336,8 @@ public class SnowGrainSizePollutionOp extends Operator {
 
                             double merisRefl2 = merisRefl2Tile.getSampleDouble(x, y);
                             double merisRefl13 = merisRefl13Tile.getSampleDouble(x, y);
-                            double unpollutedSnowGrainSize = 0.0;
-                            double sootConcentration = 0.0;
+                            double unpollutedSnowGrainSize;
+                            double sootConcentration;
 
                             if (computeSnowGrainSize && targetBand.getName().equals(SnowRadianceConstants.UNPOLLUTED_SNOW_GRAIN_SIZE_BAND_NAME)) {
                                 double pal =

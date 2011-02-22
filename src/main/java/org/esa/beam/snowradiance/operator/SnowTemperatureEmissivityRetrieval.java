@@ -1,30 +1,14 @@
 package org.esa.beam.snowradiance.operator;
 
-import com.bc.jnn.JnnException;
 import com.bc.jnn.JnnNet;
 import org.esa.beam.snowradiance.util.SnowRadianceUtils;
-import org.esa.beam.util.math.FracIndex;
 import org.esa.beam.util.math.LookupTable;
-
-import java.io.IOException;
 
 /**
  * @author Olaf Danne
  * @version $Revision: 8267 $ $Date: 2010-02-05 16:39:24 +0100 (Fr, 05 Feb 2010) $
  */
 public class SnowTemperatureEmissivityRetrieval {
-
-//    private JnnNet neuralNetWv;
-
-    /**
-     * This method loads required SnowRadiance Auxdata
-     *
-     * @throws java.io.IOException
-     * @throws com.bc.jnn.JnnException
-     */
-    protected void loadSnowRadianceAuxData() throws IOException, JnnException {
-//        neuralNetWv = SnowRadianceAuxData.getInstance().loadNeuralNet(SnowRadianceAuxData.NEURAL_NET_WV_OCEAN_MERIS_FILE_NAME);
-    }
 
     public static float getRtmSingle(float waterVapourColumn, float emissivity, float tSfc, float viewZenith,
                                      LookupTable lut) {
@@ -122,7 +106,7 @@ public class SnowTemperatureEmissivityRetrieval {
                                                                                     rtmLookupTables, tLowestLayer);
             float btToa12Lower = SnowTemperatureEmissivityRetrieval.getToaBTFromRtm(waterVapourColumn, emisLower, tSfc, viewZenith, 1,
                                                                                     rtmLookupTables, tLowestLayer);
-            float derivative = (float) ((btToa12Upper - btToa12Lower) / (emisUpper - emisLower));
+            float derivative = (btToa12Upper - btToa12Lower) / (emisUpper - emisLower);
             if (derivative < 0.0) {
                 derivative = (float) Math.min(derivative, -eps);
             } else {
@@ -146,6 +130,7 @@ public class SnowTemperatureEmissivityRetrieval {
      * This method computes the water vapour column to correct for transmission in 3.7um (and 1.6um) channel..
      * Computation by FUB neural net (IDL breadboard step 1.b.1)
      *
+     * @param neuralNetWv            - water vapour neural net
      * @param zonalWind              - zonalWind
      * @param meridionalWind         - meridionalWind
      * @param merisAzimuthDifference - MERIS azimuth difference

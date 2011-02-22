@@ -6,7 +6,6 @@ import org.esa.beam.framework.gpf.OperatorSpi;
 import org.esa.beam.framework.gpf.ui.SingleTargetProductDialog;
 import org.esa.beam.framework.ui.AppContext;
 import org.esa.beam.snowradiance.operator.SnowRadianceMasterOp;
-import org.esa.beam.snowradiance.util.SnowRadianceUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,19 +21,11 @@ public class SnowRadianceDialog extends SingleTargetProductDialog {
 
     private String targetProductNameSuffix;
 
-    private Map<String, Object> parameterMap;
-
-    public static SingleTargetProductDialog createDefaultDialog(String operatorName, AppContext appContext) {
-        return new SnowRadianceDialog(operatorName, appContext, operatorName, null);
-    }
-
     public SnowRadianceDialog(String operatorName, AppContext appContext, String title, String helpID)  {
         super(appContext, TITLE, helpID);
         targetProductNameSuffix = "";
 
         System.setProperty("snowradianceMode", "GUI");
-
-        parameterMap = new HashMap<String, Object>(17);
 
         final OperatorSpi operatorSpi = GPF.getDefaultInstance().getOperatorSpiRegistry().getOperatorSpi(operatorName);
         if (operatorSpi == null) {
