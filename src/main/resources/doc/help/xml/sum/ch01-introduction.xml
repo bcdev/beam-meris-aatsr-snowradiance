@@ -139,11 +139,12 @@
 				</listitem>
                 <listitem>
 					[2] : Kokhanovsky, A.: Retrieval algorithm of snow/ice properties. STSE SnowRadiance, SIP-ATBD,
-                    IUP, October 2009.
+                    IUP, October 2009. Download from: http://github.com/downloads/bcdev/beam-meris-aatsr-snowradiance/ATBD_D13.pdf.
 				</listitem>
                 <listitem>
 					[3] Preusker, R., and J. Fischer: Estimation of snow temperature and emissivity using AATSR
                     measurements at 11um and 12um. STSE SnowRadiance, Snow Temperature ATBD, FUB, January 2010.
+                    Download from: http://github.com/downloads/bcdev/beam-meris-aatsr-snowradiance/ATBD_D10.pdf.
 				</listitem>
                 <listitem>
                     [4] Krämer, U. and C. Brockmann: Using O2 Products for the
