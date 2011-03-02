@@ -234,7 +234,8 @@ public class SnowRadianceForm extends JTabbedPane {
         panel.add(new JLabel(" "));
         panel.add(computeSnowGrainSizeCheckBox);
         panel.add(computeSnowAlbedoCheckBox);
-        panel.add(computeSnowSootContentCheckBox);
+        // deactivate following option, do not compute soot because results seem to be poor (OKr, 28/02/2011)
+//        panel.add(computeSnowSootContentCheckBox);
         panel.add(computeEmissivityFubCheckBox);
         panel.add(computeSnowTemperatureFubCheckBox);
 

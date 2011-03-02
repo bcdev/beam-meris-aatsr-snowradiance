@@ -159,6 +159,11 @@
                     Atmospheric Correction.
                     ESRIN Contract No. 21090/07/I-LG, March 2010.
 				</listitem>
+                <listitem>
+					[2] : Kokhanovsky, A.: Retrieval algorithm of snow/ice properties: Validation document.
+                    STSE SnowRadiance, Validation Report, IUP, October 2010.
+                    Download from: http://github.com/downloads/bcdev/beam-meris-aatsr-snowradiance/ATBD_D13.pdf.
+				</listitem>
 			</itemizedlist>
 		</para>
     </sect1>

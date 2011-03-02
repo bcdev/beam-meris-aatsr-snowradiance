@@ -49,7 +49,7 @@ public class SnowRadianceModel {
                label = "Compute snow albedo")
     private boolean computeSnowAlbedo = true;
 
-    @Parameter(defaultValue = "true",
+    @Parameter(defaultValue = "false",
                description = "Compute snow soot content",
                label = "Compute snow soot content")
     private boolean computeSnowSootContent = true;

@@ -61,7 +61,7 @@ public class SnowGrainSizePollutionOp extends Operator {
                label = "Compute snow albedo")
     private boolean computeSnowAlbedo;
 
-    @Parameter(defaultValue = "true",
+    @Parameter(defaultValue = "false",
                description = "Compute snow soot content",
                label = "Compute snow soot content")
     private boolean computeSnowSootContent;
