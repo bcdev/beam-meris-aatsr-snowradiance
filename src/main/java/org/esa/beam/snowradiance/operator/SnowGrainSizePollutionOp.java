@@ -332,6 +332,9 @@ public class SnowGrainSizePollutionOp extends Operator {
                             double vza = vzMerisTile.getSampleDouble(x, y);
                             double reflFunction;
 
+                            if (x == 800 && y == 151) {
+                                System.out.println();
+                            }
                             reflFunction = SnowGrainSizePollutionRetrieval.computeReflLutApprox(saa, sza, vaa, vza);
 
                             double merisRefl2 = merisRefl2Tile.getSampleDouble(x, y);

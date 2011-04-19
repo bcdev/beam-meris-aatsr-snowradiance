@@ -1,7 +1,7 @@
 <module>
     <manifestVersion>1.0.0</manifestVersion>
     <symbolicName>beam-meris-aatsr-snowradiance</symbolicName>
-    <version>1.1</version>
+    <version>1.1.1</version>
     <name>MERIS/(A)ATSR Snow Properties</name>
     <description><![CDATA[
             <p>The purpose of the MERIS/(A)ATSR Snow Properties processor is to compute quantities such as snow

@@ -169,6 +169,7 @@ public class SnowRadianceMasterOp extends Operator {
 
     public void initialize() throws OperatorException {
 
+        JAI.getDefaultInstance().getTileScheduler().setParallelism(1); // for debugging purpose
         SnowRadianceUtils.validateMerisProduct(merisSourceProduct);
 
         Product colocatedProduct = null;

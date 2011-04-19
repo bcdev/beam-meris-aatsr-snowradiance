@@ -141,11 +141,8 @@ public class SnowGrainSizePollutionRetrieval {
         final double c = 5.157;
         final double mus = Math.cos(sza*MathUtils.DTOR);
         final double muv = Math.cos(vza*MathUtils.DTOR);
-        final double nus = Math.sin(sza*MathUtils.DTOR);
-        final double nuv = Math.sin(vza*MathUtils.DTOR);
-        final double azimDiff = (vaa - saa)*MathUtils.DTOR;
 
-        final double arcTheta = Math.acos(-mus*muv+nus*nuv*azimDiff) * MathUtils.RTOD;
+        final double arcTheta = computeArcTheta(saa, sza, vaa, vza);
 
         final double px = 11.1*Math.exp(-0.087*arcTheta) + 1.1*Math.exp(-0.014*arcTheta);
 
@@ -153,5 +150,19 @@ public class SnowGrainSizePollutionRetrieval {
 
         return reflLutApprox;
     }
+
+    public static double computeArcTheta(double saa, double sza, double vaa, double vza) {
+        final double mus = Math.cos(sza*MathUtils.DTOR);
+        final double muv = Math.cos(vza*MathUtils.DTOR);
+        final double nus = Math.sin(sza*MathUtils.DTOR);
+        final double nuv = Math.sin(vza*MathUtils.DTOR);
+        final double azimDiff = (vaa - saa)*MathUtils.DTOR;
+        final double cosAzimDiff = Math.cos(azimDiff);
+        final double delta = -mus * muv + nus * nuv * cosAzimDiff;
+        final double arcTheta = Math.acos(delta) * MathUtils.RTOD;
+
+        return arcTheta;
+    }
+
 
 }
