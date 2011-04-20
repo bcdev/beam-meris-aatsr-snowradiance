@@ -19,7 +19,8 @@ public class SnowTemperatureEmissivityRetrieval {
         return btToa;
     }
 
-    public static float getToaBTFromRtm(float waterVapourColumn, float emissivity, float tSfc, float viewZenith, int iwvl,
+    public static float getToaBTFromRtm(float waterVapourColumn, float emissivity, float tSfc, float viewZenith,
+                                        int iwvl,
                                         LookupTable[][] rtmLookupTables, double[] tLowestLayer) {
 
         final int tsfcUpperIndex = SnowRadianceUtils.getNearestHigherValueIndexInDoubleArray(tSfc, tLowestLayer);
@@ -42,12 +43,17 @@ public class SnowTemperatureEmissivityRetrieval {
         return rtm;
     }
 
-    public static float minimizeNewtonForTemperature(double assumedEmissivityAt11Microns, float waterVapourColumn, float viewZenith, float aatsrBt11,
+    public static float minimizeNewtonForTemperature(double assumedEmissivityAt11Microns, float waterVapourColumn,
+                                                     float viewZenith, float aatsrBt11,
                                                      LookupTable[][] rtmLookupTables, double[] tLowestLayer) {
         final float emissivity = (float) assumedEmissivityAt11Microns;
         float tSfcStart = aatsrBt11 + 0.5f;
-        if (tSfcStart < SnowRadianceConstants.TSFC_MIN) tSfcStart = SnowRadianceConstants.TSFC_MIN;
-        if (tSfcStart > SnowRadianceConstants.TSFC_MAX) tSfcStart = SnowRadianceConstants.TSFC_MAX;
+        if (tSfcStart < SnowRadianceConstants.TSFC_MIN) {
+            tSfcStart = SnowRadianceConstants.TSFC_MIN;
+        }
+        if (tSfcStart > SnowRadianceConstants.TSFC_MAX) {
+            tSfcStart = SnowRadianceConstants.TSFC_MAX;
+        }
         final float deltaTsfc = 0.1f;  // as in breadboard: inv_aatsr.pro, l.48
         final float thresh = 0.1f;  // as in breadboard: inv_aatsr.pro, l.2
         final double eps = 0.001;
@@ -56,16 +62,17 @@ public class SnowTemperatureEmissivityRetrieval {
         final int itermax = 5;
         int iter = 0;
         float btToa11 = 100.0f;
-        while (Math.abs(btToa11 - aatsrBt11) > thresh && aatsrBt11 != SnowRadianceConstants.SNOW_TEMPERATURE_BAND_NODATAVALUE
-                && iter < itermax) {
+        while (Math.abs(
+                btToa11 - aatsrBt11) > thresh && aatsrBt11 != SnowRadianceConstants.SNOW_TEMPERATURE_BAND_NODATAVALUE
+               && iter < itermax) {
             btToa11 = getToaBTFromRtm(waterVapourColumn, emissivity, tsfc, viewZenith, 0,
-                                                                         rtmLookupTables, tLowestLayer);
+                                      rtmLookupTables, tLowestLayer);
             final float tSfcUpper = Math.min(tsfc + deltaTsfc, SnowRadianceConstants.TSFC_MAX);
             final float tSfcLower = Math.max(tsfc - deltaTsfc, SnowRadianceConstants.TSFC_MIN);
             final float btToa11Upper = getToaBTFromRtm(waterVapourColumn, emissivity, tSfcUpper, viewZenith, 0,
-                                                                                    rtmLookupTables, tLowestLayer);
+                                                       rtmLookupTables, tLowestLayer);
             final float btToa11Lower = getToaBTFromRtm(waterVapourColumn, emissivity, tSfcLower, viewZenith, 0,
-                                                                                    rtmLookupTables, tLowestLayer);
+                                                       rtmLookupTables, tLowestLayer);
             float derivative = ((btToa11Upper - btToa11Lower) / (tSfcUpper - tSfcLower));
             if (derivative < 0.0) {
                 derivative = (float) Math.min(derivative, -eps);
@@ -74,8 +81,12 @@ public class SnowTemperatureEmissivityRetrieval {
             }
 
             tsfc -= (btToa11 - aatsrBt11) / derivative;
-            if (tsfc < SnowRadianceConstants.TSFC_MIN) tsfc = SnowRadianceConstants.TSFC_MIN;
-            if (tsfc > SnowRadianceConstants.TSFC_MAX) tsfc = SnowRadianceConstants.TSFC_MAX;
+            if (tsfc < SnowRadianceConstants.TSFC_MIN) {
+                tsfc = SnowRadianceConstants.TSFC_MIN;
+            }
+            if (tsfc > SnowRadianceConstants.TSFC_MAX) {
+                tsfc = SnowRadianceConstants.TSFC_MAX;
+            }
             iter++;
         }
 
@@ -85,7 +96,8 @@ public class SnowTemperatureEmissivityRetrieval {
         return tsfc;
     }
 
-    public static float minimizeNewtonForEmissivity(float waterVapourColumn, float viewZenith, float tSfc, float aatsrBt12,
+    public static float minimizeNewtonForEmissivity(float waterVapourColumn, float viewZenith, float tSfc,
+                                                    float aatsrBt12,
                                                     LookupTable[][] rtmLookupTables, double[] tLowestLayer) {
         final float emissivityStart = 0.96f; // as in breadboard: inv_aatsr.pro, l.114
         final float deltaEmi = 0.01f;  // as in breadboard: inv_aatsr.pro, l.11
@@ -96,15 +108,19 @@ public class SnowTemperatureEmissivityRetrieval {
         final int itermax = 5;
         int iter = 0;
         float btToa12 = 100.0f;
-        while (Math.abs(btToa12 - aatsrBt12) > thresh && aatsrBt12 != SnowRadianceConstants.SNOW_TEMPERATURE_BAND_NODATAVALUE
-                && iter < itermax) {
-            btToa12 = SnowTemperatureEmissivityRetrieval.getToaBTFromRtm(waterVapourColumn, emissivity, tSfc, viewZenith, 1,
+        while (Math.abs(
+                btToa12 - aatsrBt12) > thresh && aatsrBt12 != SnowRadianceConstants.SNOW_TEMPERATURE_BAND_NODATAVALUE
+               && iter < itermax) {
+            btToa12 = SnowTemperatureEmissivityRetrieval.getToaBTFromRtm(waterVapourColumn, emissivity, tSfc,
+                                                                         viewZenith, 1,
                                                                          rtmLookupTables, tLowestLayer);
             final float emisUpper = Math.min(emissivity + deltaEmi, SnowRadianceConstants.EMISSIVITY_MAX);
             final float emisLower = Math.max(emissivity - deltaEmi, SnowRadianceConstants.EMISSIVITY_MIN);
-            float btToa12Upper = SnowTemperatureEmissivityRetrieval.getToaBTFromRtm(waterVapourColumn, emisUpper, tSfc, viewZenith, 1,
+            float btToa12Upper = SnowTemperatureEmissivityRetrieval.getToaBTFromRtm(waterVapourColumn, emisUpper, tSfc,
+                                                                                    viewZenith, 1,
                                                                                     rtmLookupTables, tLowestLayer);
-            float btToa12Lower = SnowTemperatureEmissivityRetrieval.getToaBTFromRtm(waterVapourColumn, emisLower, tSfc, viewZenith, 1,
+            float btToa12Lower = SnowTemperatureEmissivityRetrieval.getToaBTFromRtm(waterVapourColumn, emisLower, tSfc,
+                                                                                    viewZenith, 1,
                                                                                     rtmLookupTables, tLowestLayer);
             float derivative = (btToa12Upper - btToa12Lower) / (emisUpper - emisLower);
             if (derivative < 0.0) {
@@ -114,8 +130,12 @@ public class SnowTemperatureEmissivityRetrieval {
             }
 
             emissivity -= (btToa12 - aatsrBt12) / derivative;
-            if (emissivity < SnowRadianceConstants.EMISSIVITY_MIN) emissivity = SnowRadianceConstants.EMISSIVITY_MIN;
-            if (emissivity > SnowRadianceConstants.EMISSIVITY_MAX) emissivity = SnowRadianceConstants.EMISSIVITY_MAX;
+            if (emissivity < SnowRadianceConstants.EMISSIVITY_MIN) {
+                emissivity = SnowRadianceConstants.EMISSIVITY_MIN;
+            }
+            if (emissivity > SnowRadianceConstants.EMISSIVITY_MAX) {
+                emissivity = SnowRadianceConstants.EMISSIVITY_MAX;
+            }
             iter++;
         }
 
@@ -138,12 +158,13 @@ public class SnowTemperatureEmissivityRetrieval {
      * @param merisSunZenith         - MERIS sun zenith angle (degree)
      * @param merisRadiance14        - MERIS radiance band14 angle (degree)
      * @param merisRadiance15        - MERIS radiance band15 angle (degree)
+     *
      * @return float
      */
     public static float computeWaterVapour(JnnNet neuralNetWv, float zonalWind, float meridionalWind,
-                                    float merisAzimuthDifference,
-                                    float merisViewZenith, float merisSunZenith,
-                                    float merisRadiance14, float merisRadiance15) {
+                                           float merisAzimuthDifference,
+                                           float merisViewZenith, float merisSunZenith,
+                                           float merisRadiance14, float merisRadiance15) {
 
         float waterVapour = SnowRadianceConstants.WATER_VAPOUR_STANDARD_VALUE;   // standard value
 
@@ -155,23 +176,30 @@ public class SnowTemperatureEmissivityRetrieval {
         // apply FUB NN...
         nnIn[0] = windSpeed;
         nnIn[1] = Math.cos(Math.toRadians(merisAzimuthDifference)) *
-                Math.sin(Math.toRadians(merisViewZenith));  // angles in degree!
+                  Math.sin(Math.toRadians(merisViewZenith));  // angles in degree!
         nnIn[2] = Math.cos(Math.toRadians(merisViewZenith));  // angle in degree!
         nnIn[3] = Math.cos(Math.toRadians(merisSunZenith));  // angle in degree!
         nnIn[4] = Math.log(Math.max(merisRadiance15, 1.0E-4) / Math.max(merisRadiance14, 1.0E-4));
 
-        final float[][] nnLimits = new float[][]{{3.75e-02f, 1.84e+01f},
+        final float[][] nnLimits = new float[][]{
+                {3.75e-02f, 1.84e+01f},
                 {-6.33e-01f, 6.31e-01f},
                 {7.73e-01f, 1.00e+00f},
                 {1.60e-01f, 9.26e-01f},
-                {-6.98e-01f, 7.62e+00f}};
+                {-6.98e-01f, 7.62e+00f}
+        };
 
+        boolean applyNetWv = true;
         for (int i = 0; i < nnIn.length; i++) {
-            if (nnIn[i] >= nnLimits[i][0] && nnIn[i] >= nnLimits[i][1]) {
-                // otherwise do not apply NN, keep WV to standard value
-                neuralNetWv.process(nnIn, nnOut);
-                waterVapour = (float) nnOut[0];
+            if (nnIn[i] < nnLimits[i][0] || nnIn[i] > nnLimits[i][1]) {
+                // if any input is out of NN range, do not apply NN, keep WV to standard value
+                applyNetWv = false;
+                break;
             }
+        }
+        if (applyNetWv) {
+            neuralNetWv.process(nnIn, nnOut);
+            waterVapour = (float) nnOut[0];
         }
 
         return waterVapour;
@@ -182,6 +210,7 @@ public class SnowTemperatureEmissivityRetrieval {
      *
      * @param viewAzimuth - view azimuth angle (degree)
      * @param sunAzimuth  - sun azimuth angle (degree)
+     *
      * @return float
      */
     protected static float removeAzimuthDifferenceAmbiguity(float viewAzimuth, float sunAzimuth) {
