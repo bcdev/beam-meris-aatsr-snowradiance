@@ -5,32 +5,28 @@ import com.bc.jnn.JnnException;
 import com.bc.jnn.JnnNet;
 import org.esa.beam.dataio.envisat.EnvisatConstants;
 import org.esa.beam.framework.datamodel.Band;
+import org.esa.beam.framework.datamodel.FlagCoding;
 import org.esa.beam.framework.datamodel.Product;
 import org.esa.beam.framework.datamodel.ProductData;
-import org.esa.beam.framework.datamodel.FlagCoding;
-import org.esa.beam.framework.datamodel.MetadataAttribute;
-import org.esa.beam.framework.datamodel.BitmaskDef;
+import org.esa.beam.framework.gpf.GPF;
 import org.esa.beam.framework.gpf.Operator;
 import org.esa.beam.framework.gpf.OperatorException;
 import org.esa.beam.framework.gpf.OperatorSpi;
 import org.esa.beam.framework.gpf.Tile;
-import org.esa.beam.framework.gpf.GPF;
 import org.esa.beam.framework.gpf.annotations.OperatorMetadata;
 import org.esa.beam.framework.gpf.annotations.Parameter;
 import org.esa.beam.framework.gpf.annotations.SourceProduct;
 import org.esa.beam.framework.gpf.annotations.TargetProduct;
-import org.esa.beam.snowradiance.util.SnowRadianceUtils;
-import org.esa.beam.util.ProductUtils;
 import org.esa.beam.meris.brr.Rad2ReflOp;
 import org.esa.beam.meris.cloud.CloudProbabilityOp;
-import org.esa.beam.util.math.LookupTable;
+import org.esa.beam.snowradiance.util.SnowRadianceUtils;
+import org.esa.beam.util.ProductUtils;
 
 import java.awt.Dimension;
 import java.awt.Rectangle;
-import java.awt.Color;
 import java.io.IOException;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Operator for snow grain size and pollutionretrieval
@@ -40,6 +36,14 @@ import java.util.HashMap;
  */
 @OperatorMetadata(alias = "SnowRadiance.snowgrains")
 public class SnowGrainSizePollutionOp extends Operator {
+
+    public static final String WV_BAND_NAME = "water_vapour";
+    public static final String NDVI_BAND_NAME = "ndvi";
+    public static final String MDSI_BAND_NAME = "mdsi";
+
+    private static final String PRODUCT_NAME = "SNOWRADIANCE PRODUCT";
+    private static final String PRODUCT_TYPE = "SNOWRADIANCE PRODUCT";
+
     @SourceProduct(alias = "source",
                    label = "Name (MERIS product)",
                    description = "Select a MERIS product.")
@@ -97,18 +101,7 @@ public class SnowGrainSizePollutionOp extends Operator {
     @TargetProduct(description = "The target product.")
     private Product targetProduct;
 
-
     private Product cloudProbabilityProduct;
-
-    public static final String WV_BAND_NAME = "water_vapour";
-    public static final String NDVI_BAND_NAME = "ndvi";
-    public static final String MDSI_BAND_NAME = "mdsi";
-
-    private LookupTable[][] rtmLookupTables;
-
-    private static String productName = "SNOWRADIANCE PRODUCT";
-    private static String productType = "SNOWRADIANCE PRODUCT";
-
     private Band[] merisReflectanceBands;
 
 
@@ -163,8 +156,8 @@ public class SnowGrainSizePollutionOp extends Operator {
     }
 
     private void createTargetProduct() {
-        targetProduct = new Product(productName,
-                                    productType,
+        targetProduct = new Product(PRODUCT_NAME,
+                                    PRODUCT_TYPE,
                                     merisProduct.getSceneRasterWidth(),
                                     merisProduct.getSceneRasterHeight());
 
@@ -277,19 +270,19 @@ public class SnowGrainSizePollutionOp extends Operator {
 
         Rectangle rectangle = targetTile.getRectangle();
 
-        Tile zonalWindTile = getSourceTile(merisProduct.getTiePointGrid("zonal_wind"), rectangle, pm);
-        Tile meridWindTile = getSourceTile(merisProduct.getTiePointGrid("merid_wind"), rectangle, pm);
-        Tile saMerisTile = getSourceTile(merisProduct.getTiePointGrid("sun_azimuth"), rectangle, pm);
-        Tile szMerisTile = getSourceTile(merisProduct.getTiePointGrid("sun_zenith"), rectangle, pm);
-        Tile vaMerisTile = getSourceTile(merisProduct.getTiePointGrid("view_azimuth"), rectangle, pm);
-        Tile vzMerisTile = getSourceTile(merisProduct.getTiePointGrid("view_zenith"), rectangle, pm);
+        Tile zonalWindTile = getSourceTile(merisProduct.getTiePointGrid("zonal_wind"), rectangle);
+        Tile meridWindTile = getSourceTile(merisProduct.getTiePointGrid("merid_wind"), rectangle);
+        Tile saMerisTile = getSourceTile(merisProduct.getTiePointGrid("sun_azimuth"), rectangle);
+        Tile szMerisTile = getSourceTile(merisProduct.getTiePointGrid("sun_zenith"), rectangle);
+        Tile vaMerisTile = getSourceTile(merisProduct.getTiePointGrid("view_azimuth"), rectangle);
+        Tile vzMerisTile = getSourceTile(merisProduct.getTiePointGrid("view_zenith"), rectangle);
 
-        Tile merisRad14Tile = getSourceTile(merisProduct.getBand("radiance_14"), rectangle, pm);
-        Tile merisRad15Tile = getSourceTile(merisProduct.getBand("radiance_15"), rectangle, pm);
+        Tile merisRad14Tile = getSourceTile(merisProduct.getBand("radiance_14"), rectangle);
+        Tile merisRad15Tile = getSourceTile(merisProduct.getBand("radiance_15"), rectangle);
 
         Tile[] merisSpectralBandTiles = new Tile[EnvisatConstants.MERIS_L1B_NUM_SPECTRAL_BANDS];
         for (int i = 0; i < EnvisatConstants.MERIS_L1B_NUM_SPECTRAL_BANDS; i++) {
-            merisSpectralBandTiles[i] = getSourceTile(merisReflectanceBands[i], rectangle, pm);
+            merisSpectralBandTiles[i] = getSourceTile(merisReflectanceBands[i], rectangle);
         }
 
         Tile merisRefl2Tile = merisSpectralBandTiles[1];
@@ -297,11 +290,11 @@ public class SnowGrainSizePollutionOp extends Operator {
         Tile merisRefl13Tile = merisSpectralBandTiles[12];
         Tile merisRefl14Tile = merisSpectralBandTiles[13];
 
-        Tile merisL1FlagsTile = getSourceTile(merisProduct.getBand(("l1_flags")), rectangle, pm);
+        Tile merisL1FlagsTile = getSourceTile(merisProduct.getBand(("l1_flags")), rectangle);
 
         Tile cloudProbTile = null;
         if (applyCloudMask) {
-            cloudProbTile = getSourceTile(cloudProbabilityProduct.getBand(CloudProbabilityOp.CLOUD_PROP_BAND), rectangle, pm);
+            cloudProbTile = getSourceTile(cloudProbabilityProduct.getBand(CloudProbabilityOp.CLOUD_PROP_BAND), rectangle);
         }
 
         int x0 = rectangle.x;
@@ -340,7 +333,6 @@ public class SnowGrainSizePollutionOp extends Operator {
                             double merisRefl2 = merisRefl2Tile.getSampleDouble(x, y);
                             double merisRefl13 = merisRefl13Tile.getSampleDouble(x, y);
                             double unpollutedSnowGrainSize;
-                            double sootConcentration;
 
                             if (computeSnowGrainSize && targetBand.getName().equals(SnowRadianceConstants.UNPOLLUTED_SNOW_GRAIN_SIZE_BAND_NAME)) {
                                 double pal =
@@ -365,9 +357,8 @@ public class SnowGrainSizePollutionOp extends Operator {
                                     unpollutedSnowGrainSize =
                                             SnowGrainSizePollutionRetrieval.getUnpollutedSnowGrainSize(pal);
                                     if (!SnowRadianceUtils.snowGrainSizePollutionAlgoFailed(unpollutedSnowGrainSize)) {
-                                        sootConcentration =
-                                                SnowGrainSizePollutionRetrieval.getSootConcentrationInPollutedSnow(merisRefl13, reflFunction, sza, vza,
-                                                                                                                   unpollutedSnowGrainSize);
+                                        double sootConcentration = SnowGrainSizePollutionRetrieval.getSootConcentrationInPollutedSnow(
+                                                merisRefl13, reflFunction, sza, vza, unpollutedSnowGrainSize);
                                         if (SnowRadianceUtils.snowGrainSizePollutionAlgoFailed(sootConcentration)) {
                                             targetTile.setSample(x, y, SnowRadianceConstants.SOOT_CONCENTRATION_BAND_NODATAVALUE);
                                         } else {

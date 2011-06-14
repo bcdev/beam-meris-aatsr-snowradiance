@@ -172,7 +172,6 @@ public class SnowRadianceMasterOp extends Operator {
         JAI.getDefaultInstance().getTileScheduler().setParallelism(1); // for debugging purpose
         SnowRadianceUtils.validateMerisProduct(merisSourceProduct);
 
-        Product colocatedProduct = null;
         Product snowPropertiesProduct = null;
         if (computeSnowTemperatureFub || computeEmissivityFub ||
                 computeSnowGrainSize || computeSnowSootContent || computeSnowAlbedo) {
@@ -197,20 +196,22 @@ public class SnowRadianceMasterOp extends Operator {
 
                 Map<String, Product> collocateInput = new HashMap<String, Product>(2);
                 Map<String, Object> collocateParams = new HashMap<String, Object>(2);
+                Product colocatedProduct;
                 if (getCloudMaskFromSynergy) {
                     // get the colocated product from Synergy...
                     JAI.getDefaultInstance().getTileScheduler().setParallelism(1);
                     collocateInput.put("MERIS", merisSourceProduct);
                     collocateInput.put("AATSR", aatsrSourceProduct);
                     collocateParams.put("subsetOvAreas", false);
-                    colocatedProduct = GPF.createProduct(OperatorSpi.getOperatorAlias(CreateSynergyOp.class), collocateParams, collocateInput);
+                    colocatedProduct = GPF.createProduct(OperatorSpi.getOperatorAlias(CreateSynergyOp.class),
+                                                         collocateParams, collocateInput);
                 } else {
                     collocateInput.put("masterProduct", merisSourceProduct);
                     collocateInput.put("slaveProduct", aatsrSourceProduct);
                     collocateParams.put("masterComponentPattern", "${ORIGINAL_NAME}_MERIS");
                     collocateParams.put("slaveComponentPattern", "${ORIGINAL_NAME}_AATSR");
-                    colocatedProduct =
-                            GPF.createProduct(OperatorSpi.getOperatorAlias(CollocateOp.class), collocateParams, collocateInput);
+                    colocatedProduct = GPF.createProduct(OperatorSpi.getOperatorAlias(CollocateOp.class),
+                                                         collocateParams, collocateInput);
                 }
                 colocatedProduct.setProductType(merisSourceProduct.getProductType());
 
